@@ -19,4 +19,5 @@ int main() {
 	}
 	ans = st.size()+1;
 	cout << ans << endl;
-}			
+}
+

@@ -3,18 +3,18 @@ using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
 #define all(a) (a).begin(),(a).end()
 
-typedef long long ll;
 typedef vector<int> vi;
-typedef set<int> seti;
-typedef vector<string> vs;
-
-const int MOD = 1e9 + 7;
-const int inf = 1e8;
 
 int main() {
-	int ans;
-	int N,;
+	int N,Lsum = 0,Lmax = 0;
 	cin >> N;
-	
+	vi L(N);
+	rep(i,N){
+		cin>>L[i];
+		Lmax = max(Lmax,L[i]);
+		Lsum+=L[i];
+	}
+	string ans = "No";
+	if(Lsum-Lmax > Lmax)ans = "Yes";
 	cout << ans << endl;
 }

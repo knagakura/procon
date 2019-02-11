@@ -11,3 +11,4 @@ ans ="YES"
 if l.count(3) > 0:
 	ans = "NO"
 print(ans)
+ 

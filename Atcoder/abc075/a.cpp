@@ -12,9 +12,11 @@ const int MOD = 1e9 + 7;
 const int inf = 1e8;
 
 int main() {
-	int ans;
-	int N,;
-	cin >> N;
-	
-	cout << ans << endl;
+	int A,B,C;
+	cin>>A>>B>>C;
+	int ans=A;
+	if(A==B)ans = C;
+	else if (B==C)ans = A;
+	else if (C==A) ans=B;
+	cout<<ans<<endl;
 }

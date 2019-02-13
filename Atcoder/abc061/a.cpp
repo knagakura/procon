@@ -9,13 +9,14 @@ typedef vector<int> vi;
 typedef set<int> seti;
 typedef vector<string> vs;
 
-const int MOD = 1e9 + 7;
-const int inf = 1e8;
+const int MOD = 1e9+7;
+const int inf = 1e9;
 
 int main() {
-	int N;
-	cin>>N;
-	int ans;
-	ans = 800*N-200*(N/15);
+	int A,B,C;
+	cin>>A>>B>>C;
+	string ans="No";
+	if(C>=A&&C<=B)ans="Yes";
+	
 	cout<<ans<<endl;
 }

@@ -4,8 +4,11 @@ using namespace std;
 int main() {
 	int A,B;
 	cin>>A>>B;
-	int ans;
-	ans = B+A;
-	if(B+A>24)ans-=24;
+	int ans=A+B;
+	if(A+B>=10){
+		cout<<"error"<<endl;
+		return 0;
+	}
 	cout<<ans<<endl;
+	return 0;
 }

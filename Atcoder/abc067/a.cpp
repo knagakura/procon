@@ -4,8 +4,7 @@ using namespace std;
 int main() {
 	int A,B;
 	cin>>A>>B;
-	int ans;
-	ans = B+A;
-	if(B+A>24)ans-=24;
+	string ans="Impossible";
+	if(A%3==0|B%3==0|(A+B)%3==0)ans="Possible";
 	cout<<ans<<endl;
 }

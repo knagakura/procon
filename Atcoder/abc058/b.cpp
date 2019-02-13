@@ -9,13 +9,16 @@ typedef vector<int> vi;
 typedef set<int> seti;
 typedef vector<string> vs;
 
-const int MOD = 1e9 + 7;
-const int inf = 1e8;
+const int MOD = 1e9+7;
+const int inf = 1e9;
 
 int main() {
-	int N;
-	cin>>N;
-	int ans;
-	ans = 800*N-200*(N/15);
-	cout<<ans<<endl;
+	string O,E;
+	cin>>O>>E;
+	rep(i,O.size()){
+		cout<<O[i];
+		if(i<E.size())
+		cout<<E[i];
+	}	
+	cout<<endl;
 }

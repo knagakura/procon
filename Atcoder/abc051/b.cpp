@@ -12,21 +12,28 @@ typedef vector<string> vs;
 const int MOD = 1e9+7;
 const int inf = 1e9;
 
+int sx,sy,tx,ty;
+vi dx={1,-1,0,0};
+vi dy={0, 0,1,-1};
+
+bool visited[2001][2001];
+string ans="";
+
+
+void dfs(int x, int y){
+	if(x==tx&&y==ty)return;
+	if(visited[x][y]==true)return;
+	visited[x][y]=true;
+}
+
 int main() {
-	int N;
-	cin>>N;
-	int ans=0;
-	ll Nb=1;
-	rep1(i,N+1){
-		Nb*=i;
-		Nb%=MOD;
-	}
-	cout<<Nb<<endl;
-	for (ll i = 1; i*i <= Nb; ++i){
-		if(Nb%i==0){
-			ans+=2;
-			ans%=MOD;
-		}
-	}
+	cin>>sx>>sy>>tx>>ty;
+	sx+=1000;sy+=1000;
+	tx+=1000;ty+=1000;
+
+	rep(i,2001)rep(j,2001)
+		visited[i][j]=false;
+
+
 	cout<<ans<<endl;
 }

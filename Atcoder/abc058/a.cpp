@@ -2,10 +2,10 @@
 using namespace std;
 
 int main() {
-	int A,B;
-	cin>>A>>B;
-	int ans;
-	ans = B+A;
-	if(B+A>24)ans-=24;
+	int a,b,c;
+	cin>>a>>b>>c;
+	string ans="NO";
+	if(b-a==c-b)ans="YES";
+	
 	cout<<ans<<endl;
 }

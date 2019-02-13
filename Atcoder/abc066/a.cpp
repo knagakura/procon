@@ -2,10 +2,10 @@
 using namespace std;
 
 int main() {
-	int A,B;
-	cin>>A>>B;
+	int a,b,c;
+	cin>>a>>b>>c;
 	int ans;
-	ans = B+A;
-	if(B+A>24)ans-=24;
+	ans=min(a+b,b+c);
+	ans=min(ans,c+a);
 	cout<<ans<<endl;
 }

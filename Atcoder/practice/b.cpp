@@ -4,18 +4,20 @@ using namespace std;
 #define rep1(i,N) for(int i=1;i<int(N);++i)
 #define all(a) (a).begin(),(a).end()
 
-typedef long long ll;
-typedef vector<int> vi;
-typedef set<int> seti;
-typedef vector<string> vs;
-
-const int MOD = 1e9 + 7;
-const int inf = 1e8;
+const int inf = 1e9;
 
 int main() {
 	int N;
 	cin>>N;
-	int ans;
-	ans = 800*N-200*(N/15);
+	vector<int> a(N);
+	rep(i,N) cin>>a[i];
+	int ans=inf;
+	for (int A = -100; A <= 100; ++A){
+		int cost=0;
+		rep(i,N){
+			cost+=(a[i]-A)*(a[i]-A);
+		}
+		ans=min(ans,cost);
+	}
 	cout<<ans<<endl;
 }

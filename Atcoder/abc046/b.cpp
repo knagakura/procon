@@ -13,13 +13,11 @@ const int MOD = 1e9+7;
 const int inf = 1e9;
 
 int main() {
-	int N;
-	cin>>N;
-	vi a(N);
-	rep(i,N){
-		cin>>a[i];
-		a[i]--;
+	int N,K;
+	cin>>N>>K;
+	int ans=K;
+	rep(i,N-1){
+		ans*=(K-1);
 	}
-	
 	cout<<ans<<endl;
 }

@@ -13,13 +13,17 @@ const int MOD = 1e9+7;
 const int inf = 1e9;
 
 int main() {
-	int N;
-	cin>>N;
-	vi a(N);
-	rep(i,N){
-		cin>>a[i];
-		a[i]--;
+	string S;
+	cin>>S;
+	int ans;
+	int N = S.size();
+	rep1(i,N){
+		string Sn=S.substr(0,N-i);
+		int Nn=Sn.size();
+		if(Nn%2==0&&Sn.substr(0,Nn/2)==Sn.substr(Nn/2,Nn/2)){
+			ans = Nn;
+			break;
+		}
 	}
-	
 	cout<<ans<<endl;
 }

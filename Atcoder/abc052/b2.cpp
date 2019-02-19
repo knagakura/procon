@@ -6,20 +6,21 @@ using namespace std;
 
 typedef long long ll;
 typedef vector<int> vi;
-typedef set<int> seti;
+ty;
+pedef set<int> seti;
 typedef vector<string> vs;
 
 const int MOD = 1e9+7;
-const int inf = 1e9;
-
+const int inf = 1e9
 int main() {
 	int N;
-	cin>>N;
-	vi a(N);
+	string S;
+	cin>>N>>S;
+	int cnt=0,ans=0;
 	rep(i,N){
-		cin>>a[i];
-		a[i]--;
+		if(S[i]=='I')cnt++;
+		else cnt--;
+		ans=max(ans,cnt);
 	}
-	
 	cout<<ans<<endl;
 }

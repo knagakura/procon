@@ -15,11 +15,24 @@ const int inf = 1e9;
 int main() {
 	int N;
 	cin>>N;
-	vi a(N);
-	rep(i,N){
-		cin>>a[i];
-		a[i]--;
-	}
-	
-	cout<<ans<<endl;
+	vector<int> A(N);
+	rep(i,N)cin>>A[i];
+	int mini,Asum,Amin;
+	do {
+		Amin=inf;
+		rep(i,N){
+			if(A[i]>0&&Amin>A[i]){
+				mini=i;
+				Amin=A[i];
+			}
+		}
+		Asum=0;
+		rep(i,N){
+			if(A[i]>0&&i!=mini){
+				A[i]%=Amin;
+				Asum+=A[i];
+			}
+		}
+	}while(Asum>0);
+	cout<<Amin<<endl;
 }

@@ -13,13 +13,12 @@ const int MOD = 1e9+7;
 const int inf = 1e9;
 
 int main() {
-	int N;
-	cin>>N;
-	vi a(N);
-	rep(i,N){
-		cin>>a[i];
-		a[i]--;
+	string S;
+	cin>>S;
+	string ans="yes";
+	sort(all(S));
+	rep(i,S.size()-1){
+		if(S[i]==S[i+1])ans="no";
 	}
-	
 	cout<<ans<<endl;
 }

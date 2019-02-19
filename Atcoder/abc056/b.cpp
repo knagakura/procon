@@ -2,22 +2,23 @@
 using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
 #define rep1(i,N) for(int i=1;i<int(N);++i)
-#define all(a) (a).begin(),(a).end()
+#define all(a) (a).begin(),(a).end()		//sort(all(vi S)) sort(all(string S))
 
 typedef long long ll;
 typedef vector<int> vi;
 typedef set<int> seti;
 typedef vector<string> vs;
 
-const ll MOD = 1e9+7;
-const int inf = 1e8;
+const int MOD = 1e9+7;
+const int inf = 1e9;
 
 int main() {
-	int N;
-	cin>>N;
-	ll ans=1;
-	rep1(i,N+1){
-		ans =ans*i%MOD;
+	int W,a,b;
+	cin>>W>>a>>b;
+	int ans=0;
+	if((a<=b&b<=a+W)|(a<=b+W&b+W<=a+W))ans=0;
+	else{
+		ans=min(abs(b-(a+W)),abs((b+W)-a));
 	}
 	cout<<ans<<endl;
 }

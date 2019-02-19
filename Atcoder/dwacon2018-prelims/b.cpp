@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
+
 #define rep(i,N) for(int i=0;i<int(N);++i)
 #define rep1(i,N) for(int i=1;i<int(N);++i)
 #define all(a) (a).begin(),(a).end()		//sort(all(vi S)) sort(all(string S))
@@ -10,16 +11,12 @@ typedef set<int> seti;
 typedef vector<string> vs;
 
 const int MOD = 1e9+7;
-const int inf = 1e9;
+const int INF = 1e9;
 
 int main() {
-	int N;
-	cin>>N;
-	vi a(N);
-	rep(i,N){
-		cin>>a[i];
-		a[i]--;
-	}
+	string S;
+	cin>>S;
+	int ans;
 	
 	cout<<ans<<endl;
 }

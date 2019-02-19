@@ -15,11 +15,19 @@ const int inf = 1e9;
 int main() {
 	int N;
 	cin>>N;
-	vi a(N);
+	vector<int> a(N);
+	int asum=0;
 	rep(i,N){
 		cin>>a[i];
-		a[i]--;
+		asum+=a[i];
 	}
-	
+	rep(i,N)a[i]=abs(N*a[i]-asum);
+	int d=inf,ans;
+	rep(i,N){
+		if(d>a[i]){
+			d=a[i];
+			ans=i;
+		}
+	}
 	cout<<ans<<endl;
 }

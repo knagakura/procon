@@ -11,15 +11,19 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int inf = 1e9;
+vector<int> ans(10000);
+					   //1,2,3,4,5,6,7,8,9
+vector<int> matchn(9) = {2,5,5,4,5,6,3,7,6};
 
+void dfs(int x){
+	x
+}
 int main() {
-	int N;
-	cin>>N;
-	vi a(N);
-	rep(i,N){
-		cin>>a[i];
-		a[i]--;
-	}
+	int N,M;
+	cin>>N>>M;
+	vector<int> A(M);
+	rep(i,M)cin>>A[i];
+	int ans;
 	
 	cout<<ans<<endl;
 }

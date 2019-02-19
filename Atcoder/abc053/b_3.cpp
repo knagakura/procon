@@ -13,13 +13,15 @@ const int MOD = 1e9+7;
 const int inf = 1e9;
 
 int main() {
-	int N;
-	cin>>N;
-	vi a(N);
+	string S;
+	cin>>S;
+	int N=S.size();
+	int ans=0;
+	int a=inf,b=0;
 	rep(i,N){
-		cin>>a[i];
-		a[i]--;
+		if(S[i]=='A')a = min(a,i);
+		else if(S[i]=='Z')b =max(b,i);
 	}
-	
+	ans=b-a+1;
 	cout<<ans<<endl;
 }

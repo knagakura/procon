@@ -16,10 +16,8 @@ int main() {
 	int N;
 	cin>>N;
 	vi a(N);
-	rep(i,N){
-		cin>>a[i];
-		a[i]--;
-	}
-	
+	rep(i,N)cin>>a[i];
+	sort(all(a));
+	int ans=a[N-1]-a[0];
 	cout<<ans<<endl;
 }

@@ -10,16 +10,17 @@ typedef set<int> seti;
 typedef vector<string> vs;
 
 const int MOD = 1e9+7;
-const int inf = 1e9;
+const int INF = 1e9;
 
 int main() {
-	int N;
-	cin>>N;
-	vi a(N);
-	rep(i,N){
-		cin>>a[i];
-		a[i]--;
+	int N,K;
+	cin>>N>>K;
+	vector<int> l(N);
+	rep(i,N)cin>>l[i];
+	sort(all(l));
+	int ans=0;
+	rep(i,K){
+		ans+=l[N-1-i];
 	}
-	
 	cout<<ans<<endl;
 }

@@ -13,16 +13,20 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	string S;
-	cin>>S;
-	string ans = "NO";
-	int N = S.size();
+	int N;
+	cin>>N;
+	vector<ll> A(N),ans(N+1);
+	rep(i,N)cin>>A[i];
+
 	for (int i = 0; i < N; ++i){
+		ll sum=0;
 		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
+			sum+=A[j];
+			ans[j-i+1]=max(ans[j-i+1],sum);
 		}
 	}
-	cout<<ans<<endl;
+
+	rep1(i,N+1){
+		cout<<ans[i]<<endl;
+	}
 }

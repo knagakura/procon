@@ -13,16 +13,28 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	string S;
-	cin>>S;
-	string ans = "NO";
-	int N = S.size();
-	for (int i = 0; i < N; ++i){
-		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
+	ll N,P;
+	cin>>N>>P;
+	vector<ll> A(N);
+	int cnt0 = 0,cnt1 = 0;
+	rep(i,N){
+		cin>>A[i];
+		if(A[i]%2==0)cnt0++;
+		else cnt1++;
+	}
+	cout<<cnt0<<endl;
+	cout<<cnt1<<endl;
+	ll ans = 1;
+	if(P==0){
+		rep(i,cnt0)ans*=2;
+		cout<<ans<<endl;
+		int d = 0;
+		for (int i = 0; 2*i < cnt1; ++i){
+			d += cnt1*(cnt1-1)/2;
 		}
+		ans*=d;
 	}
 	cout<<ans<<endl;
 }
+//偶数を
+

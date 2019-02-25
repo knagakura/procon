@@ -11,18 +11,22 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-
+int N,A;
+vector<int> x(N);
+int cnt=0;
+int k = 0;
+ll dfs(int i,int sum){
+	if(i==N-1)return cnt;
+	if(sum==k*A&&k>0)cnt++;
+	cout<<sum<<endl;
+	dfs(i+1,sum);
+	sum+=x[i];
+	k+=1;
+	dfs(i+1,sum);
+}
 int main() {
-	string S;
-	cin>>S;
-	string ans = "NO";
-	int N = S.size();
-	for (int i = 0; i < N; ++i){
-		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
-		}
-	}
-	cout<<ans<<endl;
+	cin>>N>>A;
+	rep(i,N)cin>>x[i];
+	ll ans = dfs(0,0);
+	cout<<cnt<<endl;
 }

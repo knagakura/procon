@@ -13,16 +13,15 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	string S;
-	cin>>S;
-	string ans = "NO";
-	int N = S.size();
-	for (int i = 0; i < N; ++i){
-		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
-		}
+	int N;
+	cin>>N;
+	vector<int> a(N+1),b(N+1);
+	rep1(i,N+1)cin>>a[i]>>b[i];
+	int ans = 1;
+	rep(i,N){
+		if(min(a[i+1],b[i+1])>=max(a[i],b[i]))
+		ans+=min(a[i+1],b[i+1])-max(a[i],b[i])+1;
+		if(a[i]==b[i])ans--;
 	}
 	cout<<ans<<endl;
 }

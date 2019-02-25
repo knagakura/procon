@@ -13,16 +13,17 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	string S;
-	cin>>S;
-	string ans = "NO";
-	int N = S.size();
-	for (int i = 0; i < N; ++i){
-		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
-		}
+	ll A,B,Q;
+	cin>>A>>B>>Q;
+	vector<ll> s(A),t(B),x(Q);
+	rep(i,A)cin>>s[i];
+	rep(i,B)cin>>t[i];
+	rep(i,Q)cin>>x[i];
+	rep(i,Q){
+		
 	}
-	cout<<ans<<endl;
 }
+
+//一番近いsに行ってからそこから一番近いtに行く
+//一番近いtに行ってからそこから一番近いsに行く
+//の最小値

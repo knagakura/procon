@@ -13,16 +13,14 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	string S;
-	cin>>S;
-	string ans = "NO";
-	int N = S.size();
-	for (int i = 0; i < N; ++i){
-		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
-		}
+	int H,W;
+	string ans="Possible";
+	cin>>H>>W;
+	vector<string> A(H);
+	rep(i,H)cin>>A[i];
+	rep(x,H-1)rep(y,W-1){
+		if(A[x+1][y]=='#'&&A[x][y+1]=='#')ans="Impossible";
 	}
 	cout<<ans<<endl;
 }
+//右だけ、下だけっていうの以外だったらNo

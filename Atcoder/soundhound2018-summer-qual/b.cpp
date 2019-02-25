@@ -15,14 +15,12 @@ const int INF = 1e9;
 int main() {
 	string S;
 	cin>>S;
-	string ans = "NO";
-	int N = S.size();
-	for (int i = 0; i < N; ++i){
-		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
+	int w;
+	cin>>w;
+	rep(i,S.size()){
+		if(i*w<=S.size()-1){
+			cout<<S[i*w];
 		}
 	}
-	cout<<ans<<endl;
+	cout<<endl;
 }

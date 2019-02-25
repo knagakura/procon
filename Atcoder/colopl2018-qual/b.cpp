@@ -13,16 +13,17 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
+	int N,X;
 	string S;
-	cin>>S;
-	string ans = "NO";
-	int N = S.size();
-	for (int i = 0; i < N; ++i){
-		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
+	cin>>N>>X>>S;
+	vi T(N);
+	rep(i,N)cin>>T[i];
+	int ans=0;
+	rep(i,N){
+		if(S[i]=='1'){
+			ans+=min(T[i],X);
 		}
+		else ans+=T[i];
 	}
 	cout<<ans<<endl;
 }

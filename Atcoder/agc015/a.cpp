@@ -13,16 +13,20 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	string S;
-	cin>>S;
-	string ans = "NO";
-	int N = S.size();
-	for (int i = 0; i < N; ++i){
-		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
-		}
+	ll N,A,B,ans;
+	cin>>N>>A>>B;
+	if(B<A)ans=0;
+	else if(B==A)ans=1;
+	else if(N==1)ans=0;
+	else if(N==2)ans=1;
+	else{
+		ans=1+(N-2)*(B-A);
 	}
 	cout<<ans<<endl;
 }
+
+//4 4 4 6 min
+//4 5 4 6 +1
+//4 5 5 6 +2
+//4 5 6 6 +3
+//4 6 6 6 +4

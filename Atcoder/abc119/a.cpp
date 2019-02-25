@@ -13,16 +13,12 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	string S;
+	string S,y,m,d,ans = "Heisei";
 	cin>>S;
-	string ans = "NO";
-	int N = S.size();
-	for (int i = 0; i < N; ++i){
-		for (int j = i; j < N; ++j){
-			string Sc;
-			Sc+=S.substr(0,i)+S.substr(j,N-j);
-			if(Sc=="keyence")ans="YES";
-		}
-	}
+	//y = S.substr(0,4);
+	//m = S.substr(5,2);
+	//d = S.substr(8,2);
+	//if(y<="2019"&&m<="04"&&d<=30)
+	if(S>"2019/04/30")ans ="TBD";
 	cout<<ans<<endl;
 }

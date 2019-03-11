@@ -10,22 +10,18 @@ typedef set<int> seti;
 typedef vector<string> vs;
 
 const int MOD = 1e9+7;
-const int inf = 1e9;
+const int INF = 1e9;
 
 int main() {
 	int N;
 	cin>>N;
-	ll ans=0;
-	ll Nb=1;
-	rep1(i,N+1){
-		Nb*=i;
-		Nb%=MOD;
-	}
-	cout<<Nb<<endl;
-	for (ll i = 1; i*i <= Nb; ++i){
-		if(Nb%i==0){
-			ans+=2;
-			ans%=MOD;
+	vector<int> a(N);
+	int ans = 0;
+	rep(i,N)cin>>a[i];
+	rep(i,N-1){
+		if(a[i] == a[i+1]){
+			ans++;
+			a[i+1] = 0;
 		}
 	}
 	cout<<ans<<endl;

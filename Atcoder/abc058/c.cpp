@@ -8,25 +8,25 @@ typedef long long ll;
 typedef vector<int> vi;
 typedef set<int> seti;
 typedef vector<string> vs;
+typedef vector<vector<int>> vvi;
 
 const int MOD = 1e9+7;
-const int inf = 1e9;
+const int INF = 1e9;
 
 int main() {
 	int N;
 	cin>>N;
-	ll ans=0;
-	ll Nb=1;
-	rep1(i,N+1){
-		Nb*=i;
-		Nb%=MOD;
-	}
-	cout<<Nb<<endl;
-	for (ll i = 1; i*i <= Nb; ++i){
-		if(Nb%i==0){
-			ans+=2;
-			ans%=MOD;
+	vector<string> S(100);
+	int v[100][100];
+	rep(i,N){
+		cin>>S[i];
+		sort(all(S[i]));
+
+		rep(j,S[i].size()){
+			int k = S[i][j] - 'a';
+			v[i][k]++;
 		}
 	}
-	cout<<ans<<endl;
+	
+	cout<<endl;
 }

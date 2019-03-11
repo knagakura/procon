@@ -1,3 +1,4 @@
+//偶数番目の頻度最大と奇数番目の頻度最大
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -10,23 +11,23 @@ typedef set<int> seti;
 typedef vector<string> vs;
 
 const int MOD = 1e9+7;
-const int inf = 1e9;
+const int INF = 1e9;
 
 int main() {
 	int N;
 	cin>>N;
-	ll ans=0;
-	ll Nb=1;
-	rep1(i,N+1){
-		Nb*=i;
-		Nb%=MOD;
+	vector<int> v(N);
+	rep(i,N)cin>>v[i];
+
+	vector<int> cnt0(100000),cnt1(100000);
+	for (int i = 0; i < N; i+=2){
+		cnt0[v[i]]++;
 	}
-	cout<<Nb<<endl;
-	for (ll i = 1; i*i <= Nb; ++i){
-		if(Nb%i==0){
-			ans+=2;
-			ans%=MOD;
-		}
+	for (int i = 1; i < N; i+=2){
+		cnt1[v[i]]++;
+	}
+
+	rep(i,100000){
 	}
 	cout<<ans<<endl;
 }

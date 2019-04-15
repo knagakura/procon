@@ -12,18 +12,14 @@ typedef vector<string> vs;
 const int MOD = 1e9+7;
 const int INF = 1e9;
 
+vector<int> v(10);
 int main() {
-	int N,M,K;
-	cin>>N>>M>>K;
-	vector<int> A(N),B(M);
-	rep(i,N)cin>>A[i];
-	rep(i,M)cin>>B[i];
-	int X = 0, Y = 0;
-	rep(i,N)X+=A[i] * pow(K,N-1-i);
-	rep(i,M)Y+=B[i] * pow(K,M-1-i);
-	cout<<X<<endl;
-	cout<<Y<<endl;
-	if(X==Y)cout<<"same"<<endl;
-	if(X>Y) cout<<'X'<<endl;
-	if(X<Y) cout<<'Y'<<endl;
+	rep(i,5)cin>>v[i];
+	int k;
+	string ans = "Yay!";
+	cin>>k;
+	rep(i,5)rep(j,5){
+		if(abs(v[i]-v[j])>k)ans = ":(";
+	}
+	cout<<ans<<endl;
 }

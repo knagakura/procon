@@ -11,22 +11,37 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-int N,A;
-vector<int> x(N);
-int cnt=0;
-int k = 0;
-ll dfs(int i,int sum){
-	if(i==N-1)return cnt;
-	if(sum==k*A&&k>0)cnt++;
-	cout<<sum<<endl;
-	dfs(i+1,sum);
-	sum+=x[i];
-	k+=1;
-	dfs(i+1,sum);
-}
+
+ll N,A;
+vector<int> x(55);
+ll dp[55][2505][55];
 int main() {
 	cin>>N>>A;
 	rep(i,N)cin>>x[i];
-	ll ans = dfs(0,0);
-	cout<<cnt<<endl;
+	sort(all(x));
+
+	dp[0][0][0]= 1;
+
+	rep(i,N)rep(j,N*A+1)rep(k,N+1){
+		if(j+x[i]<=N*A){
+			dp[i+1][j+x[i]][k+1] += dp[i][j][k];
+		}
+		dp[i+1][j][k] += dp[i][j][k];
+	}
+
+	rep(i,N){
+		rep(j,N*A+1){
+			rep(k,N+1){
+				cout<<dp[i][j][k]<<endl;
+			}
+		}
+	}
+	int ans = 0;
+	rep(j,N*A+1)rep1(k,N+1){
+		if(dp[N][j][k] == k*A){
+			cout<<dp[N][j][k]<<endl;
+			ans += dp[N][j][k];
+		}
+	}
+	cout<<ans<<endl;
 }

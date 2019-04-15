@@ -13,17 +13,23 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	int N,M,K;
-	cin>>N>>M>>K;
-	vector<int> A(N),B(M);
-	rep(i,N)cin>>A[i];
-	rep(i,M)cin>>B[i];
-	int X = 0, Y = 0;
-	rep(i,N)X+=A[i] * pow(K,N-1-i);
-	rep(i,M)Y+=B[i] * pow(K,M-1-i);
-	cout<<X<<endl;
-	cout<<Y<<endl;
-	if(X==Y)cout<<"same"<<endl;
-	if(X>Y) cout<<'X'<<endl;
-	if(X<Y) cout<<'Y'<<endl;
+	int k,s,t;
+	cin>>k>>s>>t;
+	vector<string> ans(100);
+	rep(i,k)ans[i] = "";
+
+	ans[0] = "ABC";
+	rep(i,k){
+		ans[i+1] += "A";
+		ans[i+1] += ans[i];
+		ans[i+1] += "B";
+		ans[i+1] += ans[i];
+		ans[i+1] += "C";
+	}
+	for (int i = s-1; i < t; ++i){
+		cout<<ans[k-1][i];
+	}
+	cout<<endl;
+	cout<<ans[k-1]<<endl;
+	rep(i,k)cout<<ans[i].size()<<endl;
 }

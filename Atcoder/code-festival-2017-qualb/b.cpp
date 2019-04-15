@@ -11,28 +11,23 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-ll N,P;
-vector<int> A(55);
-ll dp[55][2];
+
+map <ll,ll> mpd,mpt;
 int main() {
-	cin>>N>>P;
-	dp[0][0] = 1;
-	rep(i,N)cin>>A[i];
-	rep(i,N){
-		//選ばない場合
-		dp[i+1][0] += dp[i][0];
-		dp[i+1][1] += dp[i][1];
-		//偶数を選ぶ場合
-		if(A[i]%2 == 0){
-			dp[i+1][0] += dp[i][0];
-			dp[i+1][1] += dp[i][1];
-		}
-		//奇数を選ぶ場合
-		else{
-			dp[i+1][0] += dp[i][1];
-			dp[i+1][1] += dp[i][0];
+	int N,M;
+	cin>>N;vector<int> D(N);
+	rep(i,N)cin>>D[i];
+	cin>>M;vector<int> T(M);
+	rep(i,M)cin>>T[i];
+
+	rep(i,N)mpd[D[i]]++;
+	rep(i,M)mpt[T[i]]++;
+	string ans = "YES";
+	rep(i,M){
+		if(mpt[T[i]]>mpd[T[i]]){
+			ans = "NO";
+			break;
 		}
 	}
-	ll ans = dp[N][P];
 	cout<<ans<<endl;
 }

@@ -1,0 +1,19 @@
+10 15
+SNCZWRCEWB
+
+Z L
+C L
+N L
+S L
+-4
+
+
+10 15
+SNCZWRCEWB
+B R
+-1
+
+E R
+W R
+B R
+-3

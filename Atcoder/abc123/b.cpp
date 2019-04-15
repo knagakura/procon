@@ -11,28 +11,39 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-ll N,P;
-vector<int> A(55);
-ll dp[55][2];
+
+vector<int> v(10);
+vector<int> b(10);
 int main() {
-	cin>>N>>P;
-	dp[0][0] = 1;
-	rep(i,N)cin>>A[i];
-	rep(i,N){
-		//選ばない場合
-		dp[i+1][0] += dp[i][0];
-		dp[i+1][1] += dp[i][1];
-		//偶数を選ぶ場合
-		if(A[i]%2 == 0){
-			dp[i+1][0] += dp[i][0];
-			dp[i+1][1] += dp[i][1];
-		}
-		//奇数を選ぶ場合
-		else{
-			dp[i+1][0] += dp[i][1];
-			dp[i+1][1] += dp[i][0];
+	rep(i,5)cin>>v[i];
+
+	rep(i,5){
+		b[i] = v[i]%10;
+	}
+
+	int cnt = 0;
+	rep(i,5){
+		if(b[i]==0)cnt++;
+	}
+	int ans = 0;
+	if(cnt == 5){
+		rep(i,5)ans+=v[i];
+		cout<<ans<<endl;
+		return 0;
+	}
+	int ind = 0;
+	int minb = INF;
+	rep(i,5){
+		if(b[i]>0&&minb>b[i]){
+			ind = i;
+			minb = min(b[i],minb);
 		}
 	}
-	ll ans = dp[N][P];
+	rep(i,5){
+		if(b[i]==0||i == ind)ans+=v[i];
+		else{
+			ans+= v[i]-b[i]+10;
+		}
+	}
 	cout<<ans<<endl;
 }

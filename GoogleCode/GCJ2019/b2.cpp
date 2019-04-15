@@ -11,19 +11,27 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
+int T;
+int N;
+string S;
+
+void ans(string s){
+	int M = s.size();
+	rep(i,M){
+		if(s[i] == 'S')cout<<'E';
+		else cout<<'S';
+	}
+}
+void solve(int Tn){
+	cin>>N>>S;
+	cout<<"Case #"<<Tn<<": ";
+	ans(S);
+	cout<<endl;;
+}
 
 int main() {
-	int N,M,K;
-	cin>>N>>M>>K;
-	vector<int> A(N),B(M);
-	rep(i,N)cin>>A[i];
-	rep(i,M)cin>>B[i];
-	int X = 0, Y = 0;
-	rep(i,N)X+=A[i] * pow(K,N-1-i);
-	rep(i,M)Y+=B[i] * pow(K,M-1-i);
-	cout<<X<<endl;
-	cout<<Y<<endl;
-	if(X==Y)cout<<"same"<<endl;
-	if(X>Y) cout<<'X'<<endl;
-	if(X<Y) cout<<'Y'<<endl;
+	cin>>T;
+	rep(t,T){
+		solve(t+1);
+	}
 }

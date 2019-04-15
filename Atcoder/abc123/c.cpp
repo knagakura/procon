@@ -11,19 +11,16 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
+vector<ll> A(10);
 
 int main() {
-	int N,M,K;
-	cin>>N>>M>>K;
-	vector<int> A(N),B(M);
-	rep(i,N)cin>>A[i];
-	rep(i,M)cin>>B[i];
-	int X = 0, Y = 0;
-	rep(i,N)X+=A[i] * pow(K,N-1-i);
-	rep(i,M)Y+=B[i] * pow(K,M-1-i);
-	cout<<X<<endl;
-	cout<<Y<<endl;
-	if(X==Y)cout<<"same"<<endl;
-	if(X>Y) cout<<'X'<<endl;
-	if(X<Y) cout<<'Y'<<endl;
+	ll N;
+	cin>>N;
+	rep(i,5)cin>>A[i];
+	ll ans = 5;
+	ll mina = A[0];
+	rep(i,5)mina = min(mina,A[i]);
+	if(mina == 1)ans+=N-1;
+	else ans+= N/mina;
+	cout<<ans<<endl;
 }

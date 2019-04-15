@@ -11,28 +11,28 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-ll N,P;
-vector<int> A(55);
-ll dp[55][2];
+
 int main() {
-	cin>>N>>P;
-	dp[0][0] = 1;
+	int N,M,K;
+	cin>>N>>M>>K;
+	vector<int> A(N),B(M);
 	rep(i,N)cin>>A[i];
-	rep(i,N){
-		//選ばない場合
-		dp[i+1][0] += dp[i][0];
-		dp[i+1][1] += dp[i][1];
-		//偶数を選ぶ場合
-		if(A[i]%2 == 0){
-			dp[i+1][0] += dp[i][0];
-			dp[i+1][1] += dp[i][1];
-		}
-		//奇数を選ぶ場合
-		else{
-			dp[i+1][0] += dp[i][1];
-			dp[i+1][1] += dp[i][0];
+	rep(i,M)cin>>B[i];
+	string ans = "Same";
+	if(N>M)ans = "Y";
+	if(N<M)ans = "X";
+	if(N == M){
+		rep(i,N){
+			if(A[i]==B[i])continue;
+			else if(A[i]>B[i]){
+				ans ="Y";
+				break;
+			}
+			else if(A[i]<B[i]){
+				ans = "X";
+				break;
+			}
 		}
 	}
-	ll ans = dp[N][P];
 	cout<<ans<<endl;
 }

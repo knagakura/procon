@@ -14,36 +14,32 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-
+int A[324][324];
+int H,W,D,Q;
+int d[100000];
 int main() {
-	int N,K;
-	cin>>N>>K;
-	vector<ll> s(N);
-	rep(i,N){
-		cin>>s[i];
+	cin>>H>>W>>D;
+	std::map<ll, P> map;
+	rep(i,H)rep(j,W){
+		cin>>A[i][j];
+		map[A[i][j]] = {i,j};
 	}
-	rep(i,N){
-		if(s[i] == 0){
-			cout<<N<<endl;
-			return 0;
-		}
+	cin>>Q;
+	for (int i = D+1; i <= H*W; ++i){
+		d[i] = d[i-D] + abs(map[i].first-map[i-D].first) + abs(map[i].second-map[i-D].second);
 	}
-	int ans = 0;
-	
-	int r = 0;
-	int mul = 1;
-	rep(l,N){
-		while(r < N && mul * s[r] <= K){
-			mul *=  s[r];
-			r++;
-		}
-		ans = max(ans, r-l);
-		if(l == r){
-			r++;
-		}
-		else{
-			mul /= s[l];
-		}
+	rep(i,Q){
+		int L,R,ans = 0;
+		cin>>L>>R;
+/*		while(L+D<=R){
+			ans+= abs(map[L+D].first - map[L].first);
+			ans+= abs(map[L+D].second- map[L].second);
+			L+=D;
+		}*/
+		ans = d[R]-d[L];
+		cout<<ans<<endl;
 	}
-	cout<<ans<<endl;
+	/*rep(i,H*W){
+		cerr<<map[i+1].first<<" "<<map[i+1].second<<endl;
+	}*/
 }

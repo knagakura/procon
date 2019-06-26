@@ -14,36 +14,47 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
+int d[108][108];
 
 int main() {
 	int N,K;
 	cin>>N>>K;
-	vector<ll> s(N);
-	rep(i,N){
-		cin>>s[i];
+	if(K>(N-1)*(N-2)/2){
+		cout<<-1<<endl;
+		return 0;
 	}
-	rep(i,N){
-		if(s[i] == 0){
-			cout<<N<<endl;
-			return 0;
-		}
-	}
-	int ans = 0;
-	
-	int r = 0;
-	int mul = 1;
-	rep(l,N){
-		while(r < N && mul * s[r] <= K){
-			mul *=  s[r];
-			r++;
-		}
-		ans = max(ans, r-l);
-		if(l == r){
-			r++;
-		}
-		else{
-			mul /= s[l];
+
+	for (int i = 0; i < N; ++i){
+		for (int j = i+1; j < N; ++j){
+			d[i][j] = 1;
 		}
 	}
-	cout<<ans<<endl;
+	int cnt = 0;
+	for (int i = 1; i < N-1; ++i){
+		for (int j = i+1; j < N; ++j){
+			if(cnt >= K)i=N,j=N;
+			d[i][j] = 0;
+			cnt++;
+		}
+	}
+	int M = 0;
+	for (int i = 0; i < N; ++i){
+		for (int j = i+1; j < N; ++j){
+			if(d[i][j])M++;
+		}
+	}
+	cout<<M<<endl;
+	for (int i = 0; i < N; ++i){
+		for (int j = i+1; j < N; ++j){
+			if(d[i][j]){
+				cout<<i+1<<" "<<j+1<<endl;
+			}
+		}
+	}
+	for (int i = 0; i < N; ++i){
+		for (int j = 0; j < N; ++j){
+			cerr<<d[i][j]<<" ";
+		}
+		cerr<<endl;
+	}
 }

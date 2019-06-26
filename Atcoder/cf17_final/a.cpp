@@ -16,34 +16,35 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	int N,K;
-	cin>>N>>K;
-	vector<ll> s(N);
-	rep(i,N){
-		cin>>s[i];
-	}
-	rep(i,N){
-		if(s[i] == 0){
-			cout<<N<<endl;
+	string S;
+	cin>>S;
+	vector<string> v;
+	v.push_back("AKIHABARA");
+
+	v.push_back("KIHABARA");
+	v.push_back("AKIHBARA");
+	v.push_back("AKIHABRA");
+	v.push_back("AKIHABAR");
+
+	v.push_back("KIHBARA");
+	v.push_back("KIHABRA");
+	v.push_back("KIHABAR");
+	v.push_back("AKIHBRA");
+	v.push_back("AKIHBAR");
+	v.push_back("AKIHABR");
+
+	v.push_back("KIHBRA");
+	v.push_back("KIHBAR");
+	v.push_back("AKIHBR");
+	v.push_back("KIHABR");
+
+	v.push_back("KIHBR");
+
+	rep(i,(int)v.size()){
+		if(S == v[i]){
+			cout<<"YES"<<endl;
 			return 0;
 		}
 	}
-	int ans = 0;
-	
-	int r = 0;
-	int mul = 1;
-	rep(l,N){
-		while(r < N && mul * s[r] <= K){
-			mul *=  s[r];
-			r++;
-		}
-		ans = max(ans, r-l);
-		if(l == r){
-			r++;
-		}
-		else{
-			mul /= s[l];
-		}
-	}
-	cout<<ans<<endl;
+	cout<<"NO"<<endl;
 }

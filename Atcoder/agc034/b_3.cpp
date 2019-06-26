@@ -16,33 +16,40 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	int N,K;
-	cin>>N>>K;
-	vector<ll> s(N);
+	string S;
+	cin>>S;
+	int N = S.size();
+	string T;
 	rep(i,N){
-		cin>>s[i];
-	}
-	rep(i,N){
-		if(s[i] == 0){
-			cout<<N<<endl;
-			return 0;
+		if(S[i] == 'A'){
+			T.push_back('A');
 		}
-	}
-	int ans = 0;
-	
-	int r = 0;
-	int mul = 1;
-	rep(l,N){
-		while(r < N && mul * s[r] <= K){
-			mul *=  s[r];
-			r++;
-		}
-		ans = max(ans, r-l);
-		if(l == r){
-			r++;
+		else if(S[i] == 'B'){
+			if(i+1<N&&S[i+1] == 'C'){
+				T.push_back('D');
+				i++;
+			}
+			else{
+				T.push_back('X');
+			}
 		}
 		else{
-			mul /= s[l];
+			T.push_back('X');
+		}
+	}
+	cerr<<S<<endl;
+	cerr<<T<<endl;
+	int cnt = 0;
+	ll ans = 0;
+	rep(i,T.size()){
+		if(T[i] == 'A'){
+			cnt++;
+		}
+		else if(T[i] == 'D'){
+			ans += cnt;
+		}
+		else{
+			cnt = 0;
 		}
 	}
 	cout<<ans<<endl;

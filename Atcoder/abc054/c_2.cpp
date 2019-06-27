@@ -14,19 +14,39 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-
+int d[100][100];
 int main() {
-	int N;
-	cin>>N;
-	int ans;
+	int N,M;
+	cin>>N>>M;
+	rep(i,N)rep(j,N){
+		d[i][j] = 0;
+	}
+	rep(i,M){
+		int a,b;
+		cin>>a>>b;
+		a--;b--;
+		d[a][b] = d[b][a] = 1;
+	}
 	/*
 	昇順にソート済みのvector（またはstring）を入れると
 	辞書順で次の並びのvectorに置き換えてくれる
 	辞書順最後になったら -1 を返し止まる
 	*/
-	sort(all(vector or string));
+	vector<int> v;
+	rep(i,N){
+		v.push_back(i);
+	}
+	sort(all(v));
+	int ans = 0;
 	do{
-		/*hoge*/
-	}while(next_permutation(all(vector or string)));
+		int cnt = 0;
+		for (int i = 0; i < N-1; ++i){
+			if(d[v[i]][v[i+1]])cnt++;
+		}
+		if(v[0] == 0&&cnt == N-1){
+			ans++;
+			/*print(v);*/
+		}
+	}while(next_permutation(all(v)));
 	cout<<ans<<endl;
 }

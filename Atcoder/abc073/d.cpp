@@ -44,5 +44,6 @@ int main() {
 		ans = min(ans, tmp);
 		print(r);
 	}while(next_permutation(all(r)));
+	
 	cout<<ans<<endl;
 }

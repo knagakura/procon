@@ -6,6 +6,7 @@ using namespace std;
 #define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
 #define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
 
+using P = pair<int, int>;		//P.first, P.second
 typedef long long ll;
 typedef vector<int> vi;
 typedef set<int> seti;
@@ -14,38 +15,22 @@ typedef vector<string> vs;
 const int MOD = 1e9+7;
 const int INF = 1e9;
 
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) {
-    	mp[x]++;
-    }
-    return mp;
-}
-
 int main() {
-	ll N, P;
-	cin>>N>>P;
-	map <ll, int> f = factorize(P);
-	if(P==1){
-		cout<<1<<endl;
-		return 0;
-	}
-	ll ans = 1;
-	for(auto i :f){
-		cerr<<i.first<<": "<<i.second<<endl;
-		if(i.second >= N){
-			for (int j = 0; j < i.second/N; ++j){
-				ans*=i.first;
-			}
+	string S;
+	int N;
+	cin>>S;
+	cin>>N;
+	vs T;
+	rep(i,5){
+		string U = "";
+		U+=S[i];
+		rep(j,5){
+			string V;
+			V = U+S[j];;
+			T.push_back(V);
 		}
 	}
-	cout<<ans<<endl;
+	print(T);
+	sort(all(T));
+	cout<<T[N-1]<<endl;
 }

@@ -6,6 +6,7 @@ using namespace std;
 #define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
 #define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
 
+using P = pair<int, int>;		//P.first, P.second
 typedef long long ll;
 typedef vector<int> vi;
 typedef set<int> seti;
@@ -14,38 +15,27 @@ typedef vector<string> vs;
 const int MOD = 1e9+7;
 const int INF = 1e9;
 
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) {
-    	mp[x]++;
-    }
-    return mp;
-}
-
+int X[100][100];
 int main() {
-	ll N, P;
-	cin>>N>>P;
-	map <ll, int> f = factorize(P);
-	if(P==1){
-		cout<<1<<endl;
-		return 0;
+	int N,D;
+	cin>>N>>D;
+	rep(i,N)rep(j,D){
+		cin>>X[i][j];
 	}
-	ll ans = 1;
-	for(auto i :f){
-		cerr<<i.first<<": "<<i.second<<endl;
-		if(i.second >= N){
-			for (int j = 0; j < i.second/N; ++j){
-				ans*=i.first;
+	int ans = 0;
+	rep(i,N){
+		rep(j,N){
+			if(i == j)continue;
+			int res = 0;
+			rep(k,D){
+				res += (X[i][k] - X[j][k])*(X[i][k] - X[j][k]);
+			}
+			double aaa = sqrt(res);
+			if(aaa == int(aaa)){
+				ans++;
+				//cerr<<i<<" "<<j<<endl;
 			}
 		}
 	}
-	cout<<ans<<endl;
+	cout<<ans/2<<endl;
 }

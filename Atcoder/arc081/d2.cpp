@@ -14,16 +14,11 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-ll xorall(ll x){
-	vector<ll> v = {x,1,x+1,0};
-	return v[x%4];
-}
+
 int main() {
-	ll A,B;
-	cin>>A>>B;
-	ll ans = xorall(A-1)^xorall(B);
-	if(A == 0){
-		ans = xorall(B);
-	}
+	int N;cin>>N;
+	string S1,S2;cin>>S1>>S2;
+	int ans;
+	
 	cout<<ans<<endl;
 }

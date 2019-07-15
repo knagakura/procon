@@ -24,5 +24,4 @@ int main() {
 		ll ans = a*b;
 		cout<<ans<<endl;
 	}
-
 }

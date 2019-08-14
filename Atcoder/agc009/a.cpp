@@ -14,20 +14,27 @@ typedef vector<string> vs;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-
+ll a,b;
 int main() {
-	int c[3][3];
-	rep(i,3)rep(j,3)cin>>c[i][j];
-	int d1 = c[0][1]-c[0][0];
-	int d2 = c[0][2]-c[0][0];
-	string ans = "Yes";
-	rep1(i,3)rep(j,3){
-		if(c[i][1]-c[i][0] == d1&&c[i][2]-c[i][0]==d2){
+	int N;
+	cin>>N;
+	vector<P> ab;
+	rep(i,N){
+		cin>>a>>b;
+		a %= b;
+		ab.push_back({a,b});
+	}
+	printpair(ab);
+	ll ans = 0;
+	for (int i = N-1; i >= 0; --i){
+		a = ab[i].first;
+		b = ab[i].second;
+		a += ans;
+		a %= b;
+		if(a == 0){
 			continue;
 		}
-		else{
-			ans = "No";
-		}
+		ans += b - a;
 	}
 	cout<<ans<<endl;
 }

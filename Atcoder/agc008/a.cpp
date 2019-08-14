@@ -16,17 +16,35 @@ const int MOD = 1e9+7;
 const int INF = 1e9;
 
 int main() {
-	int c[3][3];
-	rep(i,3)rep(j,3)cin>>c[i][j];
-	int d1 = c[0][1]-c[0][0];
-	int d2 = c[0][2]-c[0][0];
-	string ans = "Yes";
-	rep1(i,3)rep(j,3){
-		if(c[i][1]-c[i][0] == d1&&c[i][2]-c[i][0]==d2){
-			continue;
+	ll x,y;
+	cin>>x>>y;
+	cerr<<x*y<<endl;
+	int ans;
+	if(x == 0){
+		if(y > 0){
+			ans = y;
 		}
 		else{
-			ans = "No";
+			ans = abs(y) + 1;
+		}
+	}
+	else if(y == 0){
+		if(x > 0){
+			ans = abs(x) + 1;
+		}
+		else{
+			ans = abs(x);
+		}
+	}
+	else if(x*y<0){
+		ans = abs(abs(x)-abs(y))+1;
+	}
+	else if(x*y>0){
+		if(y<x){
+			ans = abs(abs(x)-abs(y)) + 2;
+		}
+		else{
+			ans = abs(abs(x)-abs(y));
 		}
 	}
 	cout<<ans<<endl;

@@ -12,10 +12,14 @@ typedef vector<string> vs;
 const int MOD = 1e9+7;
 const int INF = 1e9;
 
+vector<int> v(10);
 int main() {
-	int A,B,C;
-	cin>>A>>B>>C;
-	int ans = min(C,B/A);
-	for(int i = 0; i < N; ++i)
+	rep(i,5)cin>>v[i];
+	int k;
+	string ans = "Yay!";
+	cin>>k;
+	rep(i,5)rep(j,5){
+		if(abs(v[i]-v[j])>k)ans = ":(";
+	}
 	cout<<ans<<endl;
 }

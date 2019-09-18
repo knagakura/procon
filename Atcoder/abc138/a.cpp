@@ -15,10 +15,13 @@ typedef vector<string> vs;
 const int MOD = 1e9+7;
 const int INF = 1e9;
 int main() {
-    int N;
-    cin>>N;
-    int ans;
-    
-    cout<<ans<<endl;
-
+    int a;
+    cin>>a;
+    string S;
+    cin>>S;
+    if(a>=3200){
+        cout<<S<<endl;
+        return 0;
+    }
+    cout<<"red"<<endl;
 }

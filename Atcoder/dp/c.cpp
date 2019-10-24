@@ -23,7 +23,7 @@ int main() {
 		if(j == k) continue;
 		dp[i+1][k] = max(dp[i+1][k],dp[i][j] + a[i+1][k]);
 	}
-	ll ans = max(dp[N-1][0],dp[N-1][1]);
+	ll ans = max(dp[N][0],dp[N][1]);
 	ans = max(ans,dp[N-1][2]);
 	cout<<ans<<endl;
 }

@@ -15,12 +15,13 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    double N,M,d;
-    cin>>N>>M>>d;
-
-    double ans = (M-1)*2*(N-d)/(N*N);
-    if(d == 0){
-        ans = (M-1)/N;
-    }
+    int N;
+    cin>>N;
+    vector<ll> C(N);
+    rep(i,N)cin>>C[i];
+    
+    int ans;
+    
     cout<<ans<<endl;
+
 }

@@ -11,11 +11,33 @@ typedef long long ll;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-vector<vector<int>> G;
+int A[15][15];
+int N,M,K;
+
+int dp[15][550];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    int N,M;
-    cin>>N>>M;
+    cin>>N>>M>>K;
+    rep(i,N)rep(j,M){
+        cin>>A[i][j];
+    }
+    dp[0][0] = 1;
+    rep(i,N)rep(j,K){
+        if(dp[i][j]){
+            rep(k,M){
+                if(j+A[i][k]<=K){
+                    dp[i+1][j + A[i][k]] = 1;
+                }
+            }
+        }
+    }
+    int ans = -1;
+    rep(j,K+1){
+        if(dp[N][j]){
+            ans = K-j;
+        }
+    }
+    cout<<ans<<endl;
 }

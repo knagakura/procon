@@ -11,11 +11,11 @@ typedef long long ll;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-vector<vector<int>> G;
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
-    int N,M;
-    cin>>N>>M;
+    cout<<10<<" "<<10<<" "<<500<<endl;
+    rep(i,10)rep(j,10){
+        cout<<1;
+        if(j==9)cout<<endl;
+        else cout<<" ";
+    }
 }

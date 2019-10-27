@@ -11,11 +11,20 @@ typedef long long ll;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-vector<vector<int>> G;
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    int N,M;
-    cin>>N>>M;
+    ll n,p;
+    cin>>n>>p;
+    int ans = -1;
+    rep(k,29){
+        if(n-k*p<=0)break;
+        //cerr<<k<<" "<<__builtin_popcount(n-k*p)<<endl;
+        if(__builtin_popcount(n-k*p) <= k){
+            ans = k;
+            break;
+        }
+    }
+    cout<<ans<<endl;
 }

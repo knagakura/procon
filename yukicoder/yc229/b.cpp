@@ -11,11 +11,34 @@ typedef long long ll;
 
 const int MOD = 1e9+7;
 const int INF = 1e9;
-vector<vector<int>> G;
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    int N,M;
-    cin>>N>>M;
+    int Q;
+    cin>>Q;
+    //逆からみる
+    while(Q--){
+        int a,b,c;
+        cin>>a>>b>>c;
+        int a2 = a;
+        int cnt1 = 1;
+        while(a>0){
+            //cerr<<a<<endl;
+            if(a%c == 0){
+                a /= c;
+            }
+            else{
+                a -= a%c;
+            }
+            cnt1++;
+        }
+        //cerr<<a<<endl;
+        cerr<<cnt1<<endl;
+        ll x =  1;
+        while(a2>x*c){
+            x *= c;
+        }
+        cerr<<x<<endl;
+    }
 }

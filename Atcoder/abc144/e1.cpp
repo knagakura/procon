@@ -8,22 +8,39 @@ using namespace std;
 
 using P = pair<int, int>;
 typedef long long ll;
-const double PI = acos(-1);
+
 const int MOD = 1e9+7;
 const int INF = 1e9;
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    double a,b,x;
-    cin>>a>>b>>x;
-    if(x<=a*b*a/2){
-        double radian = atan2(b, 2*x/(a*b));
-        //cout<< radian <<endl;
-        cout<< radian* 180 / PI<<endl;
+    int N,K;
+    cin>>N>>K;
+    vector<ll> A(N),F(N);
+    priority_queue<int> que;
+    rep(i,N){
+        cin>>A[i];
+        que.push(A[i]);
     }
-    else{
-        double radian = atan(2*(a*a*b-x)/(a*a*a));
-        cout<<radian*180/PI<<endl;
+    rep(i,N){
+        cin>>F[i];
     }
+    sort(all(F));
+    while(K--){
+        int x = que.top();
+        cerr<<x<<endl;
+        if(x ==0)break;
+        que.pop();
+        x--;
+        que.push(x);
+    }
+    ll ans = 0;
+    rep(i,N){
+        int x = que.top();
+        cerr<<x<<" "<<F[i]<<endl;
+        que.pop();
+        ans =max(ans, x * F[i]);
+    }
+    cout<<ans<<endl;
 }

@@ -17,30 +17,19 @@ vector<ll> H,S;
 
 bool check(ll X){
     //cnt[t]:t秒以内に処理しろ！
-    vector<ll> cnt(N,0);
+    vector<ll> T;
     rep(i,N){
         ll t = (X-H[i])/S[i];
         if(X-H[i]<0)return false;
         //N-1秒以内のものだけ。それより後でもいいものはいつやってもいい
-        if(t<N)cnt[t]++;
+        T.push_back(t);
     }
-    //累積和を取ることでt秒以内の数を数え上げられる
-    //cum[t]:t秒以内に処理するべき個数
-    //1秒で一個しか処理できないので、それがt+1を越えるとき、false
-    vector<ll> cum(N,0);
-    cum[0] = cnt[0];
-    for(int i = 0; i < N-1; ++i){
-        cum[i+1] = cnt[i+1]+cum[i];
-    }
-    //cerr<<X<<endl;
-    //print(cnt);print(cum);
-    rep(t,N){
-        if(cum[t]>t+1){
-            //cerr<<"false"<<endl;
+    sort(all(T));
+    rep(i,N){
+        if(T[i]<i){
             return false;
         }
     }
-    //cerr<<"true"<<endl;
     return true;
 }
 int main() {

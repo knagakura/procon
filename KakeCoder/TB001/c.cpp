@@ -26,6 +26,7 @@ int main() {
     Cost[0][0] = 0;
     queue<pair<int,int>> Q;
     Q.push({0,0});
+    ll cnt = 1;
     while(!Q.empty()){
         auto p =  Q.front();
         int x = p.first;
@@ -44,7 +45,9 @@ int main() {
                 //chmin(Cost[nx][ny], Cost[x][y]);
             }
             Q.push({nx,ny});
+            cnt++;
         }
     }
+    cerr<<cnt<<endl;
     cout<<Cost[H-1][W-1]<<endl;
 }

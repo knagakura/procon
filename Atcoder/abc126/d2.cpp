@@ -19,11 +19,16 @@ const ll INFLL = 1e18;
 const ll MOD = 1e9+7;
 
 const double PI = acos(-1.0);
-int N,K;
-vector<vector<int>> G;
+vector<vector<int>> Graph;
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
+    int N;
     cin>>N;
+    Graph.resize(N);
+    rep(i,N-1){
+        int u,v,w;
+    }
+    
 }

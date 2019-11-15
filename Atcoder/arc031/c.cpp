@@ -19,11 +19,26 @@ const ll INFLL = 1e18;
 const ll MOD = 1e9+7;
 
 const double PI = acos(-1.0);
-int N,K;
-vector<vector<int>> G;
+
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
+    int N;
     cin>>N;
+    vector<pair<ll,int>> B(N),B_sorted(N);
+    ll maxb = 0;
+    int maxidx = 0;
+    rep(i,N){
+        ll c;cin>>c;
+        B[i] = B_sorted[i] = {c,i};
+        if(chmax(maxb,c)){
+            maxidx = i;
+        }
+    }
+    printpair(B);
+    cerr<<maxb<<" "<<maxidx<<endl;
+    sort(B_sorted.begin(),B_sorted.begin() + maxidx);
+    sort(B_sorted.begin()+maxidx,B_sorted.end(),greater<pair<ll,int>>());
+    printpair(B_sorted);
 }

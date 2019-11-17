@@ -19,6 +19,7 @@ const ll INFLL = 1e18;
 const ll MOD = 1e9+7;
 
 const double PI = acos(-1.0);
+
 class modint {
   public:
     using ll = long long;
@@ -59,51 +60,28 @@ class modint {
     static modint C(ll n,ll r){
         return n >= r ? fact(n)/(fact(n-r)*fact(r)) : modint(0);
     }
-    static modint P(ll n, ll r){
-        if(n<0)return 0;
-        return n >= r ? fact(n)/(fact(n-r)): modint(0);
-    }
 };
 vector<modint> modint::factorial;
 #define fact(n) modint::fact(n)
 #define C(n,r) modint::C(n,r)
-#define P(n,r) modint::P(n,r)
 #define H(a,b) C(a+b, a)
 
-int N,K;
-vector<vector<int>> G;
-modint ans = 1;
-void dfs(int x, int pre, int d){
-    print(G[x]);
-    cerr<<x<<endl;
-    cerr<<ans<<endl;
-    ll bro = G[x].size()-1;
-    if(d == 0){
-        ans *= K;
-    }
-    else if(d == 1){
-        ans *= P(K-1,bro);
-    }
-    else{
-        ans *= P(K-2, bro);
-    }
-    for(auto nx: G[x]){
-        if(nx == pre)continue;
-        dfs(nx, x, d+1);
-    }
-}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    cin>>N>>K;
-    G.resize(N);
-    rep(i,N-1){
-        int a,b; cin>>a>>b;
-        a--;b--;
-        G[a].push_back(b);
-        G[b].push_back(a);
+    ll x,y;
+    cin>>x>>y;
+    ll z = min(x,y);
+    ll ans = 0;
+    if((x + y)%3 == 0){
+        ll n = (x + y)/3;
+        ll l = z-n;
+        if(l >=0){
+            cerr<<n<<"C"<<l<<endl;
+            modint a = C(n,l);
+            ans = a;
+        }
     }
-    dfs(0,-1,0);
     cout<<ans<<endl;
 }

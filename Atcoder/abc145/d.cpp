@@ -73,7 +73,7 @@ int main() {
     ll x,y;
     cin>>x>>y;
     ll z = min(x,y);
-    ll ans = 0;
+    modint ans = 0;
     if((x + y)%3 == 0){
         ll n = (x + y)/3;
         ll l = z-n;

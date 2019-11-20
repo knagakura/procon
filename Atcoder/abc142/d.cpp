@@ -18,6 +18,21 @@ ll gcd(ll a,ll b){
 }
 ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
 
+template<typename T> 
+map<T,int> factorize(T x){
+    map<T,int> mp;
+    for (T i = 2; i*i <= x; i++){
+        while (x%i == 0) {
+            x /= i;
+            mp[i]++;
+        }
+        if (x == 1) break;
+    }
+    if (x != 1) mp[x]++;
+    return mp;
+}
+
+
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
@@ -25,9 +40,7 @@ int main() {
     cin>>A>>B;
     ll g = gcd(A,B);
     vector<ll> cd;
-    for(int i = 1; i*i <=g; ++i){
-        if(g%i == 0){
-
-        }
-    }
+    auto map = factorize(g);
+    map[1]++;
+    cout<<map.size()<<endl;
 }

@@ -21,7 +21,14 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
-
+void printYes(){
+    cout<<"Yay!"<<endl;
+    return;
+}
+void printNo(){
+    cout<<":("<<endl;
+    return;
+}
 /*------------------------------------*/
 
 int main() {
@@ -29,5 +36,16 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    
+    int X,Y;
+    cin>>X>>Y;
+    int okane[4] = {0,300000,200000,100000};
+    if(X > 3){
+        X = 0;
+    }
+    if(Y > 3){
+        Y = 0;
+    }
+    ll ans = okane[X] + okane[Y];
+    if(X == 1&&Y==1)ans += 400000;
+    cout<<ans<<endl;
 }

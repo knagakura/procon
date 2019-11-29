@@ -21,26 +21,7 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
-template<typename T>
-vector<T> cumulative_sum(vector<T> &v) {
-    vector<T> sum(v.size() + 1);
-    for(int i = 0; i < (int)v.size(); ++i){
-        sum[i+1] = sum[i] + v[i];
-    }
-    return sum;
-}
-/*使うとき
-vector<int> a(N);
-auto cum = cumlative_sum(a)
-とするとvector<int> cumが生成される
 
-i番目までの仕切りの和
-cum[i]: [0,i)の和（半開区間）
-
-要素i~jの和が欲しい時
-j+1 ~ i番目の仕切りまで数えればよい
-int sum = cum[j+1]-cum[i]
-*/
 /*------------------------------------*/
 
 int main() {
@@ -50,21 +31,26 @@ int main() {
 
     int N;
     cin>>N;
-    vector<ll> A(N);
-    ll suma = 0;
+    vector<ll> P(N);
     rep(i,N){
-        cin>>A[i];
-        suma += A[i];
+        cin>>P[i];
     }
-    auto cum = cumulative_sum(A);
-    ll ans = INFLL;
-    //i番目の仕切りで区切るとき
-    for(int i = 1; i<N; i++){
-        ll l = cum[i];
-        ll r = suma - cum[i];
-        ll mid = (l + r)/2;
-        ll cost = abs(l-mid) + abs(r - mid);
-        chmin(ans, cost);
+    int K = 1;
+    rep(i,N){
+        string x = to_string(P[i]);
+        int tmp = 0;
+        rep(j,(int)x.size()){
+            tmp += x[j] - '0';
+        }
+        K *= tmp;
+        while(to_string(K).size()>1){
+            string K_st = to_string(K);
+            int cnt = 0;
+            rep(j,(int)K_st.size()){
+                cnt += K_st[j]-'0';
+            }
+            K = cnt;
+        }
     }
-    cout<<ans<<endl;
+    cout<<K<<endl;
 }

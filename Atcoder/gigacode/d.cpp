@@ -19,52 +19,54 @@ const double PI = acos(-1.0);
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
+ll H,W,K,V;
+ll A[130][130];
+ll cnt[130][130];
 /*------------------------------------/
 for library*/
-template<typename T>
-vector<T> cumulative_sum(vector<T> &v) {
-    vector<T> sum(v.size() + 1);
-    for(int i = 0; i < (int)v.size(); ++i){
-        sum[i+1] = sum[i] + v[i];
+void debug(){
+    rep(i,H){
+        rep(j,W){
+            cerr<<A[i][j]<<" ";
+        }
+        cerr<<endl;
     }
-    return sum;
+    cerr<<endl;
+
+    rep(i,H+1){
+        rep(j,W+1){
+            cerr<<cnt[i][j]<<" ";
+        }
+        cerr<<endl;
+    }
+    cerr<<endl;
 }
-/*使うとき
-vector<int> a(N);
-auto cum = cumlative_sum(a)
-とするとvector<int> cumが生成される
-
-i番目までの仕切りの和
-cum[i]: [0,i)の和（半開区間）
-
-要素i~jの和が欲しい時
-j+1 ~ i番目の仕切りまで数えればよい
-int sum = cum[j+1]-cum[i]
-*/
 /*------------------------------------*/
 
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int N;
-    cin>>N;
-    vector<ll> A(N);
-    ll suma = 0;
-    rep(i,N){
-        cin>>A[i];
-        suma += A[i];
+    cin>>H>>W>>K>>V;
+    rep(i,H)rep(j,W){
+        cin>>A[i][j];
     }
-    auto cum = cumulative_sum(A);
-    ll ans = INFLL;
-    //i番目の仕切りで区切るとき
-    for(int i = 1; i<N; i++){
-        ll l = cum[i];
-        ll r = suma - cum[i];
-        ll mid = (l + r)/2;
-        ll cost = abs(l-mid) + abs(r - mid);
-        chmin(ans, cost);
+    rep(i,H)rep(j,W){
+        cnt[i+1][j+1] = cnt[i+1][j] + cnt[i][j+1] - cnt[i][j]+ A[i][j];
+    }
+    //debug();
+    ll ans = 0;
+    rep(x1,H)rep(y1,W){
+        for(int x2 = x1; x2 <=H;x2++){
+            for(int y2 = y1; y2 <= W;y2++){
+                ll okane = cnt[x2][y2] - cnt[x2][y1] - cnt[x1][y2] + cnt[x1][y1];
+                ll S = (x2 - x1) * (y2 - y1);
+                okane += S * K;
+                if(okane <= V){
+                    chmax(ans,S);
+                }
+            }
+        }
     }
     cout<<ans<<endl;
 }

@@ -48,23 +48,23 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
+    int N,K;
+    cin>>N>>K;
     vector<ll> A(N);
-    ll suma = 0;
     rep(i,N){
         cin>>A[i];
-        suma += A[i];
+        A[i] %= K;
+        A[i]--;
     }
-    auto cum = cumulative_sum(A);
-    ll ans = INFLL;
-    //i番目の仕切りで区切るとき
-    for(int i = 1; i<N; i++){
-        ll l = cum[i];
-        ll r = suma - cum[i];
-        ll mid = (l + r)/2;
-        ll cost = abs(l-mid) + abs(r - mid);
-        chmin(ans, cost);
+    auto cumA = cumulative_sum(A);
+    map<int, int> map;
+    rep(i,N+1){
+        map[cumA[i]]++;
+    }
+    print(cumA);
+    ll ans = 0;
+    for(auto p: map){
+        ans +=  p.second* (p.second-1)/2;
     }
     cout<<ans<<endl;
 }

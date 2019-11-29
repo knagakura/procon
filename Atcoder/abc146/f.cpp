@@ -21,50 +21,23 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
-template<typename T>
-vector<T> cumulative_sum(vector<T> &v) {
-    vector<T> sum(v.size() + 1);
-    for(int i = 0; i < (int)v.size(); ++i){
-        sum[i+1] = sum[i] + v[i];
-    }
-    return sum;
-}
-/*使うとき
-vector<int> a(N);
-auto cum = cumlative_sum(a)
-とするとvector<int> cumが生成される
 
-i番目までの仕切りの和
-cum[i]: [0,i)の和（半開区間）
-
-要素i~jの和が欲しい時
-j+1 ~ i番目の仕切りまで数えればよい
-int sum = cum[j+1]-cum[i]
-*/
 /*------------------------------------*/
-
+ll dp[123456];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    vector<ll> A(N);
-    ll suma = 0;
-    rep(i,N){
-        cin>>A[i];
-        suma += A[i];
+    int N,M;
+    string S;
+    cin>>N>>M>>S;
+    rep1(i,N+1){
+        dp[i] = INFLL;
     }
-    auto cum = cumulative_sum(A);
-    ll ans = INFLL;
-    //i番目の仕切りで区切るとき
-    for(int i = 1; i<N; i++){
-        ll l = cum[i];
-        ll r = suma - cum[i];
-        ll mid = (l + r)/2;
-        ll cost = abs(l-mid) + abs(r - mid);
-        chmin(ans, cost);
+    dp[0] = 0;
+    set<int> set;
+    for(int i = 0; i < N+1; i++){
+        
     }
-    cout<<ans<<endl;
 }

@@ -28,22 +28,35 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    int t;
-    cin>>t;
-    rep(_,t){
-        vector<ll> x(3);
-        cin>>x[0]>>x[1]>>x[2];
-        sort(all(x));
-        int sum = x[0]+x[1]+x[2];
-        if(x[0]+x[1]-x[2]<0){
-            sum+=x[0]+x[1]-x[2];
-        }
-        if(x[1]+x[2]-x[0]<0){
-            sum+=x[1]+x[2]-x[0];
-        }
-        if(x[2]+x[0]-x[1]<0){
-            sum+=x[2]+x[0]-x[1];
-        }
-        cout<<sum/2<<endl;
+
+    ll T[2],A[2],B[2];
+    cin>>T[0]>>T[1]>>A[0]>>A[1]>>B[0]>>B[1];
+    ll d[2][2];
+    d[0][0] = T[0] * A[0];
+    d[0][1] = T[1] * A[1];
+    d[1][0] = T[0] * B[0];
+    d[1][1] = T[1] * B[1];
+    ll D[2] = {d[0][0]+ d[0][1],
+               d[1][0]+ d[1][1]};
+
+    if(D[0] == D[1]){
+        cout<<"infinity"<<endl;
+        return 0;
     }
+    if((d[0][0]-d[1][0]) * (D[0]-D[1])>0){
+        cout<<0<<endl;
+        return 0;
+    }
+    ll ans = -1;
+    ll d1 = abs(d[0][0]-d[1][0]);
+    ll d2 = abs(D[0]-D[1]);
+    /*
+    while((d1<0&&d2 > 0)||(d1>0&&d2<0)){
+        //cerr<<d1<<" "<<d2<<endl;
+        ans+=2;
+        d1 += d2;
+    }*/
+    if(d1<d2)swap(d1,d2);
+    ans =  d1/d2*2+1;
+    cout<<ans<<endl;
 }

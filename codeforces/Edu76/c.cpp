@@ -23,27 +23,38 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+void solve(){
+    int n;
+    cin>>n;
+    vector<ll> a(n);
+    vector<int> idx[n];
+    rep(i,n){
+        cin>>a[i];
+        a[i]--;
+        idx[a[i]].push_back(i);
+    }
+    int ans = INF;
+    rep(i,n){
+        if((int)idx[i].size()==1)continue;
+        rep(j,(int)idx[i].size()-1){
+            chmin(ans, idx[i][j+1]-idx[i][j]+1);
+        }
+    }
+    if(ans ==INF){
+        cout<<-1<<endl;
+    }
+    else{
+        cout<<ans<<endl;
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
+
     int t;
     cin>>t;
-    rep(_,t){
-        vector<ll> x(3);
-        cin>>x[0]>>x[1]>>x[2];
-        sort(all(x));
-        int sum = x[0]+x[1]+x[2];
-        if(x[0]+x[1]-x[2]<0){
-            sum+=x[0]+x[1]-x[2];
-        }
-        if(x[1]+x[2]-x[0]<0){
-            sum+=x[1]+x[2]-x[0];
-        }
-        if(x[2]+x[0]-x[1]<0){
-            sum+=x[2]+x[0]-x[1];
-        }
-        cout<<sum/2<<endl;
+    while(t--){
+        solve();
     }
 }

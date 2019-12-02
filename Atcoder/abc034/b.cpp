@@ -28,22 +28,9 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    int t;
-    cin>>t;
-    rep(_,t){
-        vector<ll> x(3);
-        cin>>x[0]>>x[1]>>x[2];
-        sort(all(x));
-        int sum = x[0]+x[1]+x[2];
-        if(x[0]+x[1]-x[2]<0){
-            sum+=x[0]+x[1]-x[2];
-        }
-        if(x[1]+x[2]-x[0]<0){
-            sum+=x[1]+x[2]-x[0];
-        }
-        if(x[2]+x[0]-x[1]<0){
-            sum+=x[2]+x[0]-x[1];
-        }
-        cout<<sum/2<<endl;
-    }
+
+    ll N; cin>>N;
+    if(N%2 == 0)N--;
+    else N++;
+    cout<<N<<endl;
 }

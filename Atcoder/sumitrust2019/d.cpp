@@ -28,22 +28,32 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    int t;
-    cin>>t;
-    rep(_,t){
-        vector<ll> x(3);
-        cin>>x[0]>>x[1]>>x[2];
-        sort(all(x));
-        int sum = x[0]+x[1]+x[2];
-        if(x[0]+x[1]-x[2]<0){
-            sum+=x[0]+x[1]-x[2];
+
+    int N;
+    string S;
+    cin>>N>>S;
+    set<string> set1pre,set2pre,set3;
+    string y = "";
+    y.push_back(S[0]);
+    set1pre.insert(y);
+    rep1(i,N){
+        set<string> set1,set2;
+        string xx = "";
+        xx.push_back(S[i]);
+        set1.insert(xx);
+        for(auto x1:set1pre){
+            set1.insert(x1);
+            x1.push_back(S[i]);
+            set2.insert(x1);
         }
-        if(x[1]+x[2]-x[0]<0){
-            sum+=x[1]+x[2]-x[0];
+        for(auto x2:set2pre){
+            set2.insert(x2);
+            x2.push_back(S[i]);
+            set3.insert(x2);
         }
-        if(x[2]+x[0]-x[1]<0){
-            sum+=x[2]+x[0]-x[1];
-        }
-        cout<<sum/2<<endl;
+        swap(set1pre,set1);
+        swap(set2pre,set2);
     }
+    cout<<set3.size()<<endl;
+
 }

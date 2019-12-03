@@ -21,34 +21,32 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
+
 /*------------------------------------*/
 
+ll count(ll X){
+    string S = to_string(X);
+    int N = S.size();
+    ll dp[100][2][2] = {};
+    dp[0][0][0] = 1;
+    for(int i = 0; i < N; i++)rep(j,2)rep(k,2){
+        int num = S[i]-'0';
+        for(int d = 0; d <= (j ? 9:num);d++){
+            dp[i+1][j || (d < num)][k || d == 4 || d == 9] += dp[i][j][k];
+        }
+    }
+    return dp[N][1][1] + dp[N][0][1];
+}
 int main() {
-	cin.tie(0);
-	ios::sync_with_stdio(false);
-	cout << fixed << setprecision(20);
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
 
-	ll N,K;
-	cin>>N>>K;
-	vector<ll> A(N);
-	rep(i,N)cin>>A[i];
-	ll maxx = 0;
-	//bitのk桁目が立っている個数を数える
-	//大きい方から決めていくべき
-	for(ll k = 43;k>=0;k--){
-		if(bit(k)>K)continue;
-		int cnt = 0;
-		rep(i,N){
-			if(A[i]&bit(k))cnt++;
-		}
-		if(cnt < N - cnt){//0の方が多い
-			if((maxx | bit(k) )>K)continue;
-			maxx |= (1LL<<k);
-		}
-	}
-	ll ans = 0;
-	rep(i,N){
-		ans += (ll)(maxx ^ A[i]);
-	}
-	cout<<ans<<endl;
+    ll A,B;
+    cin>>A>>B;
+
+    //  0~B       の中にある禁止された数
+    //- 0~A-1   の中にある禁止された数
+    ll ans = count(B) - count(A-1);
+    cout<<ans<<endl;
 }

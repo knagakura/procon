@@ -41,28 +41,23 @@ void solve(){
     //print(power);
     
     int l = 0; 
-    int r;
     int cnt = 0;
     while(l < n){
-        cerr<<"start l: "<<l<<endl;
         cnt++;
+        int r = l;
         int maxa = 0;
-        for(r = l+1;r <=n;r++){
-            cerr<<'\t'<<l<<" "<<r<<endl;
-            int length = r - l;
-            chmax(maxa,a[r-1]);
-            //初めてダメになったrだから、半開区間
-            if(power[length]<maxa){
+        while(true){
+            chmax(maxa,a[r]);
+            if(maxa > power[r-l+1]){
                 break;
             }
+            r++;
         }
-        //forを抜けた後は、rはnの一個先になっている
-        cerr<<'\t'<<"[l,r): "<<l<<" "<<r<<endl;
-        if(l == r-1){
+        if(l == r){
             cout<<-1<<endl;
             return;
         }
-        l =  r-1;
+        l = r;
     }
     cout<<cnt<<endl;
 }

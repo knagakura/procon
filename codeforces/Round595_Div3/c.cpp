@@ -5,7 +5,7 @@ using namespace std;
 #define all(a) (a).begin(),(a).end()
 #define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
 #define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
-
+#define bit(k) (1LL<<(k))
 typedef long long ll;
 
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
@@ -21,59 +21,41 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
+ll pow(ll a, ll n) {
+    ll res = 1;
+    while (n > 0) {
+        if (n & 1) res = res * a;
+        a = a * a;
+        n >>= 1;
+    }
+    return res;
+}
 /*------------------------------------*/
+
+ll n;
+vector<ll> ans;
+void dfs(ll cnt,ll x){
+    //cerr<<cnt<<" "<<x<<endl;
+    if(cnt > 25)return;
+    if(x>n){
+        ans.push_back(x);
+    }
+    dfs(cnt+1,3 * x + 1);
+    dfs(cnt+1,3 * x);
+}
 void solve(){
-    int n;
     cin>>n;
-    vector<int> a(n);
-    rep(i,n)cin>>a[i];
-    int m;
-    cin>>m;
-    vector<int> power(n+2,0);
-    rep(i,m){
-        int p,s;
-        cin>>p>>s;
-        chmax(power[s],p);
-    }
-    for(int i = n;i>=2;i--){
-        chmax(power[i-1],power[i]);
-    }
-    //print(power);
-    
-    int l = 0; 
-    int r;
-    int cnt = 0;
-    while(l < n){
-        cerr<<"start l: "<<l<<endl;
-        cnt++;
-        int maxa = 0;
-        for(r = l+1;r <=n;r++){
-            cerr<<'\t'<<l<<" "<<r<<endl;
-            int length = r - l;
-            chmax(maxa,a[r-1]);
-            //初めてダメになったrだから、半開区間
-            if(power[length]<maxa){
-                break;
-            }
-        }
-        //forを抜けた後は、rはnの一個先になっている
-        cerr<<'\t'<<"[l,r): "<<l<<" "<<r<<endl;
-        if(l == r-1){
-            cout<<-1<<endl;
-            return;
-        }
-        l =  r-1;
-    }
-    cout<<cnt<<endl;
+    dfs(0,0);
+    sort(all(ans));
+    print(ans);
 }
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int t;
-    cin>>t;
-    while(t--){
+    int q;
+    cin>>q;
+    while(q--){
         solve();
     }
 }

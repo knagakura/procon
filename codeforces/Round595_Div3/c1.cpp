@@ -21,34 +21,30 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
+
 /*------------------------------------*/
-
+ll dp[523400] = {};
 int main() {
-	cin.tie(0);
-	ios::sync_with_stdio(false);
-	cout << fixed << setprecision(20);
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
 
-	ll N,K;
-	cin>>N>>K;
-	vector<ll> A(N);
-	rep(i,N)cin>>A[i];
-	ll maxx = 0;
-	//bitのk桁目が立っている個数を数える
-	//大きい方から決めていくべき
-	for(ll k = 43;k>=0;k--){
-		if(bit(k)>K)continue;
-		int cnt = 0;
-		rep(i,N){
-			if(A[i]&bit(k))cnt++;
-		}
-		if(cnt < N - cnt){//0の方が多い
-			if((maxx | bit(k) )>K)continue;
-			maxx |= (1LL<<k);
-		}
-	}
-	ll ans = 0;
-	rep(i,N){
-		ans += (ll)(maxx ^ A[i]);
-	}
-	cout<<ans<<endl;
+    int q;
+    cin>>q;
+    dp[0] = 1;
+    rep(i,52000){
+        if(dp[i]){
+            dp[3*i+1] = 1;
+            dp[3*i] = 1;
+        }
+    }
+    vector<ll> ans;
+    rep(i,52000){
+        if(dp[i])ans.push_back(i);
+    }
+    while(q--){
+        int a;
+        cin>>a;
+        cout<<*lower_bound(all(ans), a)<<endl;;
+    }
 }

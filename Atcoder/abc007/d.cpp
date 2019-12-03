@@ -5,7 +5,7 @@ using namespace std;
 #define all(a) (a).begin(),(a).end()
 #define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
 #define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
-
+#define bit(k) (1LL<<(k))
 typedef long long ll;
 
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
@@ -21,59 +21,51 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
+
 /*------------------------------------*/
-void solve(){
-    int n;
-    cin>>n;
-    vector<int> a(n);
-    rep(i,n)cin>>a[i];
-    int m;
-    cin>>m;
-    vector<int> power(n+2,0);
-    rep(i,m){
-        int p,s;
-        cin>>p>>s;
-        chmax(power[s],p);
+
+ll count(ll X){
+    string S = to_string(X);
+    int N = S.size();
+    ll dp[100][2] = {};
+    dp[0][0] = 1;
+    rep(i,N+1)rep(j,2){
+        cerr<<dp[i][j];
+        if(j == 1)cerr<<endl;
+        else cerr<<" ";
     }
-    for(int i = n;i>=2;i--){
-        chmax(power[i-1],power[i]);
-    }
-    //print(power);
-    
-    int l = 0; 
-    int r;
-    int cnt = 0;
-    while(l < n){
-        cerr<<"start l: "<<l<<endl;
-        cnt++;
-        int maxa = 0;
-        for(r = l+1;r <=n;r++){
-            cerr<<'\t'<<l<<" "<<r<<endl;
-            int length = r - l;
-            chmax(maxa,a[r-1]);
-            //初めてダメになったrだから、半開区間
-            if(power[length]<maxa){
-                break;
+    for(int i = 0; i < N; i++){
+        int num = S[i]-'0';//上からi桁目
+        cerr<<i<<"桁目"<<num<<endl;
+        rep(j,10){
+            if(j == 4||j == 9)continue;
+            if(j < num){//確定に遷移
+                dp[i+1][1] += dp[i][0];
+                dp[i+1][1] += dp[i][1];
+            }
+            else{
+                dp[i+1][0] += dp[i][0];
             }
         }
-        //forを抜けた後は、rはnの一個先になっている
-        cerr<<'\t'<<"[l,r): "<<l<<" "<<r<<endl;
-        if(l == r-1){
-            cout<<-1<<endl;
-            return;
-        }
-        l =  r-1;
     }
-    cout<<cnt<<endl;
+    rep(i,N+1)rep(j,2){
+        cerr<<dp[i][j];
+        if(j == 1)cerr<<endl;
+        else cerr<<" ";
+    }
+    return X - (dp[N][0] + dp[N][1]);
 }
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int t;
-    cin>>t;
-    while(t--){
-        solve();
-    }
+    ll A,B;
+    cin>>A>>B;
+
+    //  0~B       の中にある禁止された数
+    //- 0~A-1   の中にある禁止された数
+
+    ll ans = count(B) - count(A-1);
+    cout<<ans<<endl;
 }

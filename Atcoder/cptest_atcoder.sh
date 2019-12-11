@@ -1,11 +1,14 @@
 #!/bin/bash
-problemname=$1
-oj dl "https://atcoder.jp/contests/${problemname:0:6}/tasks/$1"
-echo ///////////////
-echo //     g ./${problemname:7:8}.cpp      //
-echo ///////////////
-g++-8 -O2 -std=gnu++14 -Wall -Wextra -Wshadow ./${problemname:7:8}.cpp
 
-oj test
+contestname=$1
+problemname=$2
+filename=${3:-${problemname}.cpp}
+taskname=${4:-${contestname}}
+oj dl "https://atcoder.jp/contests/${contestname}/tasks/${taskname}_${problemname}"
+echo g ./${filename}
+
+g++-8 -O2 -std=gnu++14 -Wall -Wextra -Wshadow ./${filename}
+
+oj t
 rm -f a.out
-rm -rf test 
+rm -rf test

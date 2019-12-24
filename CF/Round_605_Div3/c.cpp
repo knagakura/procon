@@ -5,7 +5,7 @@ using namespace std;
 #define all(a) (a).begin(),(a).end()
 #define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
 #define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
-
+#define bit(k) (1LL<<(k))
 typedef long long ll;
 
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
@@ -29,38 +29,24 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N,D,K;
-    cin>>N>>D>>K;
-    vector<int> L(D),R(D),S(K),T(K);
-    rep(i,D){
-        cin>>L[i]>>R[i];
-    }
+    int N,K;
+    cin>>N>>K;
+    string S;
+    cin>>S;
+    S.push_back('*');
+    map<char,ll> map;
     rep(i,K){
-        cin>>S[i]>>T[i];
+        char x;cin>>x;
+        map[x]++;
     }
-
-
-    rep(i,K){
-        int s = S[i];
-        int t = T[i];
-        bool GisL = (t < s);
-        int ans = 0;
-        rep(j,D){
-            int l = L[j];
-            int r = R[j];
-            
-            if(l <= s && s <= r){
-                s = (GisL ? l : r);
-            }
-            if(!(GisL) && t <= s){
-                ans = j + 1;
-                break;
-            }
-            if(GisL && s <= t){
-                ans = j + 1;
-                break;
-            }
+    ll ans = 0;
+    ll cnt = 0;
+    rep(i,N+1){
+        if(map[S[i]])cnt++;
+        else{
+            ans += (cnt + 1) * cnt/ 2;
+            cnt = 0;
         }
-        cout<<ans<<endl;
     }
+    cout<<ans<<endl;
 }

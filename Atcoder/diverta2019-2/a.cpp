@@ -1,4 +1,8 @@
-#include <bits/stdc++.h>
+bool isprime(int v) {
+	if (v == 1) return false;
+	for (int i = 2; 1LL * i*i <= v; i++) if (v%i == 0) return false;
+	return true;
+}#include <bits/stdc++.h>
 using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
 #define rep1(i,N) for(int i=1;i<int(N);++i)

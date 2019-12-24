@@ -18,15 +18,20 @@ const int INF = 1e9;
 int main() {
 	int N,Q;
 	cin>>N>>Q;
-	vector<P> lr(Q);
+	vector<int> ans(N+1);
 	rep(i,Q){
 		int l,r;
 		cin>>l>>r;
 		l--;r--;
-		lr[i] = {l,r};
+		ans[l] += 1;
+		ans[r+1] -= 1;
 	}
-	sort(all(lr));
-	printpair(lr);
-	int ans;
-	cout<<ans<<endl;
+	rep1(i,N){
+		ans[i] = ans[i-1] + ans[i];
+	}
+	print(ans);
+	rep(i,N){
+		cout<<ans[i]%2;
+	}
+	cout<<endl;
 }

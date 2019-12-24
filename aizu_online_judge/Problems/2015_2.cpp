@@ -5,7 +5,7 @@ using namespace std;
 #define all(a) (a).begin(),(a).end()
 #define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
 #define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
-
+#define bit(k) (1LL<<(k))
 typedef long long ll;
 
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
@@ -24,43 +24,51 @@ for library*/
 
 /*------------------------------------*/
 
+bool solve(){
+    int N,M;
+    cin>>N>>M;
+    if(N == 0&&M==0)return true;
+    vector<int> H(N),W(N);
+    vector<int> a(1,0),b(1,0);
+    //頻度分布
+    vector<int> X(1005,0),Y(1005,0);
+    rep(i,N){
+        cin>>H[i];
+        a.push_back(a.back() + H[i]);
+    }
+    rep(i,M){
+        cin>>W[i];
+        b.push_back(b.back() + W[i]);
+    }
+    int A = a.size();
+    int B = b.size();
+    rep(i,A)rep(j,A){
+        if(i >= j)continue;
+        int d = abs(a[i]-a[j]);
+        X[d]++;
+    }
+    rep(i,B)rep(j,B){
+        if(i >= j)continue;
+        int d = abs(b[i]-b[j]);
+        Y[d]++;
+    }
+    ll ans = 0;
+    /*
+    for(int i = 1;i <= 10;i++){
+        cerr<<X[i]<<Y[i]<<endl;
+    }*/
+    //print(a);print(b);
+    rep1(i,1001){
+        ans += X[i] * Y[i];
+    }
+    cout<<ans<<endl;
+    return false;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int N,D,K;
-    cin>>N>>D>>K;
-    vector<int> L(D),R(D),S(K),T(K);
-    rep(i,D){
-        cin>>L[i]>>R[i];
-    }
-    rep(i,K){
-        cin>>S[i]>>T[i];
-    }
-
-
-    rep(i,K){
-        int s = S[i];
-        int t = T[i];
-        bool GisL = (t < s);
-        int ans = 0;
-        rep(j,D){
-            int l = L[j];
-            int r = R[j];
-            
-            if(l <= s && s <= r){
-                s = (GisL ? l : r);
-            }
-            if(!(GisL) && t <= s){
-                ans = j + 1;
-                break;
-            }
-            if(GisL && s <= t){
-                ans = j + 1;
-                break;
-            }
-        }
-        cout<<ans<<endl;
+    while(1){
+        if(solve())break;
     }
 }

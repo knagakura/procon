@@ -29,35 +29,26 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
+    ll N,M;
+    cin>>N>>M;
+    vector<ll> A(N);
+    rep(i,N)cin>>A[i];
+    sort(all(A),greater<ll>());
+    print(A);
+    vector<ll> v;
+    vector<pair<ll,pair<int,int>>> pv;
     rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
-    }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
-            }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
+        rep(j,N){
+            v.push_back(A[i]+A[j]);
+            pv.push_back({A[i] + A[j],{i,j}});
+            //cerr<<A[i]+A[j]<<"\t";
         }
         //cerr<<endl;
     }
-
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    sort(all(v),greater<ll>());
+    sort(all(pv),greater<pair<ll,pair<int,int>>>());
+    print(v);
+    for(auto p:pv){
+        cerr<<p.first<<" "<<p.second.first<<" "<<p.second.second<<endl;
+    }
 }

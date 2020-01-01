@@ -29,35 +29,47 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
-    rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
-    }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
-            }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
-        }
-        //cerr<<endl;
-    }
+    
+    int N,M;
+    cin>>N>>M;
+    vector<long double> A(N),B(N);
+    vector<long double> C(M),D(M);
 
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    rep(i,N)cin>>A[i]>>B[i];
+    rep(i,M)cin>>C[i]>>D[i];
+    print(A);print(B);print(C);print(D);
+    auto check = [&](long double x){
+        vector<long double> E,F;
+        rep(i,N){
+            E.push_back(B[i]-x * A[i]);
+        }
+        rep(i,M){
+            F.push_back(D[i]-x * C[i]);
+        }
+        sort(all(E),greater<long double>());
+        sort(all(F),greater<long double>());
+        double res = 0;
+        rep(i,4){
+            res += E[i];
+        }
+        res += max(E[4],F[0]);
+        //print(E);print(F);
+        //cerr<<"(x,res): "<<x<<" "<<res<<endl;
+        return res >= 0;
+    };
+
+    long double ok = 0;
+    long double ng = 1e7;
+    int cnt = 0;
+    while(cnt < 100){
+        cnt++;
+        long double mid = (ng + ok)/2;
+        //cerr<<ok<<" "<<ng<<endl;
+        if(check(mid)){
+            ok = mid;
+        }else{
+            ng = mid;
+        }
+    }
+    cout<<ok<<endl;
 }

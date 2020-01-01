@@ -31,33 +31,23 @@ int main() {
 
     int N;
     cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
+    vector<ll> A(N);
+    vector<ll> cnt(N+1);
     rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
+        cin>>A[i];
+        cnt[A[i]]++;
     }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
+    //print(A);
+    //print(cnt);
+    int ans[2] = {0,0};
+    rep1(i,N+1){
+        if(cnt[i] == 0)ans[1] = i;
+        if(cnt[i] == 2)ans[0] = i;
     }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
-            }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
-        }
-        //cerr<<endl;
+    if(ans[0] == ans[1]){
+        cout<<"Correct"<<endl;
     }
-
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    else{
+        cout<<ans[0]<<" "<<ans[1]<<endl;
+    }
 }

@@ -23,41 +23,51 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+int N;
+ll a[12][12];
+ll ans;
+void dfs(int idx, string &g){
+    if(idx == N){
+        //cerr<<g<<endl;
+        vector<vector<int>> v(3);
+        rep(i,N){
+            v[g[i] - '0'].push_back(i);
+        }
+        ll score = 0;
+        rep(j,3){
+            int n = v[j].size();
+            rep(k,n)rep(l,n){
+                if(k > l)continue;
+                score += a[ v[j][k] ][ v[j][l] ];
+            }
+            //print(v[j]);
+        }
+        chmax(ans, score);
+        return;
+    }
+    g[idx] = '0';
+    dfs(idx + 1,g);
+    g[idx] = '1';
+    dfs(idx + 1,g);
+    g[idx] = '2';
+    dfs(idx + 1,g);
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
     cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
-    rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
-    }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
-            }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
+    rep(i,N)rep(j,N)a[i][j] = 0;
+    for(int i = 0;i < N;i++){
+        for(int j = i+1; j < N; j++){
+            cin>>a[i][j];
+            a[j][i] = a[i][j];
         }
-        //cerr<<endl;
     }
-
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    string g = "";
+    rep(i,N)g.push_back('0');
+    ans = -INFLL;
+    dfs(0,g);
+    cout<<ans<<endl;
 }

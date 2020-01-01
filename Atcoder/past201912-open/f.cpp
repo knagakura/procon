@@ -24,40 +24,51 @@ for library*/
 
 /*------------------------------------*/
 
+bool isbig(char c){
+    return (0 <= c - 'A' && c-'A' < 26);
+}
+bool issmall(char c){
+    return (0 <= c - 'a' && c - 'a' < 26);
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
+    string S;cin>>S;
+    int N; N = S.size();
+    string x = "";
+    int cnt = 0;
+    vector<string> ans;
     rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
-    }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
-            }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
+        if(isbig(S[i])){
+            cnt++;
+
+            S[i] = char((S[i] - 'A') + 'a');
         }
-        //cerr<<endl;
+        x.push_back(S[i]);
+        if(cnt == 2){
+            ans.push_back(x);
+            cnt = 0;
+            x = "";
+        }
     }
 
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    sort(all(ans));
+
+    /*
+    rep(i,(int)ans.size()){
+        cerr<<ans[i]<<endl;
+    }*/
+    rep(i,(int)ans.size()){
+        rep(j,(int)ans[i].size()){
+            if(j == 0 || j == (int) ans[i].size() - 1){
+                cout<<char(ans[i][j] - 'a' + 'A');
+            }
+            else{
+                cout<<ans[i][j];
+            }
+        }
+    }
+    cout<<endl;
 }

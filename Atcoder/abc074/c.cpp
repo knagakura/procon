@@ -28,36 +28,31 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int N;
-    cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
-    rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
-    }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
+    double a,b,c,d,e,f;
+    cin>>a>>b>>c>>d>>e>>f;
+    a *= 100;
+    b *= 100;
+    int ans_all = 0;
+    int ans_s = 0;
+    double tmp = -1;
+    for(int i = 0; i*a <= f; i++){
+        for(int j = 0; i*a + j*b <= f;j++){
+            int w = i*a + j*b;
+            if(w == 0)continue;
+            for(int k = 0;w + k*c <= f;k++){
+                for(int l = 0; w + k*c + l*d <= f;l++){
+                    int s = k*c + l*d;
+                    if(s > (w / 100) * e)continue;
+                    double noudo = 100*s/double(w + s);
+                    if(tmp < noudo){
+                        tmp = noudo;
+                        ans_s = s;
+                        ans_all = w + s;
+                    }
+                }
             }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
         }
-        //cerr<<endl;
     }
-
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    cout<<ans_all<<" "<<ans_s<<endl;
 }
+

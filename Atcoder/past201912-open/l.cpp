@@ -23,41 +23,40 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+int d[50][50];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
-    rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
-    }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
-            }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
-        }
-        //cerr<<endl;
-    }
+    int N,M;
+    cin>>N>>M;
 
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    vector<int> x(N),y(N),c(N),X(M),Y(M),C(M);
+    rep(i,N){
+        cin>>x[i]>>y[i]>>c[i];
+    }
+    rep(i,M){
+        cin>>X[i]>>Y[i]>>C[i];
+    }
+    rep(i,N+M)rep(j,N+M){
+        if(i > j)continue;
+        if(i < N){
+            if(j < N){
+                d[i][j] = d[j][i] = abs(x[i]-x[j])+abs(y[i]-y[j]) * (c[i] == c[j] ? 1:10);
+            }
+            if(j >=N){
+                d[i][j] = d[j][i] = abs(x[i]-X[j-N])+abs(y[i]-X[j-N]) * (c[i] == C[j-N] ? 1:10);
+            }
+        }
+        else{
+            d[i][j] = d[j][i] = abs(X[i-N]-X[j-N])+abs(Y[i-N]-X[j-N]) * (C[i-N] == C[j-N] ? 1:10);
+        }
+    }
+    rep(i,N+M){
+        rep(j,N+M){
+            cerr<<d[i][j]<<' ';
+        }
+        cerr<<endl;
+    }
 }

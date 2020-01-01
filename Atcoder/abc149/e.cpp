@@ -21,7 +21,26 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
+template<typename T>
+vector<T> cumulative_sum(vector<T> &v) {
+    vector<T> sum(v.size() + 1);
+    for(int i = 0; i < (int)v.size(); ++i){
+        sum[i+1] = sum[i] + v[i];
+    }
+    return sum;
+}
+/*使うとき
+vector<int> a(N);
+auto cum = cumlative_sum(a)
+とするとvector<int> cumが生成される
 
+i番目までの仕切りの和
+cum[i]: [0,i)の和（半開区間）
+
+要素i~jの和が欲しい時
+j+1 ~ i番目の仕切りまで数えればよい
+int sum = cum[j+1]-cum[i]
+*/
 /*------------------------------------*/
 
 int main() {
@@ -29,35 +48,26 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
+    ll N,M;
+    cin>>N>>M;
+    vector<ll> A(N);
+    rep(i,N)cin>>A[i];
+    sort(all(A),greater<ll>());
+    print(A);
+    auto check = [&](int i,int x){
+        //cerr<<i<<" "<<x<<" "<<A[i]+A[x]<<" "<<A[x-1] * 2<<endl;
+        return ((A[i] + A[x]) <= (A[x - 1] * 2));
+    };
+    vector<bool> doublee(N,false);
+    auto cumsum = cumulative_sum(A);
+    ll ans = 0;
     rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
-    }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
+        for(int j = i+1;j+1 < N;j++){
+            if(A[i] + A[j+1] > A[j] * 2){
+                doublee[j] = true;
+                ans +=  A[j] * 2;
+                break;
             }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
         }
-        //cerr<<endl;
     }
-
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
 }

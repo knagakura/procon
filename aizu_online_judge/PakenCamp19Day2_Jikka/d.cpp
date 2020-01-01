@@ -29,35 +29,25 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
-    rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
-    }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
-            }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
+    ll N,K;
+    cin>>N>>K;
+    vector<ll> a(N);
+    rep(i,N)cin>>a[i];
+    ll ans = 0;
+    ll sum = 0;
+    ll r = 0;
+    for(ll l = 0;l < N;l++){
+        while(r < N && sum + a[r] <= K * (r+1 - l)){
+            sum += a[r];
+            r++;
         }
-        //cerr<<endl;
+        ans += r - l;
+        if(l == r){
+            r++;
+        }
+        else{
+            sum -= a[l];
+        }
     }
-
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    cout<<ans<<endl;
 }

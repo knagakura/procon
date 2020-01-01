@@ -23,41 +23,50 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+ll dp[1080][1080];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
-    rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
+    int N,M;
+    cin>>N>>M;
+    vector<string> S(M);
+    
+    vector<ll> C(M);
+    rep(i,M)cin>>S[i]>>C[i];
+
+    rep(i,1050)rep(j,1050){
+        dp[i][j] = INF*1e5;
     }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
+    dp[0][0] = 0;
+    vector<ll> bitS(M,0);
+    rep(i,M){
+        rep(j,N){
+            //cerr<<S[i][j]<<endl;
+            if(S[i][j] == 'Y'){
+                bitS[i] = bitS[i] | bit(N-1-j);
             }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
         }
-        //cerr<<endl;
+    }
+    //print(bitS);
+    rep(i,M){
+        rep(k,bit(N)){
+            chmin(dp[i+1][k], dp[i][k]);
+            chmin(dp[i+1][bitS[i] | k], dp[i][k] + C[i]);
+        }
     }
 
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    /*
+    rep(i,M+1){
+        rep(j,bit(N)){
+            if(dp[i][j] < INF*1e5)cerr<<dp[i][j]<<" ";
+        }
+        cerr<<endl;
+    }*/
+    if(dp[M][bit(N)-1] == INF*1e5){
+        cout<<-1<<endl;
+        return 0;
+    }
+    cout<<dp[M][bit(N)-1]<<endl;
 }

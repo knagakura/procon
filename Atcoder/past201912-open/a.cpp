@@ -29,35 +29,23 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    vector<vector<ll>> a(2,vector<ll>(N));
+    string S;
+    cin>>S;
+    int N = S.size();
     rep(i,N){
-        cin>>a[0][i];
-        a[1][i] = a[0][i];
-    }
-    if(N == 1){
-        cout<<a[0][0]/2<<endl;
-        return 0;
-    }
-    ll ans[2] = {0,0};
-    reverse(all(a[1]));
-    rep(i,2){
-        rep(j,N-1){
-            if((a[i][j] + a[i][j+1]) % 2 == 0){
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = a[i][j+1] = 0;
-            }
-            else{
-                ans[i] += (a[i][j] + a[i][j+1]) / 2;
-                a[i][j] = 0;
-                a[i][j+1] = min(1LL,a[i][j+1]);
-            }
-            //print(a[i]);
+        if(0 <= S[i]-'a' && S[i] - 'a'< 26){
+            cout<<"error"<<endl;
+            return 0;
         }
-        //cerr<<endl;
     }
 
-    //cerr<<ans[0]<<" "<<ans[1]<<endl;
-    cout<<max(ans[0],ans[1])<<endl;
+    ll ans = 0;
+    rep(i,N){
+        if(S[i]-'0' == 0 && ans == 0)continue;
+        ans *= 10;
+        ans += S[i] - '0';
+    }
+    ans *= 2;
+    cout<<ans<<endl;
+    return 0;
 }

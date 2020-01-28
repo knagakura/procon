@@ -29,12 +29,19 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    ll N,K,S;
+    cin>>N>>K>>S;
+    vector<ll> A(N,1);
+    rep(i,K-1){
+        A[i] = S;
     }
-    cout<<cnt<<endl;
+    int cnt = 0;
+    for(int i = K-1;i < N-1;i++){
+        A[i] = ;
+        cnt++;
+    }
+    A[N-1] = S - cnt;
+    rep(i,N){
+        cout<<A[i]<<endl;
+    }
 }

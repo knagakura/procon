@@ -23,18 +23,31 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+void solve(){
+    vector<pair<int, int>> Ai;
+    map<int,int> Cost;
+    rep(i,3){
+        int a;cin>>a;
+        Ai.push_back({a,i});
+    }
+    sort(all(Ai));
+    rep(i,3){
+        int c;cin>>c;
+        Cost[i] = c;
+    }
+    if(Ai[1].second == 1){
+        cout<<0<<endl;
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    int T;
+    cin>>T;
+
+    while(T--){
+        solve();
     }
-    cout<<cnt<<endl;
 }

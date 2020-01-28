@@ -29,12 +29,7 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
-    }
-    cout<<cnt<<endl;
+    int H,W,N;
+    cin>>H>>W>>N;
+    cout<<(N+max(H,W)-1)/max(H,W)<<endl;
 }

@@ -18,9 +18,6 @@ const double PI = acos(-1.0);
 
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
-
-/*------------------------------------/
-for library*/
 class modint {
   public:
     using ll = long long;
@@ -88,36 +85,40 @@ class modint {
 };
 vector<modint> modint::factorial = {1};
 #define fact(n) modint::fact(n)
+#define C(n,r) modint::C(n,r)
 #define H(a,b) C(a+b, a)
-
-ll modpow(ll a, ll n, int mod) {
-    ll res = 1;
-    while (n > 0) {
-        if (n & 1) res = res * a % mod;
-        a = a * a % mod;
-        n >>= 1;
-    }
-    return res;
-}
  
+ 
+/*------------------------------------/
+for library*/
+
 /*------------------------------------*/
+
+ll gcd(ll a,ll b){
+    if(b == 0) return a;
+    return gcd(b, a%b);
+}
+template<class T>
+ll lcm(T a,T b){return a/gcd((ll)a,(ll)b)*b;}
 
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
     int N;
     cin>>N;
-    vector<ll> C(N);
-    rep(i,N)cin>>C[i];
-    sort(all(C));
-    ll ans = 0;
+    vector<modint> A(N);
+    rep(i,N)cin>>A[i];
+    modint lcmm = A[0];
     rep(i,N){
-        cerr<<modpow(2,N, MOD)<<" "<<C[i]<<" "<<(N + (N-1-i) * (N-1-i+1)/2)<<endl;
-        ans += modpow(2,N, MOD) * C[i] * (N + (N-1-i) * (N-1-i+1) / 2);
-        ans %= MOD;
+        lcmm = lcm(lcmm,A[i]);
     }
-
-    cout<<ans<<endl;
+    vector<modint> B(N);
+    rep(i,N){
+        B[i] = lcmm / A[i];
+    }
+    modint ans = 0;
+    rep(i,N){
+        ans += B[i];
+    }cout<<ans<<endl;
 }

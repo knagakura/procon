@@ -29,12 +29,35 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    int H,N;
+    cin>>H>>N;
+    vector<pair<double,pair<ll,ll>>> AB;
+    rep(i,N){
+        ll a,b;
+        cin>>a>>b;
+        AB.push_back({double(a/double(b)),{-b,a}});
     }
-    cout<<cnt<<endl;
+    sort(all(AB));
+    reverse(all(AB));
+    rep(i,N){
+    }
+    ll sumb = 0;
+    rep(i,N){
+        if(H < 0)break;
+        int a = AB[i].second.second;
+        int b = -AB[i].second.first;
+        
+        int cnt = H / a;
+        H -= cnt * a;
+        sumb += b * cnt;
+        cerr<<a<<" "<<b<<" "<<cnt<<endl;
+        cerr<<"H: "<<H<<endl;
+        cerr<<"sumb: "<<sumb<<endl;
+    }
+    if(H == 0){
+        cout<<sumb<<endl;
+        return 0;
+    }
+    cerr<<H<<endl;
+    cerr<<sumb<<endl;
 }

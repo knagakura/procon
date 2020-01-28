@@ -29,12 +29,9 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
-    }
-    cout<<cnt<<endl;
+    
+    int A[3];
+
+    rep(i,3)cin>>A[i];
+    cout<<min({abs(A[1]-A[0]), abs(A[0]-A[2]),abs(A[1]-A[2])})<<endl;
 }

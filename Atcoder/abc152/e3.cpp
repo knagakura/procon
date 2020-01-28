@@ -88,8 +88,23 @@ class modint {
 };
 vector<modint> modint::factorial = {1};
 #define fact(n) modint::fact(n)
+#define C(n,r) modint::C(n,r)
 #define H(a,b) C(a+b, a)
-
+ 
+ 
+template<typename T> 
+map<T,int> factorize(T x){
+    map<T,int> mp;
+    for (T i = 2; i*i <= x; i++){
+        while (x%i == 0) {
+            x /= i;
+            mp[i]++;
+        }
+        if (x == 1) break;
+    }
+    if (x != 1) mp[x]++;
+    return mp;
+}
 ll modpow(ll a, ll n, int mod) {
     ll res = 1;
     while (n > 0) {
@@ -99,7 +114,7 @@ ll modpow(ll a, ll n, int mod) {
     }
     return res;
 }
- 
+
 /*------------------------------------*/
 
 int main() {
@@ -109,15 +124,25 @@ int main() {
 
     int N;
     cin>>N;
-    vector<ll> C(N);
-    rep(i,N)cin>>C[i];
-    sort(all(C));
-    ll ans = 0;
+    vector<ll> A(N);
+    rep(i,N)cin>>A[i];
+    map<ll, int> lcm_map;
+    map<int, map<ll,int>> a_fact;
     rep(i,N){
-        cerr<<modpow(2,N, MOD)<<" "<<C[i]<<" "<<(N + (N-1-i) * (N-1-i+1)/2)<<endl;
-        ans += modpow(2,N, MOD) * C[i] * (N + (N-1-i) * (N-1-i+1) / 2);
-        ans %= MOD;
+        a_fact[i] = factorize(A[i]);
     }
-
+    rep(i,N){
+        for(auto p:a_fact[i]){
+            chmax(lcm_map[p.first], p.second);
+        }
+    }
+    modint LCM = 1;
+    for(auto p:lcm_map){
+        LCM *= modpow(p.first, p.second, MOD);
+    }
+    modint ans = 0;
+    rep(i,N){
+        ans += LCM / A[i];
+    }
     cout<<ans<<endl;
 }

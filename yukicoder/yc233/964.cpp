@@ -30,11 +30,9 @@ int main() {
     cout << fixed << setprecision(20);
 
     int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    cin>>N;
+    rep1(i,N+1){
+        rep(_,N)cout<<i%10;
     }
-    cout<<cnt<<endl;
+    cout<<endl;
 }

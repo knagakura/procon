@@ -29,12 +29,11 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
-    }
-    cout<<cnt<<endl;
+    char a,b;
+    cin>>a>>b;
+    string A = "";
+    string B = "";
+    rep(i,a - '0')B.push_back(b);
+    rep(i,b - '0')A.push_back(a);
+    cout<<min(A,B)<<endl;
 }

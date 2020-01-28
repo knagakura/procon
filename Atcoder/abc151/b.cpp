@@ -29,12 +29,19 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    int N,K,M;
+
+    cin>>N>>K>>M;
+    vector<ll> A(N-1);
+    int sum = 0;
+    rep(i,N-1){
+        cin>>A[i];
+        sum += A[i];
     }
-    cout<<cnt<<endl;
+    ll ans = M * N - sum;
+    if(ans > K){
+        cout<<-1<<endl;
+        return 0;
+    }
+    cout<<max(0LL,ans)<<endl;
 }

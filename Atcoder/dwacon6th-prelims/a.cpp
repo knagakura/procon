@@ -30,11 +30,19 @@ int main() {
     cout << fixed << setprecision(20);
 
     int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    cin>>N;
+    vector<string> s(N);
+    vector<ll> t(N);
+    map<string, int> map;
+    rep(i,N){
+        cin>>s[i]>>t[i];
+        map[s[i]] = i;
     }
-    cout<<cnt<<endl;
+    string X;
+    cin>>X;
+    ll ans = 0;
+    for(int i = map[X]+1;i < N;i++){
+        ans += t[i];
+    }
+    cout<<ans<<endl;
 }

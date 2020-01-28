@@ -88,17 +88,9 @@ class modint {
 };
 vector<modint> modint::factorial = {1};
 #define fact(n) modint::fact(n)
+#define C(n,r) modint::C(n,r)
 #define H(a,b) C(a+b, a)
-
-ll modpow(ll a, ll n, int mod) {
-    ll res = 1;
-    while (n > 0) {
-        if (n & 1) res = res * a % mod;
-        a = a * a % mod;
-        n >>= 1;
-    }
-    return res;
-}
+ 
  
 /*------------------------------------*/
 
@@ -109,15 +101,22 @@ int main() {
 
     int N;
     cin>>N;
-    vector<ll> C(N);
-    rep(i,N)cin>>C[i];
-    sort(all(C));
-    ll ans = 0;
+    vector<ll> x(N);
+    rep(i,N)cin>>x[i];
+    modint ans = 0;
     rep(i,N){
-        cerr<<modpow(2,N, MOD)<<" "<<C[i]<<" "<<(N + (N-1-i) * (N-1-i+1)/2)<<endl;
-        ans += modpow(2,N, MOD) * C[i] * (N + (N-1-i) * (N-1-i+1) / 2);
-        ans %= MOD;
-    }
+        for(int j = i + 1; j < N; j++){
+            ll d = j - i;
 
+            //cerr<<i<<" "<<j<<endl;
+            //cerr<<x[j] - x[i]<<endl;
+            modint add = (N-1-i) * (x[j] -x[i]) * C(N-1,d-1) * fact(d-1);
+            if(j == N-1){
+                
+            }
+            ans += add;
+            cerr<<add<<endl;
+        }
+    }
     cout<<ans<<endl;
 }

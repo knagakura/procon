@@ -23,18 +23,24 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+ll dp[12345];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    int H,N;
+    cin>>H>>N;
+    vector<int> A(N),B(N);
+    rep(i,N){
+        cin>>A[i]>>B[i];
     }
-    cout<<cnt<<endl;
+    rep(i,H+1){
+        dp[i] = INFLL;
+    }
+    dp[0] = 0;
+    rep(i,N)rep(j,H+1){
+        chmin(dp[min(H,j+A[i])],dp[j]+B[i]);
+    }
+    cout<<dp[H]<<endl;
 }

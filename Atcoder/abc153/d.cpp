@@ -23,18 +23,18 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+ 
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    ll H;cin>>H;
+    ll ans = 0;
+    ll cnt = 1;
+    while(H >= cnt){
+        ans += cnt;
+        cnt *= 2;
     }
-    cout<<cnt<<endl;
+    cout<<ans<<endl;
 }

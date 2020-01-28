@@ -23,18 +23,28 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+ll cnt[10][10] = {};
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
     int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    cin>>N;
+    rep1(i,N+1){
+        string S = to_string(i);
+        int t = S[0] - '0';
+        int b = S[(int)S.size() - 1] - '0';
+        cnt[t][b]++;
     }
-    cout<<cnt<<endl;
+    ll ans = 0;
+    rep1(i,10)rep1(j,10){
+        //if(i > j)continue;
+        ans += cnt[i][j] * cnt[j][i];
+    }
+    /*
+    rep1(i,10)rep1(j,10){
+        if(cnt[i][j])cerr<<i<<", "<<j<<": "<<cnt[i][j]<<endl;
+    }*/
+    cout<<ans<<endl;
 }

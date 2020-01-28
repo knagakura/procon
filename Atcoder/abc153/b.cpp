@@ -29,12 +29,11 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
-    }
-    cout<<cnt<<endl;
+    int H,N;
+    cin>>H>>N;
+    vector<ll> A(N);
+    rep(i,N)cin>>A[i];
+    ll sum = 0;
+    rep(i,N)sum+=A[i];
+    cout<<((sum >= H) ? "Yes":"No")<<endl;
 }

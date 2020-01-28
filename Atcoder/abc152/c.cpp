@@ -28,13 +28,14 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int N;
-    string S;
-    cin>>N>>S;
+    int N;cin>>N;
+    vector<ll> A(N);
+    rep(i,N)cin>>A[i];
+    ll minn = INFLL;
     int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    rep(i,N){
+        if(minn > A[i])cnt++;
+        chmin(minn,A[i]);
     }
     cout<<cnt<<endl;
 }

@@ -29,12 +29,14 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    ll N,D,A;
+    cin>>N>>D>>A;
+    vector<pair<ll,ll>> XH;
+    rep(i,N){
+        int x,h;
+        cin>>x>>h;
+        XH.push_back({x,h});
     }
-    cout<<cnt<<endl;
+    sort(all(XH));
+    printpair(XH);
 }

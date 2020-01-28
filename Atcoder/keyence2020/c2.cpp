@@ -25,16 +25,53 @@ for library*/
 /*------------------------------------*/
 
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    ll N,K,S;
+    cin>>N>>K>>S;
+    vector<int> A(N,S);
+    if(N == K){
+        rep(i,N){
+            cout<<A[i]<<endl;
+        }
+        return 0;
     }
-    cout<<cnt<<endl;
+    if(S == 1){
+        rep(i,K){
+            cout<<1<<endl;
+        }
+        rep(i,N-K){
+            cout<<min(S+1,(ll)1e9)<<endl;
+        }
+        return 0;
+    }
+    ll a = S/2;
+    ll b = S - a;
+    rep(i,N){
+        if(i < K+1){
+            if(i % 2 == 0)cout<<a<<endl;
+            else cout<<b<<endl;
+        }
+        else{
+            if(S == 1e9){
+                cout<<5<<endl;
+            }
+            else{
+                cout<<min(S+1,(ll)1e9)<<endl;
+            }
+        }
+    }
+    /*
+    rep(i,K+1){
+        if(i%2 == 0){
+            A[i] = a;
+        }
+        else A[i] = b;
+    }
+    for(int i = K+1;i<N;i++){
+        A[i] = min(S+1,(ll)1e9);
+    }
+    rep(i,N){
+        cout<<A[i]<<endl;
+    }
+    */
 }

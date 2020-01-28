@@ -22,19 +22,52 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 /*------------------------------------/
 for library*/
 
+
 /*------------------------------------*/
-
-int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
-
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+long long modpow(long long a, long long n, long long mod) {
+    long long res = 1;
+    while (n > 0) {
+        if (n & 1) res = res * a % mod;
+        a = a * a % mod;
+        n >>= 1;
     }
-    cout<<cnt<<endl;
+    return res;
+}
+
+// a^{-1} mod を計算する
+long long modinv(long long a, long long mod) {
+    return modpow(a, mod - 2, mod);
+}
+
+ll gcd(ll a,ll b){
+    if(b == 0) return a;
+    return gcd(b, a%b);
+}
+
+ll lcm(ll a,ll b){
+    ll ggg = gcd(a,b);
+    return a * b % MOD *modinv(ggg, MOD);
+}
+/*
+ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
+*/
+int main() {
+    int N;
+    cin>>N;
+    vector<ll> A(N);
+    rep(i,N)cin>>A[i];
+    ll lcmm = A[0];
+    rep(i,N){
+        lcmm = lcm(lcmm, A[i]);
+        B[i] = lcmm / A[i];
+    }
+    vector<ll> B(N);
+    rep(i,N){
+        B[i] = lcmm / A[i];
+    }
+    ll ans = 0;
+    rep(i,N){
+        ans += B[i]%MOD;
+        ans %= MOD;
+    }cout<<ans<<endl;
 }

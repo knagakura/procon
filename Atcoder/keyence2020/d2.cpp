@@ -30,11 +30,17 @@ int main() {
     cout << fixed << setprecision(20);
 
     int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    cin>>N;
+    vector<int> A(N),B(N);
+    vector<pair<int,int>> AB;
+    rep(i,N){
+        cin>>A[i];
+        AB.push_back({A[i],i%2});
     }
-    cout<<cnt<<endl;
+    rep(i,N){
+        cin>>B[i];
+        AB.push_back({B[i],i%2+1});
+    }
+    sort(all(AB));
+    printpair(AB);
 }

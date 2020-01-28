@@ -21,7 +21,33 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
+const ll mod = 1e9+7;
 
+void chmod(ll &M){
+    if(M >= mod) M %= mod;
+    else if(M < 0){
+        M += (abs(M)/mod + 1)*mod;
+        M %= mod;
+    }
+}
+const int MAX = 1000005;
+
+long long fac[MAX], finv[MAX], inv[MAX];
+void COMinit(){
+    fac[0] = fac[1] = 1;
+    finv[0] = finv[1] = 1;
+    inv[1] = 1;
+    for(int i = 2; i < MAX; i++){
+        fac[i] = fac[i-1] * i % mod;
+        inv[i] = mod - inv[mod%i] * (mod/i) % mod;
+        finv[i] = finv[i-1] * inv[i] % mod;
+    }
+}
+long long COM(int n, int k){
+    if(n < k) return 0;
+    if (n < 0 || k < 0) return 0;
+    return fac[n] * (finv[k] * finv[n-k] % mod) % mod;
+}
 /*------------------------------------*/
 
 int main() {
@@ -29,12 +55,21 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    COMinit();
+
+    ll N,K;
+    cin>>N>>K;
+    vector<ll> A(N);
+    rep(i,N)cin>>A[i];
+    sort(all(A));
+
+    ll ans = 0;
+    rep(i,N){
+        ll l = i;
+        ll r = N - i - 1;
+        ans += A[i] * COM(l,K-1);
+        ans -= A[i] * COM(r,K-1);
+        chmod(ans);
     }
-    cout<<cnt<<endl;
+    cout<<ans<<endl;
 }

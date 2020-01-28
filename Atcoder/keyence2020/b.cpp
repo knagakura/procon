@@ -23,18 +23,22 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+ll getl(pair<ll,ll> p){
+    return p.first - p.second;
+}
+ll getr(pair<ll,ll> p){
+    return p.first + p.second;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
     int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    cin>>N;
+    vector<pair<ll,ll>> A(N);
+    rep(i,N){
+        ll x,l;
+        cin>>x>>l;
+        A.push_back({x,l});
     }
-    cout<<cnt<<endl;
 }

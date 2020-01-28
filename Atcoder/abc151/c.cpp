@@ -28,13 +28,31 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    int N,M;
+    cin>>N>>M;
+    vector<int> p(M);
+    vector<string> S(M);
+    rep(i,M){
+        cin>>p[i]>>S[i];
+        p[i]--;
     }
-    cout<<cnt<<endl;
+
+    vector<bool> ACed(N,false);
+    vector<int> pena(N,0);
+    rep(i,M){
+        if(ACed[p[i]])continue;
+        if(S[i] == "AC"){
+            ACed[p[i]] = true;
+        }
+        if(S[i] == "WA")pena[p[i]]++;
+    }
+    int penasum = 0;
+    int acsum = 0;
+    rep(i,N){
+        if(ACed[i]){
+            acsum++;
+            penasum += pena[i];
+        }
+    }
+    cout<<acsum<<" "<<penasum<<endl;
 }

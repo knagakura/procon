@@ -23,18 +23,46 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
+//桁数、先頭の数、末尾の数
+ll dp[10][10][10];
+//桁数がNと一致した場合に注意が必要
 
+//桁数が一致する場合を数え上げる
+//桁数はmaxのみのものを数えるので、0入れない
+ll dp2[10][10][10][2];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
     int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    cin>>N;
+    int keta = to_string(N).size();
+    if(keta == 1){
+        cout<<N<<endl;
+        return 0;
     }
-    cout<<cnt<<endl;
+    //keta >= 2
+    ll ans = 0;
+    rep1(i,keta+1)rep1(j,10)rep1(k,10){
+        //最後の桁のときは、bitDPの考え方を使う？N以下の数の列挙
+        if(i == keta){
+            rep1(top,10){
+                if(top == N/(int)pow(10,keta-1)){
+
+                }
+            }
+        }
+        else{
+            dp[i][j][k] = pow(10,keta-2);
+        }
+    }
+
+    //a桁とb桁の組み合わせ全て
+    rep1(a,keta+1)rep(b,keta+1){
+        rep1(j,10)rep1(k,10){
+            ans += dp[a][j][k] * dp[b][k][j];
+        }
+    }
+    cout<<ans<<endl;
 }

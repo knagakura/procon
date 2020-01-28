@@ -25,16 +25,44 @@ for library*/
 /*------------------------------------*/
 
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    int H,N;
+    cin>>H>>N;
+    vector<pair<double,pair<ll,ll>>> AB;
+    ll maxa = 0;
+    rep(i,N){
+        ll a,b;
+        cin>>a>>b;
+        chmax(maxa, a);
+        AB.push_back({double(a/double(b)),{-b,a}});
     }
-    cout<<cnt<<endl;
+    sort(all(AB));
+    reverse(all(AB));
+    ll sumb = 0;
+    while(H>0){
+        int idx = 0;
+        if(H > maxa){
+            ll a0 = AB[0].second.second;
+            ll b0 = -AB[0].second.first;
+            H -= a0;
+            sumb += b0;
+        }
+        else{
+            ll minb = INFLL;
+            rep(i,N){
+                ll a = AB[i].second.second;
+                ll b = -AB[0].second.first;
+                if(H <= a){
+                    if(chmin(minb, b)){
+                    idx = i;
+                    }
+                }
+                sumb += minb;
+                H = 0;
+            }
+        }
+        cerr<<H<<endl;
+        cerr<<idx<<endl;
+    }
+    cout<<sumb<<endl;
 }

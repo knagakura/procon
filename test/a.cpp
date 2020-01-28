@@ -18,7 +18,11 @@ const double PI = acos(-1.0);
 
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
-
+bool isprime(int v) {
+    if (v == 1) return false;
+    for (int i = 2; 1LL * i*i <= v; i++) if (v%i == 0) return false;
+    return true;
+}
 /*------------------------------------/
 for library*/
 
@@ -29,12 +33,5 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
-    }
-    cout<<cnt<<endl;
+    
 }

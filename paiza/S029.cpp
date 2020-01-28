@@ -23,18 +23,21 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-
+vector<vector<pair<int,ll>>> G;
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
     int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    cin>>N;
+    G.resize(N);
+    rep(i,N-1){
+        int a,b
+        ll c;
+        cin>>a>>b>>c;
+        a--;b--;
+        G[a].push_back({b,c});
+        G[b].push_back({a,c});
     }
-    cout<<cnt<<endl;
 }

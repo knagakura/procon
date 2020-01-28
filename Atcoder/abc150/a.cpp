@@ -29,5 +29,8 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
+    int K,X;
+    cin>>K>>X;
+    cout<< ((500 * K >= X) ? "Yes":"No")<<endl;
     
 }

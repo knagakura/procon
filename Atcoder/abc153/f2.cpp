@@ -30,11 +30,39 @@ int main() {
     cout << fixed << setprecision(20);
 
     int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    ll D,A;
+    cin>>N>>D>>A;
+    vector<pair<ll,ll>> XH;
+    rep(i,N){
+        int x,h;
+        cin>>x>>h;
+        XH.push_back({x,h});
     }
-    cout<<cnt<<endl;
+    sort(all(XH));
+    vector<ll> X(N),H(N);
+    rep(i,N){
+        X[i] = XH[i].first;
+        H[i] = XH[i].second;
+    }
+    //今までの爆発でいくら減っているかを持つためのimos配列
+    vector<ll> Attack(N+1, 0);
+
+    ll ans = 0;
+    rep(i,N){
+        //残りの体力
+        int rem = H[i] - Attack[i];
+        if(rem > 0){
+            int need_cnt = (rem + A - 1)/A;
+            int right_x = X[i] + 2 * D;
+            int right_id = upper_bound(all(X), right_x) - X.begin();
+            //[X[i], X[right_id])の区間爆発が起こるので、
+            //imosの配列であるAttack[i]に+
+            //Attack[right_id]に-
+            Attack[i] += need_cnt * A;
+            Attack[right_id] -= need_cnt * A;
+            ans += need_cnt;
+        }
+        Attack[i+1] += Attack[i];
+    }
+    cout<<ans<<endl;
 }

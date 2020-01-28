@@ -30,11 +30,38 @@ int main() {
     cout << fixed << setprecision(20);
 
     int N;
-    string S;
-    cin>>N>>S;
-    int cnt = 0;
-    rep(i,N-2){
-        if(S.substr(i,3) == "ABC")cnt++;
+    ll D,A;
+    cin>>N>>D>>A;
+    vector<pair<ll,ll>> XH;
+    rep(i,N){
+        int x,h;
+        cin>>x>>h;
+        XH.push_back({x,h});
     }
-    cout<<cnt<<endl;
+    sort(all(XH));
+    vector<ll> X(N),H(N);
+    rep(i,N){
+        X[i] = XH[i].first;
+        H[i] = (XH[i].second + A - 1) / A;
+    }
+    ll ans = 0;
+
+    queue<pair<ll,ll>> Q;
+    ll Qsum = 0;
+    rep(i,N){
+        //古い情報から見ていって、今見ている位置に影響を与えない
+        //爆発は除いていく
+        while(!Q.empty() && Q.front().first < X[i]){
+            Qsum -= Q.front().second;
+            Q.pop();
+        }
+        //今までの爆発でできるやつ
+        H[i] -= Qsum;
+        //すでに死んでいたら何もしない
+        if(H[i] <= 0)continue;
+        ans += H[i];
+        Q.push(make_pair(X[i]+2*D, H[i]));
+        Qsum += H[i];
+    }
+    cout<<ans<<endl;
 }

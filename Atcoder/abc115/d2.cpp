@@ -24,41 +24,30 @@ for library*/
 
 /*------------------------------------*/
 
-int main() {
-	cin.tie(0);
-	ios::sync_with_stdio(false);
-	cout << fixed << setprecision(20);
+vector<int64_t> a(55),p(55);
 
-	int N;
-	cin>>N;
-	vector<ll> A(N);
-	rep(i,N)cin>>A[i];
-
-	multiset<ll> s;
-	rep(i,N){
-		auto itr = s.lower_bound(A[i]);
-		//自分以下の値がないとき
-		if(itr == s.begin()){
-			s.insert(A[i]);
-		}
-		//あるとき
-		else{
-			--itr;
-			s.erase(itr);
-			s.insert(A[i]);
-		}
-	}
-	cout<<(int)s.size()<<endl;
+int64_t F(int64_t n, int64_t x){
+    if(n == 0){
+        if(x <= 0)return 0LL;
+        else return 1;
+    }
+    else if(x <= 1 + a[n-1]){
+        return F(n-1, x-1);
+    }
+    else{
+        return p[n-1] + 1 + F(n-1, x - 2 - a[n-1]);
+    }
 }
-/*
-sの中からA[i]未満の最大値を探し、
-それを除いて、A[i]を突っ込む
-なかったら普通に突っ込む
 
-2 1 4 5 3
-[2]
-[1,2]
-[1,4]
-[1,5]
-[3,5]
-*/
+int main() {
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
+    int64_t n, x; cin >> n >> x;
+    a[0] = p[0] = 1;
+    for(int i=1; i<=n; ++i){
+        a[i] = 2*a[i-1]+3;
+        p[i] = 2*p[i-1]+1;
+    }
+    cout<< F(n,x) <<endl;
+}

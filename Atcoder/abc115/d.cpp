@@ -23,13 +23,38 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
+ll modpow(ll a, ll n, int mod) {
+    ll res = 1;
+    while (n > 0) {
+        if (n & 1) res = res * a % mod;
+        a = a * a % mod;
+        n >>= 1;
+    }
+    return res;
+}
 int N;
 ll X;
+ll F(ll i, ll k){
+    if(i == 0){
+        return (k <= 0) ? 0:1;
+    }
+    ll len = pow(2, i+1) - 3;
+    //中心
+    if(k == len / 2 + 1){
+        return F(i-1,k) + 1;
+    }
+    else if(k <= len / 2){
+        return F(i-1, k-1);
+    }
+    else{
+        return F(i-1, k) + 1 + F(i-1, k - len/2 - 1);
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
     cin>>N>>X;
-    
+    cout << F(N, X) <<endl;
 }

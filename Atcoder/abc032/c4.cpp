@@ -25,40 +25,44 @@ for library*/
 /*------------------------------------*/
 
 int main() {
-	cin.tie(0);
-	ios::sync_with_stdio(false);
-	cout << fixed << setprecision(20);
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
 
-	int N;
-	cin>>N;
-	vector<ll> A(N);
-	rep(i,N)cin>>A[i];
+    int N,K;
+    cin>>N>>K;
+    vector<ll> s(N);
+    bool f = false;
+    rep(i,N){
+        cin>>s[i];
+        if(s[i] == 0){
+            f = true;
+        }
+    }
 
-	multiset<ll> s;
-	rep(i,N){
-		auto itr = s.lower_bound(A[i]);
-		//自分以下の値がないとき
-		if(itr == s.begin()){
-			s.insert(A[i]);
-		}
-		//あるとき
-		else{
-			--itr;
-			s.erase(itr);
-			s.insert(A[i]);
-		}
-	}
-	cout<<(int)s.size()<<endl;
+    if(f){
+        cout<<N<<endl;
+        return 0;
+    }
+    int r = 0;
+    ll product = 1;
+    int ans = 0;
+    for(int l = 0;l < N; l++){
+        while(r < N && product * s[r] <= K){
+            product *= s[r];
+            r++;
+        }
+        //このループを出るときは、満たさないrが取れている
+        //[l,r)のかけ算がK以下だということ
+        //cerr<<"[l,r), product: "<<l<<" "<<r<<" "<<product<<endl;
+        chmax(ans, r - l);
+        //lを増やす準備
+        if(r == l){
+            r++;
+        }
+        else{
+            product /= s[l];
+        }
+    }
+    cout<<ans<<endl;
 }
-/*
-sの中からA[i]未満の最大値を探し、
-それを除いて、A[i]を突っ込む
-なかったら普通に突っ込む
-
-2 1 4 5 3
-[2]
-[1,2]
-[1,4]
-[1,5]
-[3,5]
-*/

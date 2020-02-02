@@ -25,40 +25,23 @@ for library*/
 /*------------------------------------*/
 
 int main() {
-	cin.tie(0);
-	ios::sync_with_stdio(false);
-	cout << fixed << setprecision(20);
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
 
-	int N;
-	cin>>N;
-	vector<ll> A(N);
-	rep(i,N)cin>>A[i];
-
-	multiset<ll> s;
-	rep(i,N){
-		auto itr = s.lower_bound(A[i]);
-		//自分以下の値がないとき
-		if(itr == s.begin()){
-			s.insert(A[i]);
-		}
-		//あるとき
-		else{
-			--itr;
-			s.erase(itr);
-			s.insert(A[i]);
-		}
-	}
-	cout<<(int)s.size()<<endl;
+    int N;
+    cin>>N;
+    vector<vector<ll>> cnt(10,vector<ll>(10,0));
+    rep1(i,N+1){
+        string S = to_string(i);
+        int top = S[0] - '0';
+        int back = S[S.size() - 1] - '0';
+        //cerr<<i<<" "<<top<<" "<<back<<endl;
+        cnt[top][back]++;
+    }
+    ll ans = 0;
+    rep1(i,10)rep1(j,10){
+        ans += cnt[i][j] * cnt[j][i];
+    }
+    cout<<ans<<endl;
 }
-/*
-sの中からA[i]未満の最大値を探し、
-それを除いて、A[i]を突っ込む
-なかったら普通に突っ込む
-
-2 1 4 5 3
-[2]
-[1,2]
-[1,4]
-[1,5]
-[3,5]
-*/

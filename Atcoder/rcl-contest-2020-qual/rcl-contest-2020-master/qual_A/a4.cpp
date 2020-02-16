@@ -21,7 +21,7 @@ for library*/
 int N,W,K,V;
 int c[1111], v[1111];
 
-constexpr double TL = 1.95;
+constexpr double TL = 1.99;
 constexpr ll CYCLES_PER_SEC = 2800000000;
 struct Timer {
   ll start;
@@ -50,6 +50,12 @@ uint32_t XorShift(void) {
 	x = y; y = z; z = w;
 	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
 }
+
+double Prob(void){
+	double ret = (double)XorShift() / UINT_MAX;
+	return ret;
+}
+
 class Status{
 public:
     //行数の最小値
@@ -123,6 +129,9 @@ void simulate(){
 
     Status status(W);
     status.Iniset();
+
+    double C = TL * 100; //許容する確率定数
+    double next; //遷移するかしないかの許容ライン
     //status.debug();
     int cnt = 0;
     while(1){
@@ -141,7 +150,9 @@ void simulate(){
             //status2.debug();
             cerr<<status.score<<" "<<status2.score<<endl;
         }*/
-        if(status.score < status2.score){
+        auto rest_time = TL - now_time;
+        next = rest_time / C;
+        if(status.score < status2.score || next > Prob()){
             status = status2;
         }
         cnt++;

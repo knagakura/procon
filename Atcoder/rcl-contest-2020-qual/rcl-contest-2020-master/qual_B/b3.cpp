@@ -73,7 +73,7 @@ public:
   //渦巻き
   void MakeSwirl(bool rotation = false){
       rep(i,4){
-          //右へ
+          
           int right[4] = {0,1,2,3};
           int left[4] = {1,0,3,2};
           int ax=0,ay=0;
@@ -81,6 +81,8 @@ public:
           if(rotation){
             rep(l, 4)right[l] = left[l];
           }
+
+          //->
           rep(j, 9){
               swirl_count++;
               ax = 0;
@@ -90,6 +92,7 @@ public:
               setxyz(i, count * 4 + coll[i],
               ax, ay, right[0]);
           }
+          //↓
           rep(j, 8){
             swirl_count++;
             ax = j * 5;
@@ -99,7 +102,7 @@ public:
             setxyz(i, count * 4 + coll[i], 
             ax, ay, right[1]);
           }
-          
+          //<-
           rep(j, 6){
               swirl_count++;
               ax = 40;
@@ -110,6 +113,7 @@ public:
               setxyz(i, count * 4 + coll[i], 
               ax, ay, right[2]);
           }
+          //↑
           rep(j, 4){
               swirl_count++;
               ax = 40 - j * 5;
@@ -120,7 +124,16 @@ public:
               setxyz(i, count * 4 + coll[i], 
               ax, ay, right[3]);
           }
-          
+          rep(j,1){
+            swirl_count++;
+            ax = 20;
+            ay = 15 + j * 5;
+            if(rotation)swap(ax, ay);
+            Paint(coll[i],
+            ax, ay, right[0]);
+            setxyz(i, count  * 4 + coll[i],
+            ax, ay, right[0]);
+          }
           //debug();
           rotate();
       }
@@ -283,6 +296,7 @@ int main() {
     else{
       ans.output();
     }
+
     /*
     print(ans.x);
     print(ans.y);

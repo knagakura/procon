@@ -29,7 +29,7 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    vector<int> a(3);
+    vector<int> A(3);
     set<int> b;
     rep(i,3){
         cin>>A[i];

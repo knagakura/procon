@@ -7,7 +7,7 @@ taskname=${4:-${contestname}}
 oj dl "https://atcoder.jp/contests/${contestname}/tasks/${taskname}_${problemname}"
 echo g ./${filename}
 
-g++-8 -O2 -std=gnu++14 -Wall -Wextra -Wshadow ./${filename}
+g++-9 -O2 -std=gnu++14 -Wall -Wextra -Wshadow ./${filename}
 
 oj t
 rm -f a.out

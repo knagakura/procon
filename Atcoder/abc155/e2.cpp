@@ -59,24 +59,17 @@ int main() {
     rep(i,N)rep(j,2){
         //i桁目に設定する値
         int sita = S[i] - '0';
-        rep(k, 10){
-            //下の桁で繰り上がりが起きているなら
-            //設定した値が少なくなる（前のところで使われている）
-            int ue = k;
-            if(j)ue--;
-            if(ue < 0)continue;
-            //設定する値がsi以上
-            //桁上がりが起きていない
-            if(ue >= sita){
-                chmin(dp[i+1][0], dp[i][j] + k + ue - sita);
+        if(j)sita++;
+        rep(a,10){
+            int ni = i+1;
+            int nj = 0;
+            int b = a - sita;
+            if(b < 0){
+                nj++;
+                b += 10;
             }
-            else{
-                chmin(dp[i+1][1], dp[i][j] + k + (10 + ue - sita));
-            }
-            //cerr<<i<<" "<<j<<" "<<k<<endl;
-            //debug();
+            chmin(dp[ni][nj], dp[i][j] + a + b);
         }
     }
-
     cout<<dp[N][0]<<endl;
 }

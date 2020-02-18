@@ -29,22 +29,16 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin>>N;
-    map<string, int> map;
-    rep(i,N){
-        string S;
-        cin>>S;
-        map[S]++;
+    int N,K;
+    cin>>N>>K;
+    vector<ll> A(N);
+    vector<ll> seki;
+    rep(i,N)cin>>A[i];
+    rep(i,N)rep(j,N){
+        if(i >= j)continue;
+        seki.push_back(A[i] * A[j]);
     }
-    int maxx = 0;
-    for(auto p:map){
-        chmax(maxx, p.second);
-    }
-    vector<string> ans;
-    for(auto p:map){
-        if(p.second == maxx)ans.push_back(p.first);
-    }
-    sort(all(ans));
-    rep(i,ans.size())cout<<ans[i]<<endl;
+    sort(all(seki));
+    print(seki);
+    cerr<<seki[K-1]<<endl;
 }

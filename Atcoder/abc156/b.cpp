@@ -28,58 +28,18 @@ for library*/
 
 /*------------------------------------*/
 
-vector<vector<int>> G;
-bool edge_used[100100];
-bool v_visited[100100];
-map<pair<int,int>, int> mp;
-
-void dfs(int from, int to){
-    if(v_visited[to]){
-        edge_used[mp[{from, to}]] = false;
-        return;
-    }
-    v_visited[to] = true;
-    print(G[to]);
-    for(auto nx:G[to]){
-        dfs(to, nx);
-    }
-}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N,M;
-    G.resize(N);
-    rep(i,N+1){
-        v_visited[i] = false;
-        edge_used[i] = true;
-    }
-    cin>>N>>M;
-
-    vector<pair<int, int>> edge(N-1+M);
-    rep(i,N-1+M){
-        int a,b;
-        cin>>a>>b;
-        a--;b--;
-        G[a].push_back(b);
-        G[b].push_back(a);
-        mp[{a,b}] = i;
-        mp[{b,a}] = i;
-        edge.push_back({a,b});
-    }
-    dfs(-1,0);
-    vector<vector<int>> G2(N);
+    ll N,K;
+    cin>>N>>K;
     int cnt = 0;
-    for(int i = 0; i < N-1+M;i++){
-        if(edge_used[i]){
-            G2[edge[i].first].push_back(edge[i].second);
-            G2[edge[i].second].push_back(edge[i].first);
-            cnt++;
-        }
+    int num = 1;
+    while(num <=N){
+        num *= K;
+        cnt++;
     }
-    cerr<<"M, cnt: "<<M<<" "<<cnt<<endl;
-    rep(i,N){
-        print(G2[i]);
-    }
+    cout<<cnt<<endl;
 }

@@ -25,61 +25,52 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 
 /*------------------------------------/
 for library*/
-
-/*------------------------------------*/
-
-vector<vector<int>> G;
-bool edge_used[100100];
-bool v_visited[100100];
-map<pair<int,int>, int> mp;
-
-void dfs(int from, int to){
-    if(v_visited[to]){
-        edge_used[mp[{from, to}]] = false;
-        return;
-    }
-    v_visited[to] = true;
-    print(G[to]);
-    for(auto nx:G[to]){
-        dfs(to, nx);
-    }
+ll gcd(ll a,ll b){
+    if(b == 0) return a;
+    return gcd(b, a%b);
 }
+ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
+/*------------------------------------*/
+ll l, r;
+ll m;
+vector<ll> n;
+
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int N,M;
-    G.resize(N);
-    rep(i,N+1){
-        v_visited[i] = false;
-        edge_used[i] = true;
+    cin>>l>>r>>m;
+    n.resize(m);
+    rep(i,m)cin>>n[i];
+    sort(all(n));
+    if(n[0] == 1){
+        cout<< 0 <<endl;
+        return 0;
     }
-    cin>>N>>M;
-
-    vector<pair<int, int>> edge(N-1+M);
-    rep(i,N-1+M){
-        int a,b;
-        cin>>a>>b;
-        a--;b--;
-        G[a].push_back(b);
-        G[b].push_back(a);
-        mp[{a,b}] = i;
-        mp[{b,a}] = i;
-        edge.push_back({a,b});
-    }
-    dfs(-1,0);
-    vector<vector<int>> G2(N);
-    int cnt = 0;
-    for(int i = 0; i < N-1+M;i++){
-        if(edge_used[i]){
-            G2[edge[i].first].push_back(edge[i].second);
-            G2[edge[i].second].push_back(edge[i].first);
-            cnt++;
+    if (m == 1){
+        if(r <= (ll)1e5){
+            ll ans = r - l + 1;
+            for (int i = l; i <=r; i++){
+                if(i % n[0] == 0){
+                    ans--;
+                }
+            }
+            cout<<ans<<endl;
+            return 0;
         }
     }
-    cerr<<"M, cnt: "<<M<<" "<<cnt<<endl;
-    rep(i,N){
-        print(G2[i]);
+    else if(m > 1){
+        if(r <= (ll)1e5){
+            ll ans = r - l + 1;
+            for (int i = l; i <= r;i++){
+                rep(j,m){
+                    if(i % n[j] == 0){
+                        ans--;
+                        break;
+                    }
+                }
+            }
+            cout<<ans<<endl;
+        }
     }
 }

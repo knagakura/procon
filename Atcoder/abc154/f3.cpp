@@ -23,8 +23,6 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 for library*/
 
 /*------------------------------------*/
-//vector<vector<int>> v(1e6, vector<int>(1e6,0));
-vector<vector<int>> v(1e3, vector<int>(1e3,0));
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);

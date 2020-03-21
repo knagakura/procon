@@ -27,11 +27,58 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+ll N, M, B;
+string S; // S.size() = N
+vector<string> A; 
+vec<ll> V; // 10^9
 
+vec<ll> dp;
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    
+    // input part
+    cin >> N >> M >> B >> S;
+    A.resize(M);V.resize(M);
+    rep(i,M){
+        cin >> A[i] >> V[i];
+    }
+
+    //memo part
+    map<string, ll> mp;
+    map<string, int> mpcnt;
+    rep(j,M){
+        int sz = A[j].size();
+        for(int k = 1; k < bit(10);k++){
+            string tmp = "";
+            int cnt = 0;
+            rep(l, sz){
+                if(bit(l) & k){
+                    tmp.push_back(A[j][l]);
+                    cnt++;
+                }
+            }
+            if(mpcnt[tmp] == 0)mp[tmp] = V[j] - (sz - cnt) * B;
+            else chmax(mp[tmp], V[j] - (sz - cnt) * B);
+            mpcnt[tmp]++;
+        }
+    }
+    /*
+    for(auto p:mp){
+        cerr << p.first << " " << p.second << endl;
+    }
+    */
+    // dp part
+    dp.assign(N+5, -INFLL);
+    dp[0] = 0;
+    rep(i,N){
+        string tmp = "";
+        rep(j, 10){
+            if(i + j > N)continue;
+            tmp.push_back(S[i + j]);
+            if(mpcnt[tmp]>0)chmax(dp[i+j+1], dp[i] + mp[tmp]);
+        }
+    }
+    cout << dp[N] << endl;
 }

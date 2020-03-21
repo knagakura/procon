@@ -94,19 +94,19 @@ int main() {
     vector<ll> S(N);
     rep(i,N)cin>>S[i];
     vector<ll> T(M);
-    rep(i,N)cin>>T[i];
+    rep(i,M)cin>>T[i];
     rep(i,N+1)dp[i][0] = 1;
     rep(j,M+1)dp[0][j] = 1;
     rep(i,N)rep(j,M){
         if(S[i] == T[j]){
-            dp[i+1][j+1] = dp[i][j+1] + dp[i+1][j] + dp[i][j];
+            dp[i+1][j+1] = dp[i+1][j] + dp[i][j+1];
         }
         else{
             dp[i+1][j+1] = dp[i][j+1] + dp[i+1][j] - dp[i][j];
         }
-        cerr<<i<<" "<<j<<endl;
-        debug();
-        cerr<<endl;
+        //cerr<<i<<" "<<j<<endl;
+        //debug();
+        //cerr<<endl;
     }
     cout<<dp[N][M].x<<endl;
 }

@@ -22,4 +22,4 @@ int main() {
 	int ans = max(A+B,max(A-B, A*B));
 	
 	cout<<ans<<endl;
-}
+}co

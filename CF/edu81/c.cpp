@@ -44,7 +44,7 @@ void solve(){
     rep(i, ss.size()){
         nxtidx[ss[i] - 'a'].push_back(i);
     }
-    //debug(nxtidx);
+    debug(nxtidx);
     ll ans = 1;
     int nowidx = -1;
     rep(i,t.size()){
@@ -53,7 +53,7 @@ void solve(){
             cout<< -1 <<endl;
             return;
         }
-        //cerr<<t[i]<<" "<<*nxtitr<<endl;
+        cerr<<t[i]<<" "<<*nxtitr<<endl;
         nowidx = *nxtitr;
         if(nowidx >= (int)s.size()){
             nowidx %= int(s.size());

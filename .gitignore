@@ -1,8 +1,13 @@
 
 .DS_Store
 
-a.out
+
 *.jpeg
 *.pdf
 
-/paiza
+/paiza/*
+*.md
+*.txt
+a.out
+/topcoder
+*.json

@@ -45,33 +45,28 @@ map<T,int> factorize(T x){
     if (x != 1) mp[x]++;
     return mp;
 }
-
+template<typename T>
+T eulerPhi(T n){
+    auto map = factorize(n);
+    T res = n;
+    for(auto& p: map){
+        res /= p.first;
+        res *= p.first - 1;
+    }
+    return res;
+}
 
 ll a,m;
-
 void solve(){
     cin >> a >> m;
     ll g = gcd(a,m);
-    ll a_d = a / g;
     ll m_d = m / g;
-    cerr<<"(g ,a', m'): "<<g<<" "<<a_d<<" "<<m_d<<endl;
-
-    map<ll, int> mm = factorize(m_d);
-    ll ans = m_d+1;
-    ll tmp = 1;
-    for(auto p:mm){
-        tmp *= (p.second+1);
-    }
-    ans -= tmp;
-    cout<<ans<<endl;
-    // 0 <= c < m_d
-    // && m_dと互いに素
+    cout << eulerPhi(m_d) <<endl;
 }
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
     int Q;
     cin>> Q;
     while(Q--){

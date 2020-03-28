@@ -27,49 +27,36 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-ll dp[200200][5];
+void solve(){
+    ll n, k;
+    cin >> n >> k;
+    ll ok = 0;
+    ll ng = n * n;
+    while(ng - ok > 1){
+        ll mid = (ok + ng) / 2;
+        if(mid * (mid + 1) / 2 < k)ok = mid;
+        else ng = mid;
+    }
+    int f = k - (ok * (ok + 1)/ 2);
+    ok++;f--;
+    string ans = "";
+    rep(i,n){
+        if(i == ok || i == f){
+            ans.push_back('b');
+        }
+        else ans.push_back('a');
+    }
+    reverse(all(ans));
+    cout << ans << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    int N;
-    cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin>>A[i];
-    rep(i,N+1)rep(j,5)dp[i][j] = INFLL;
-    rep(j,5)dp[0][j] = 0;
-    rep(i,N){
-        rep(j,5){
-            //k <= j
-            for(int k = 0; k <= j;k++){
-                //0を置くパート
-                if(j == 0 || j == 4){
-                chmin(dp[i+1][j], dp[i][k] + A[i]);
-                }
-                //2以上の偶数を置くパート
-                if(j == 1 || j == 3){
-                    if(A[i] == 0){
-                        chmin(dp[i+1][j], dp[i][k] + 2);
-                    }
-                    else{
-                        chmin(dp[i+1][j], dp[i][k] + A[i] % 2);
-                    }
-                }
-                //奇数を置くパート
-                if(j == 2){
-                    chmin(dp[i+1][j], dp[i][k] + (A[i] + 1) % 2);
-                }
-            }
-        }
+
+    int q;
+    cin >> q;
+    while(q--){
+        solve();
     }
-    ll ans = INFLL;
-    /*
-    rep(i,N+1){
-        rep(j,5){
-            cerr << dp[i][j] << " ";
-        }
-        cerr << endl;
-    }*/
-    rep(j,5)chmin(ans, dp[N][j]);
-    cout << ans << endl;
 }

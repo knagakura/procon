@@ -22,54 +22,35 @@ const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = (ll)1e9+7;
 const double PI = acos(-1.0);
-/*
+
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
-*/
-ll dp[200200][5];
+int H, W, R, C;
+bool IsIn(int x,int y){
+    return 0<=x&&x<H&&0<=y&&y<W;
+}
+
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    int N;
-    cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin>>A[i];
-    rep(i,N+1)rep(j,5)dp[i][j] = INFLL;
-    rep(j,5)dp[0][j] = 0;
-    rep(i,N){
-        rep(j,5){
-            //k <= j
-            for(int k = 0; k <= j;k++){
-                //0を置くパート
-                if(j == 0 || j == 4){
-                chmin(dp[i+1][j], dp[i][k] + A[i]);
-                }
-                //2以上の偶数を置くパート
-                if(j == 1 || j == 3){
-                    if(A[i] == 0){
-                        chmin(dp[i+1][j], dp[i][k] + 2);
-                    }
-                    else{
-                        chmin(dp[i+1][j], dp[i][k] + A[i] % 2);
-                    }
-                }
-                //奇数を置くパート
-                if(j == 2){
-                    chmin(dp[i+1][j], dp[i][k] + (A[i] + 1) % 2);
-                }
-            }
+
+    cin >> H >> W >> R >> C;
+    R--;C--;
+    vector<string> S(H);
+    rep(i,H)cin >> S[i];
+    int ans = 0;
+    rep(i,4){
+        int cnt = 0;
+        int x = R + dx[i];
+        int y = C + dy[i];
+        while(IsIn(x,y)&&S[x][y] != '#'){
+            x += dx[i];
+            y += dy[i];
+            cnt++;
         }
+        chmax(ans, cnt);
     }
-    ll ans = INFLL;
-    /*
-    rep(i,N+1){
-        rep(j,5){
-            cerr << dp[i][j] << " ";
-        }
-        cerr << endl;
-    }*/
-    rep(j,5)chmin(ans, dp[N][j]);
-    cout << ans << endl;
+    cout << ans <<endl;
 }

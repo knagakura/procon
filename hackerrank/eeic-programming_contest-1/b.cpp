@@ -27,49 +27,38 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-ll dp[200200][5];
+int N,K;
+
+vector<pair<char,long long>> RunLengthEncoder_ForString(string v){
+    vector<pair<char,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt%K));
+            continue;
+        }
+        if(v[i] == v[i+1]){
+            cnt++;
+            cnt %= K;
+        }
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
+    }
+    return RLE;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    int N;
-    cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin>>A[i];
-    rep(i,N+1)rep(j,5)dp[i][j] = INFLL;
-    rep(j,5)dp[0][j] = 0;
-    rep(i,N){
-        rep(j,5){
-            //k <= j
-            for(int k = 0; k <= j;k++){
-                //0を置くパート
-                if(j == 0 || j == 4){
-                chmin(dp[i+1][j], dp[i][k] + A[i]);
-                }
-                //2以上の偶数を置くパート
-                if(j == 1 || j == 3){
-                    if(A[i] == 0){
-                        chmin(dp[i+1][j], dp[i][k] + 2);
-                    }
-                    else{
-                        chmin(dp[i+1][j], dp[i][k] + A[i] % 2);
-                    }
-                }
-                //奇数を置くパート
-                if(j == 2){
-                    chmin(dp[i+1][j], dp[i][k] + (A[i] + 1) % 2);
-                }
-            }
-        }
+
+    string S;
+    cin >> N >> K >> S;
+    auto v = RunLengthEncoder_ForString(S);
+    printpair(v);
+    rep(i, v.size()-1){
+        
     }
-    ll ans = INFLL;
-    /*
-    rep(i,N+1){
-        rep(j,5){
-            cerr << dp[i][j] << " ";
-        }
-        cerr << endl;
-    }*/
-    rep(j,5)chmin(ans, dp[N][j]);
-    cout << ans << endl;
+    printpair(v);
 }

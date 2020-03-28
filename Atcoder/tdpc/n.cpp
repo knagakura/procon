@@ -181,7 +181,10 @@ int main() {
         
     ans.resize(N);
     dfs2();
+    mint res = 0;
     rep(i,N){
-        cout << ans[i] << endl;
+        res += ans[i];
     }
+    //print(ans);
+    cout << res / 2 << endl;
 }

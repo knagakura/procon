@@ -5,11 +5,12 @@
 *.jpeg
 *.pdf
 
+/OtherSite/paiza/*
 /paiza/*
 *.md
 *.txt
 a.out
-/topcoder
+tempCodeRunnerFile.cpp
 *.json
 CF/round630/test.cpp
 AtCoder/abc157/e2.dSYM/Contents/Resources/DWARF/e2

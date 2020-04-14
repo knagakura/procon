@@ -1,0 +1,1 @@
+java -jar tester.jar -exec "./a.out" -seed 100

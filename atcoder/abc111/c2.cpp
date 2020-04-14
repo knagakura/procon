@@ -1,3 +1,4 @@
+
 //偶数番目の頻度最大と奇数番目の頻度最大
 #include <bits/stdc++.h>
 using namespace std;
@@ -26,7 +27,7 @@ int main() {
 	for (int i = 1; i < N; i+=2){
 		cnt1[v[i]]++;
 	}
-
+	int ans;
 	rep(i,100000){
 	}
 	cout<<ans<<endl;

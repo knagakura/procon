@@ -36,27 +36,40 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
-    }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
+
+    ll K;
+    cin >> K;
+    auto check = [&](ll X){
+        string S = to_string(X);
+        int N = S.size();
+        //i桁目までで未満フラグj,最後の数字k
+        ll dp[N+1][2][10];
+        rep(i,N+1)rep(j,2)rep(k,10)
+            dp[i][j][k] = 0;
+        dp[1][0][S[0]-'0'] = 1;
+        rep1(i, S[0]-'0')dp[1][1][i] = 1;
+        for(int i = 1; i < N;i++){
+            rep1(l, 10)dp[i+1][1][l] += 1;
+            rep(j,2)rep(k,10){
+                int minn = max(0,k - 1);
+                int maxx = min({k+1, (j ? 9:S[i]-'0')});
+                for(int x = minn; x <= maxx;x++){
+                    dp[i+1][j || x < S[i]-'0'][x] += dp[i][j][k];
+                }
+            }
         }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
+        ll cnt = 0;
+        rep(j,2)rep(k,10){
+            cnt += dp[N][j][k];
         }
+        return cnt < K;
+    };
+    ll ok = 0;
+    ll ng = 1e11;
+    while(ng - ok > 1){
+        ll mid = (ok + ng) / 2;
+        if(check(mid))ok = mid;
+        else ng = mid;
     }
+    cout << ng << endl;
 }

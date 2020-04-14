@@ -36,27 +36,17 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
+    int a[3];
+    cin >> a[0] >> a[1] >> a[2];
+    int maxa = max({a[0], a[1], a[2]});
+    vector<int> b;
+    int sum = 0;
+    rep(i,3){
+        sum += a[i];
+        b.push_back(a[i]%2);
     }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
-        }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
+    sort(all(b));
+    if(b[0] == b[2]){
+
     }
 }

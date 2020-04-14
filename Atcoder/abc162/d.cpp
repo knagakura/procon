@@ -36,27 +36,30 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
+    int N;
+    string S;
+    string cs = {'R', 'G', 'B'};
+    map<char, int> mp;
+    mp['R'] = 0;
+    mp['G'] = 1;
+    mp['B'] = 2;
+    cin >> N >> S;
+    vvec<ll> r(3, vec<ll>(N+1,0));
+    for(int i = 0;i < N;i++){
+        rep(j,3)
+        r[j][i+1] += r[j][i] + (S[i] == cs[j]);
     }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
+    ll ans = 0;
+    rep(i,N)rep(j,N){
+        if(i >= j)continue;
+        if(S[i] == S[j])continue;
+        int hoka = 3 - mp[S[i]] - mp[S[j]];
+        //[i+1,j)の他の数››
+        ans += r[hoka][j] - r[hoka][i+1];
+        if((j - i) % 2 == 0){
+            int mid = (j-i)/2 + i;
+            ans -= (S[mid] == cs[hoka]);
         }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
     }
+    cout << ans << endl;
 }

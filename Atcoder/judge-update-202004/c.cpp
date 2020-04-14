@@ -31,32 +31,61 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+int N;
+int A[3][3];
+bool B[3][3];
+int a[3];
 
+void debug(){
+    rep(i,3){
+        rep(j,3){
+            cerr << A[i][j];
+            cerr << " ";
+        }
+        cerr << endl;
+    }
+}
+bool check(vector<int>& v){
+    rep(i,3)rep(j,3)A[i][j] = -1;
+    rep(k,N){
+        rep(i,3)rep(j,3)
+        if(A[i][j] == -1 && B[i][j]){
+            A[i][j] = v[k];
+            i = j = 5;
+        }
+    }
+
+    rep(i,3)rep(j,3){
+        if(A[i][j] == -1)continue;
+        if(i-1 >= 0&&B[i-1][j]){
+            if(A[i][j] <= A[i-1][j])return false;
+        }
+        if(j-1 >= 0&&B[i][j-1]){
+            if(A[i][j] <= A[i][j-1])return false;
+        }
+    }
+    return true;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
-    }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
-        }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
+
+    cin >> a[0] >> a[1] >> a[2];
+    N = a[0]+a[1]+a[2];
+    for(int i = 0;i < 3;i++){
+        for(int j = 0;j < a[i];j++){
+            B[i][j] = true;
         }
     }
+    vector<int> v;
+    rep1(i,N+1)v.push_back(i);
+    sort(all(v));
+    int ans = 0;
+    do{
+        if(check(v)){
+            ans++;
+        }
+    }while(next_permutation(all(v)));
+    cout << ans << endl;
 }

@@ -16,6 +16,12 @@ int main() {
 	int N;
 	cin>>N;
 	vector<int> A(N);
-	rep(i,N)cin>>A[i];
-	cout<<ans<<endl;
+	ll ans = pow(3, N);
+	ll odd = 1;
+	rep(i,N){
+		cin>>A[i];
+		if(A[i]&1)continue;
+		odd *= 2;
+	}
+	cout << ans - odd << endl;
 }

@@ -31,32 +31,36 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+int dp[3333][3333];
 
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
+
+    int N, T;
+    cin >> N >> T;
+    vector<pair<int, int>> ab;
+    rep(i,N){
+        int a, b;
+        cin >> a >> b;
+        ab.push_back({a, b});
     }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
+    sort(all(ab));
+    rep(i,N+1)rep(j,T)dp[i][j] = 0;
+
+    rep(i,N)rep(j,T){
+        int a = ab[i].first;
+        int b = ab[i].second;
+        chmax(dp[i+1][j], dp[i][j]);
+        if(j + a >= T)continue;
+        chmax(dp[i+1][j+a], dp[i][j] + b);
     }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
+    int ans = 0;
+    rep(i,N){
+        if(chmax(ans, dp[i][T-1] + ab[i].second)){
+            cerr << i << endl;
         }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
     }
+    cout << ans << endl;
 }

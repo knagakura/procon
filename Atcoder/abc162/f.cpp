@@ -31,32 +31,54 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+int N;
+ll dp[200010][5];
+void solve1(){
+    vvec<ll> A(2, vec<ll>(N/2));
+    rep(i,N){
+        cin >> A[i%2][i/2];
+    }
+    //print(A[0]);print(A[1]);
+    rep(i,N/2+1)rep(j,2)dp[i][j] = -INFLL;
+    dp[0][0] = 0;
+    rep(i,N/2){
+        chmax(dp[i+1][0], dp[i][0] + A[0][i]);
+        chmax(dp[i+1][1], dp[i][0] + A[1][i]);
+        chmax(dp[i+1][1], dp[i][1] + A[1][i]);
+    }
+    cout << max(dp[N/2][0], dp[N/2][1]) << endl;
+}
+ll dp2[200010][5][2];
+void solve2(){
+    vvec<ll> A(2, vec<ll>(N/2+1));
+    rep(i,N){
+        cin >> A[i%2][i/2];
+    }
+    //print(A[0]);print(A[1]);
+    rep(i,N/2+2)rep(j,2)rep(k,2)dp[i][j] = -INFLL;
+    dp2[0][0][0] = 0;
+    dp2[0][0][1] = 0;
+    rep(i,N/2+1){
+        chmax(dp2[i+1][0][0], dp2[i][0][0] + A[0][i]);
+        chmax(dp2[i+1][1][0], dp2[i][0][0] + A[1][i]);
+        chmax(dp2[i+1][1][0], dp2[i][1][0] + A[1][i]);
 
+        chmax(dp2[i+1][0][1], dp2[i][0][1] + A[0][i]);
+        chmax(dp2[i+1][1][1], dp2[i][0][1] + A[1][i]);
+        chmax(dp2[i+1][1][1], dp2[i][1][1] + A[1][i]);
+
+        chmax(dp2[i+1][0][1], dp2[i][0][0]);
+        chmax(dp2[i+1][1][1], dp2[i][1][0]);
+        chmax(dp2[i+1][1][1], dp2[i][0][0]);
+        chmax(dp2[i+1][0][1], dp2[i][1][0]);
+    }
+    cout << max(dp2[N/2+1][0][1], dp2[N/2+1][1][1]) << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
-    }
-    sort(all(ap));
     cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
-        }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
-    }
+    if(N % 2 == 0)solve1();
+    else solve2();
 }

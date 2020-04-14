@@ -36,27 +36,33 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
+    vector<pair<int, int>> a(3);
+    int x[3];
+    cin >> x[0] >> x[1] >> x[2];
+    int mx = max({x[0], x[1], x[2]});
+    int sum = (x[0] + x[1] + x[2]);
+    a[0] = {x[0]%2, x[0]};
+    a[1] = {x[1]%2, x[1]};
+    a[2] = {x[2]%2, x[2]};
+    sort(all(a));
+    int ans = 0;
+    //全部等しいとき 1 1 1, 0, 0, 0
+    if(a[0].first == a[2].first){
+        ans +=  (3 * mx - sum)/2;;
     }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
+    // 0, 1, 1
+    else if(a[1].first == 1 && a[2].first ==  1){
+        a[1].second += 1;
+        a[2].second += 1;
+        ans += 2;
+        ans += (3 * max({a[0].second,a[1].second,a[2].second}) - (sum + 2))/2;;
     }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
-        }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
+    // 0, 0, 1
+    else if(a[0].first == a[1].first){
+        a[0].second += 1;
+        a[1].second += 1;
+        ans += 2;
+        ans +=  (3 * max({a[0].second,a[1].second,a[2].second}) - (sum + 2))/2;;
     }
+    cout << ans << endl;
 }

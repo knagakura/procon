@@ -32,31 +32,64 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    vector<string> a(9);
+    rep(i,9)cin >> a[i];
+    pair<int, int> p[] = {
+        {0,0},
+        {1,4},
+        {2,8},
+        {3,6},
+        {4,1},
+        {5,5},
+        {6,3},
+        {7,7},
+        {8,2}
+    };
+    rep(i,9){
+        rep(j,9){
+            bool ch = false;
+            rep(k,9){
+                if(i == p[k].first && j == p[k].second){
+                    ch = true;
+                    break;
+
+                }
+            }
+            if(ch){
+                    int d = a[i][j] - '0';
+                    d++;
+                    if(d == 10)d = 1;
+                    cout << d;
+            }
+            else{
+                cout << a[i][j];
+            }
+        }
+        cout << endl;
+    }
+
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
-    }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
-        }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
-    }
+
+    int t;
+    cin >> t;
+    while(t--)solve();
 }
+/*
+154 873 396
+336 592 714
+729 645 835
+
+863 725 145
+979 314 628
+412 958 357
+
+631 457 992
+998 236 471
+247 789 563
+
+*/

@@ -32,31 +32,21 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+ll dp[20][2];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
-    }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
-        }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
+    string S;
+    cin >> S;
+    int N = S.size();
+    rep(i,N+1)rep(j,2)dp[i][j] = -INFLL;
+    dp[0][0] = 0;
+    rep(i,N)rep(j,2){
+        for(int nx = 0; nx <= (j ? 9: S[i] - '0');nx++){
+            chmax(dp[i+1][j || nx < S[i] - '0'], dp[i][j] + nx);
         }
     }
+    ll ans = max(dp[N][0], dp[N][1]);
+    cout << ans << endl;
 }

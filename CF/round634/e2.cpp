@@ -32,31 +32,54 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    int N;
+    cin >> N;
+    int K = 200;
+    vec<int> a(N);
+    vvec<int> idx(K, vec<int>(N, 0));
+    vvec<int> cum(K, vec<int>(N+1, 0));
+    vec<int> sz(K,0);
+    rep(i,N){
+        cin >> a[i];
+        a[i]--;
+        idx[a[i]][i]++;
+        sz[a[i]]++;
+        rep(k, K){
+            cum[k][i+1] += cum[k][i] + idx[k][i];
+        }
+    }
+    /*
+    rep(k,K)if(sz[k])print(idx[k]);
+    rep(k,K)if(sz[k])print(cum[k]);
+    print(sz);
+    */
+    rep(k,K){
+
+    }
+    int ans = 0;
+    rep(i,N)rep(j,N+1){
+        if(i >= j)continue;
+        int midmx = 0;
+        int lrminmx = 0;
+        //cerr <<"i, j: "<< i << " " << j << endl;
+        rep(k,K){
+            chmax(midmx, cum[k][j] - cum[k][i]);
+            int l = cum[k][i];
+            int r = sz[k] - cum[k][j];
+            chmax(lrminmx, min(l, r));
+        }
+        //cerr << midmx << " " << lrminmx << endl;
+        chmax(ans, midmx + lrminmx*2);
+    }
+    cout << ans << '\n';
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
-    }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
-        }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
-    }
+
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

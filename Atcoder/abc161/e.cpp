@@ -31,32 +31,68 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+int M;
+vvec<int> G;
+vec<int> dp;
 
+void dfs(int s){
+    dump(s);
+    print(dp);
+    for(auto nx: G[s]){
+        dp[nx]+=dp[s];
+        dfs(nx);
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
+
+    int N, K, C;
+    cin >> N >> K >> C;
+    string S;
+    cin >> S;
+    vector<int> v;
+    rep(i,N)if(S[i] == 'o')v.push_back(i);
+    M = v.size();
+    print(v);
+    v.push_back(INF);
+    dp.resize(M,0);
+    G.resize(M);
+    vector<bool> start(M,true);
+    rep(i,M){
+        int nx = upper_bound(all(v),v[i]+C) - v.begin();
+        cerr << v[i]+C << " "<<v[nx] << endl;
+        if(nx == M)continue;
+        start[nx] = false;
+        G[i].push_back(nx);
     }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
+    for(int i = M-1;i >= 0;i--){
+        int px = lower_bound(all(v), v[i]-C) - v.begin();
+        cerr << i << " " << px << endl;
     }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
+    print(start);
+    rep(i,M){
+        cerr<<i;print(G[i]);
+    }
+    queue<int> q;
+    vector<bool> visited(M,false);
+    rep(i,M)if(start[i]){
+        if(G[i].size() == 0)continue;
+        dp[i] = 1;
+        //dfs(i);
+        q.push(i);
+        visited[i] = true;
+    }
+    while(!q.empty()){
+        int s = q.front();
+        q.pop();
+        for(auto x: G[s]){
+            dp[x] += dp[s];
+            if(visited[x])continue;
+            q.push(x);
+            visited[x] = true;
         }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
     }
+    print(dp);
 }

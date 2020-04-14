@@ -31,32 +31,39 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+ll gcd(ll a,ll b){
+    if(b == 0) return a;
+    return gcd(b, a%b);
+}
+ll lcm(ll a,ll b){return a/gcd(a,b)*b;}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
+
+    int N, Q;
+    cin >> N >> Q;
+    vector<ll> A(N),S(Q);
+    rep(i,N)cin>>A[i];
+    rep(i,Q)cin>>S[i];
+    vector<ll> Gs(N);
+    Gs[0] = A[0];
+    rep1(i,N){
+        Gs[i] = gcd(Gs[i-1], A[i]);
     }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
+    rep(j,Q){
+        if(gcd(Gs.back(), S[j]) != 1){
+            cout << gcd(Gs.back(), S[j]) << endl;
         }
         else{
-            cout << ap[0].first * (N / 2) << endl;
+            int ok = -1;
+            int ng = N;
+            while(ng - ok > 1){
+                int mid = (ok + ng)/2;
+                if(gcd(S[j], Gs[mid]) == 1)ng = mid;
+                else ok = mid;
+            }
+            cout << ng+1 << endl;
         }
     }
 }

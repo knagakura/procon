@@ -31,32 +31,68 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+struct UnionFind{
+    int n;
+    vector<int> Parent;
+    vector<int> sizes;
+    UnionFind(int _n):n(_n),Parent(_n),sizes(_n,1){ rep(i,n)Parent[i]=i; }
+    //find the root of x
+    int root(int x){
+        if(x!=Parent[x]){
+        Parent[x] = root(Parent[x]);
+        }
+        return Parent[x];
+    }
+    //merge x and y
+    void unite(int x,int y){
+        x = root(x);
+        y = root(y);
+        if(x == y) return;
+        if(sizes[x] < sizes[y]) swap(x, y);
+        Parent[y] = x;
+        sizes[x] += sizes[y];
+    }
+    bool same(int x,int y){ return root(x) == root(y); }
+    int size(int x){ return sizes[root(x)]; }
+    int group_num(){
+        set<int> s;
+        for(int i = 0; i < n; ++i){
+            s.insert(root(i));
+        }
+        return int(s.size());
+    }
+};
+struct range{
+    int l;
+    int r;
+    int id;
+    range(int _l, int _r, int _id): l(_l), r(_r), id(_id){}
+}
+void solve(int t){
+    int N;
+    cin >> N;
+    vector<range> v;
+    rep(i,N){
+        int a, b;
+        cin >> a >> b;
+        v.push_back(range(a,b,i));
+    }
+    UnionFind Tree(N);
+    rep(i,N)rep(j,N){
+        if(i == j)continue;
+        
+    }
+    string ans;
+    cout  << "Case #" << t << ": "  << ans << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
+    int t;
+    cin >> t;
+    rep1(i, t+1){
+        solve(i);
     }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
-        }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
-    }
+    
 }

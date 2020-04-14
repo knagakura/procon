@@ -3,7 +3,7 @@ using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
 #define rep1(i,N) for(int i=1;i<int(N);++i)
 #define all(a) (a).begin(),(a).end()
-#define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
+#define print(v) { cout<<#v<<": [ "; for(auto _ : v) cout<<_<<", "; cout<<"]"; }
 #define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
 #define dump(x) cerr<<#x<<": "<<x<<endl;
 #define bit(k) (1LL<<(k))
@@ -31,32 +31,30 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+int N, K;
+void dfs(vector<int>& x){
+    if((int)x.size() == N){
+        print(x);cout <<": ";
+        int ans = x[0];
+        for(auto c: x){
+            ans = gcd(ans, c);
+        }
+        cout << ans << endl;
+        return;
+    }
+    for(int i = 1; i <= K;i++){
+        vector<int> tmp = x;
+        tmp.push_back(i);
+        dfs(tmp);
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll N;
-    ll a[4];
-    vec<pair<ll,int>> ap;
-    rep(i,4){
-        cin >> a[i];
-        if(i == 0)ap.push_back({8*a[i], i});
-        if(i == 1)ap.push_back({4*a[i], i});
-        if(i == 2)ap.push_back({2*a[i], i});
-        if(i == 3)ap.push_back({a[i], i});
-    }
-    sort(all(ap));
-    cin >> N;
-    if(N == 1){
-        cout << min({4*a[0], 2*a[1], a[2]}) << endl;
-    }
-    else{
-        if(N&1){
-            cout << ap[0].first * (N / 2) + min({4*a[0], 2*a[1], a[2]}) << endl;
-        }
-        else{
-            cout << ap[0].first * (N / 2) << endl;
-        }
-    }
+
+    N = 6;
+    K = 6;
+    vector<int> v;
+    dfs(v);
 }

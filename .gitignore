@@ -31,3 +31,8 @@ other/GoogleCode/GCJ2019/Round1B/b_sunuke.cpp
 other/GoogleCode/GCJ2019/Round1B/b_test.cpp
 other/GoogleCode/GCJ2019/Round1B/b_yuji9511.cpp
 other/topcoder/mm117/
+
+
+*cmake-build-debug/
+*.idea/
+.idea

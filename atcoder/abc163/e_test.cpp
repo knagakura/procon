@@ -4,7 +4,6 @@ using namespace std;
 #define rep1(i,N) for(int i=1;i<int(N);++i)
 #define all(a) (a).begin(),(a).end()
 #define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
-#define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
 #define dump(x) cerr<<#x<<": "<<x<<endl;
 #define bit(k) (1LL<<(k))
 typedef long long ll;
@@ -31,7 +30,7 @@ const string dir = "DRUL";
 */
 
 int main() {
-    cin.tie(0);
+    cin.tie(nullptr);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 

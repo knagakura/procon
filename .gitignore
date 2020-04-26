@@ -36,3 +36,5 @@ other/topcoder/mm117/
 *cmake-build-debug/
 *.idea/
 .idea
+atcoder/atcoder_clion_project.py
+codeforces/cf_clion_project.py

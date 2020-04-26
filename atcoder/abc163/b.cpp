@@ -38,15 +38,13 @@ int main() {
     ll N, M;
     cin >> N >> M;
     vector<ll> A(M);
-    rep(i,M){
-        cin>>A[i];
+    rep(i, M) {
+        cin >> A[i];
         N -= A[i];
     }
-    if(N < 0){
+    if (N < 0) {
         cout << -1 << endl;
-    }
-    else {
+    } else {
         cout << N << endl;
     }
-
 }

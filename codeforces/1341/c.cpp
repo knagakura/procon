@@ -37,19 +37,7 @@ void solve(){
     rep(i,N){
         cin>>a[i];
     }
-    reverse(all(a));
-    int idx = -1;
-    rep(i,N){
-        if(a[i] != i+1){
-            idx = i;
-            break;
-        }
-    }
-    reverse(all(a));
-    if(idx == -1)idx = N;
-    while(idx--)a.pop_back();
-    int sz = a.size();
-    rep(i,sz-1){
+    rep(i,N-1){
         if(a[i]+1 < a[i+1]){
             cout << "No" << endl;
             return;

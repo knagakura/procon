@@ -26,10 +26,10 @@ int main() {
 	vector<P> cnt1,cnt2;
 	//個数、keyのPairのベクター
 	for(auto x :  map1){
-		cnt1.push_back({x.second,  x.first});
+		cnt1.emplace_back(x.second,  x.first);
 	}
 	for(auto x :  map2){
-		cnt2.push_back({x.second,  x.first});
+		cnt2.emplace_back(x.second,  x.first);
 	}
 	cnt1.push_back({0,0});
 	cnt2.push_back({0,0});

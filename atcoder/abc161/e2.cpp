@@ -49,60 +49,49 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-int N;
-vector<string> S;
-
-//s -> t
-bool check(int dx, int dy) {
-    //写す
-    string tmp;
-    rep(i,N)tmp.push_back('.');
-    vector<string> t(N, tmp);
-    rep(i, N)rep(j, N) {
-            int nx = (i + dx) % N;
-            int ny = (j + dy) % N;
-            t[nx][ny] = S[i][j];
-        }
-    //check
-    rep(i, N)rep(j, N) {
-            if (t[i][j] != t[j][i]) {
-                return false;
-            }
-        }
-    return true;
-}
-
 int main() {
     cin.tie(nullptr);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    cin >> N;
-    S.resize(N);
-    rep(i, N)cin >> S[i];
-    ll ans = 0;
-    //(0,0)でどうなるかが(i,i)と同じ
-    if (check(0, 0)){
-        ans += N;
+    int N, K, C;
+    cin >> N >> K >> C;
+    string S;
+    cin >> S;
+    vector<int> v;
+    rep(i,N){
+        if(S[i] == 'o')v.emplace_back(i);
     }
-    //aのみを1~N-1まで全探索
-    //(a,0)が(a+j,j)と同じ
-    rep1(a, N) {
-        if (check(a, 0)){
-            ans += N - a;
+    //前から見たときのやつ
+    //map<int, int> mae;
+    vector<int> mae(K+1);
+    int sz = v.size();
+    int pre = v[0];
+    int cnt = 1;
+    mae[cnt] = pre;
+    while(cnt < K){
+        int next = *lower_bound(all(v), pre + C+1);
+        cnt++;
+        mae[cnt] = next;
+        pre = next;
+    }
+
+    //逆から
+    //map<int, int> usi;
+    vector<int> usi(K+1);
+    pre = v[sz-1];
+    cnt = K;
+    usi[cnt] = pre;
+    while(cnt > 1){
+        int idx = upper_bound(all(v), pre - C - 1) - v.begin();
+        int next = v[idx-1];
+        cnt--;
+        usi[cnt] = next;
+        pre = next;
+    }
+    rep1(i,K+1){
+        if(mae[i] == usi[i]){
+            cout << mae[i]+1 << endl;
         }
     }
-    //bのみを1~N-1まで全探索
-    //(0,b)が(i,i+b)と同じ
-    //N = 4
-    //(0,0), (1,1), (2,2), (2,3)
-    //(0,1), (1,2), (2,3)
-    //(0,2), (2,3)
-    //(0,3)
-    rep1(b, N) {
-        if (check(0, b)){
-            ans += N - b;
-        }
-    }
-    cout << ans << endl;
 }

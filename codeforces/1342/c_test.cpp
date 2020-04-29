@@ -49,60 +49,14 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-int N;
-vector<string> S;
-
-//s -> t
-bool check(int dx, int dy) {
-    //写す
-    string tmp;
-    rep(i,N)tmp.push_back('.');
-    vector<string> t(N, tmp);
-    rep(i, N)rep(j, N) {
-            int nx = (i + dx) % N;
-            int ny = (j + dy) % N;
-            t[nx][ny] = S[i][j];
-        }
-    //check
-    rep(i, N)rep(j, N) {
-            if (t[i][j] != t[j][i]) {
-                return false;
-            }
-        }
-    return true;
-}
-
 int main() {
     cin.tie(nullptr);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
+    int a,b;
+    cin >> a >> b;
+    rep(i,200){
+        cout << i << " " << (i%a)%b << " " << (i%b)%a << endl;
+    }
 
-    cin >> N;
-    S.resize(N);
-    rep(i, N)cin >> S[i];
-    ll ans = 0;
-    //(0,0)でどうなるかが(i,i)と同じ
-    if (check(0, 0)){
-        ans += N;
-    }
-    //aのみを1~N-1まで全探索
-    //(a,0)が(a+j,j)と同じ
-    rep1(a, N) {
-        if (check(a, 0)){
-            ans += N - a;
-        }
-    }
-    //bのみを1~N-1まで全探索
-    //(0,b)が(i,i+b)と同じ
-    //N = 4
-    //(0,0), (1,1), (2,2), (2,3)
-    //(0,1), (1,2), (2,3)
-    //(0,2), (2,3)
-    //(0,3)
-    rep1(b, N) {
-        if (check(0, b)){
-            ans += N - b;
-        }
-    }
-    cout << ans << endl;
 }

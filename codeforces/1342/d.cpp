@@ -49,60 +49,50 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-int N;
-vector<string> S;
-
-//s -> t
-bool check(int dx, int dy) {
-    //写す
-    string tmp;
-    rep(i,N)tmp.push_back('.');
-    vector<string> t(N, tmp);
-    rep(i, N)rep(j, N) {
-            int nx = (i + dx) % N;
-            int ny = (j + dy) % N;
-            t[nx][ny] = S[i][j];
+void solve(){
+    ll N, K;
+    cin >> N >> K;
+    vector<int> a(N), c(K);
+    rep(i,N)cin >> a[i];
+    rep(i,K)cin >> c[i];
+    //c_i以下のものがi+1個まで
+    sort(all(a));
+    print(a);
+    vvec<int> ans(K);
+    for(int i = 0; i < K; i++){
+        if(a.size() == 0)break;
+        print(a);
+        int idx = upper_bound(all(a), c[i]) - a.begin();
+        idx--;
+        cerr << idx << endl;
+        //それより右側全部とる
+        int sz = a.size();
+        int rcnt = (sz - idx - 1);
+        while(rcnt--){
+            if(a.empty())break;
+            ans[i].push_back(a.back());
+            a.pop_back();
         }
-    //check
-    rep(i, N)rep(j, N) {
-            if (t[i][j] != t[j][i]) {
-                return false;
-            }
+        int tmp = idx+1;
+        while(tmp--){
+            if(a.empty())break;
+            ans[i].push_back(a.back());
+            a.pop_back();
         }
-    return true;
+    }
+    rep(i,K){
+        if(ans[i].size() == 0)break;
+        cout << ans[i].size() << " ";
+        rep(j,ans[i].size()){
+            cout << ans[i][j] <<  " ";
+        }
+        cout << endl;
+    }
 }
-
 int main() {
     cin.tie(nullptr);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    cin >> N;
-    S.resize(N);
-    rep(i, N)cin >> S[i];
-    ll ans = 0;
-    //(0,0)でどうなるかが(i,i)と同じ
-    if (check(0, 0)){
-        ans += N;
-    }
-    //aのみを1~N-1まで全探索
-    //(a,0)が(a+j,j)と同じ
-    rep1(a, N) {
-        if (check(a, 0)){
-            ans += N - a;
-        }
-    }
-    //bのみを1~N-1まで全探索
-    //(0,b)が(i,i+b)と同じ
-    //N = 4
-    //(0,0), (1,1), (2,2), (2,3)
-    //(0,1), (1,2), (2,3)
-    //(0,2), (2,3)
-    //(0,3)
-    rep1(b, N) {
-        if (check(0, b)){
-            ans += N - b;
-        }
-    }
-    cout << ans << endl;
+    solve();
 }

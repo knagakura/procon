@@ -49,60 +49,42 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-int N;
-vector<string> S;
-
-//s -> t
-bool check(int dx, int dy) {
-    //写す
-    string tmp;
-    rep(i,N)tmp.push_back('.');
-    vector<string> t(N, tmp);
-    rep(i, N)rep(j, N) {
-            int nx = (i + dx) % N;
-            int ny = (j + dy) % N;
-            t[nx][ny] = S[i][j];
-        }
-    //check
-    rep(i, N)rep(j, N) {
-            if (t[i][j] != t[j][i]) {
-                return false;
-            }
-        }
-    return true;
-}
-
 int main() {
     cin.tie(nullptr);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    cin >> N;
-    S.resize(N);
-    rep(i, N)cin >> S[i];
-    ll ans = 0;
-    //(0,0)でどうなるかが(i,i)と同じ
-    if (check(0, 0)){
-        ans += N;
+    int N, M;
+    cin >> N >> M;
+    vvec<l_l> G(N);
+    for (int i = 0; i < N - 1; ++i) {
+        G[i + 1].push_back({i, 0});
     }
-    //aのみを1~N-1まで全探索
-    //(a,0)が(a+j,j)と同じ
-    rep1(a, N) {
-        if (check(a, 0)){
-            ans += N - a;
+    for (int i = 0; i < M; ++i) {
+        int l, r;
+        ll c;
+        cin >> l >> r >> c;
+        l--, r--;
+        G[l].push_back({r, c});
+    }
+    priority_queue<l_l,
+            vector<l_l>,
+            greater<>> pq;
+    vector<ll> dist(N, INFLL);
+    dist[0] = 0;
+    pq.push({0, 0});
+    while(!pq.empty()){
+        auto tmp = pq.top();
+        pq.pop();
+        int from = tmp.second;
+        ll d = tmp.first;
+        for(auto e: G[from]){
+            int to = e.first;
+            int cost = e.second;
+            if(dist[from] + cost < dist[to]){
+                dist[to] = dist[from] + cost;
+                pq.push({dist[to], to});
+            }
         }
     }
-    //bのみを1~N-1まで全探索
-    //(0,b)が(i,i+b)と同じ
-    //N = 4
-    //(0,0), (1,1), (2,2), (2,3)
-    //(0,1), (1,2), (2,3)
-    //(0,2), (2,3)
-    //(0,3)
-    rep1(b, N) {
-        if (check(0, b)){
-            ans += N - b;
-        }
-    }
-    cout << ans << endl;
+    cout << ((dist[N-1] == INFLL)? -1: dist[N-1]) << endl;
 }

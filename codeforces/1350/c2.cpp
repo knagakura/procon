@@ -29,22 +29,76 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-int sx, sy, gx, gy;
-int N;
+template<typename T, typename U> 
+T _pow(T a, U n) {
+    ll res = 1;
+    while (n > 0) {
+        if (n & 1) res = res * a;
+        a = a * a;
+        n >>= 1;
+    }
+    return res;
+}
+template<typename T> 
+map<T,int> factorize(T x){
+    map<T,int> mp;
+    for (T i = 2; i*i <= x; i++){
+        while (x%i == 0) {
+            x /= i;
+            mp[i]++;
+        }
+        if (x == 1) break;
+    }
+    if (x != 1) mp[x]++;
+    return mp;
+}
 
-bool is_cross(int x)
+
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    cin >> sx >> sy >> gx >> gy >> N;
-    vector<int> x(N), y(N);
+    int N;
+    cin >> N;
+    vector<ll> a(N);
+    map<int, map<int,int>> mp;
+    set<int> sosu;
     rep(i,N){
-        cin >> x[i] >> y[i];
+        cin >> a[i];
+        auto v = factorize(a[i]);
+        for(auto &p: v){
+            sosu.insert(p.first);
+        }
     }
-    int cnt = 0;
-    rep(i,N-1){
-        if(is_cross())
+    rep(i,N){
+        auto v = factorize(a[i]);
+        for(auto &x: sosu){
+            if(v.count(x))continue;
+            else v[x] = 0;
+        }
+        for(auto &p: v){
+            mp[p.first][p.second]++;
+        }
     }
+    ll ans = 1;
+    /*calc*/
+    for(auto &tmp: mp){
+        ll x = tmp.first;
+        int cnt = 0;
+        //dump(x);
+        //print(mp[x]);
+        for(auto &p: mp[x]){
+            if(cnt == 0&&p.second >= 2){
+                ans *= _pow(x, p.first);
+                break;
+            }
+            if(cnt == 1){
+                ans *= _pow(x, p.first);
+                break;
+            }
+            cnt++;
+        }
+    }
+    cout << ans << endl;
 }

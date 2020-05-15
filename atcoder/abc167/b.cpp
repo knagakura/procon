@@ -54,6 +54,11 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll X;
-    cin >> X;
+    ll a,b,c,k;
+    cin >> a >> b >> c >> k;
+    if(k > a+b){
+        cout << a - (k-a-b) << endl;
+        return 0;
+    }
+    cout << min(k, a) << endl;
 }

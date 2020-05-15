@@ -79,27 +79,56 @@ void solve_u2() {
             }
         }
     }
-    rep(i, MX)
-        rep(j, R[i].size()) {
-            if (map[R[i][j]] == 0) {
-                ans[0] = R[i][j];
-                break;
-            }
+    rep(i, MX)rep(j, R[i].size()) {
+        if (map[R[i][j]] == 0) {
+            ans[0] = R[i][j];
+            break;
         }
+    }
     rep(i, 10) {
         cout << ans[i];
     }
     cout << endl;
 }
-
-void solve_u16() {
-
+void solve_u16(){
+    vector<char> ans(10, '*');
+    //すでにその数字が出たか確認
+    map<char, int> map;
+    rep(i, MX){
+        // 最上位桁がdで、長さが同じとき
+        map[R[i][0]]++;
+    }
+    vector<pair<int, char>> v;
+    for(auto p: map){
+        v.emplace_back(p.second, p.first);
+    }
+    sort(all(v), greater<>());
+    rep(i,v.size()){
+        ans[i+1] = v[i].second;
+    }
+    rep(i,MX){
+        rep(j, R[i].size()){
+            if(map[R[i][j]]==0){
+                ans[0] = R[i][j];
+                break;
+            }
+        }
+    }
+    rep(i, 10){
+        cout << ans[i];
+    }
+    cout << endl;
 }
+
 
 void solve() {
     input();
+    solve_u16();
+    /*
     if (U == 2)solve_u2();
-    else solve_u16();
+    else
+        solve_u16();
+        */
 }
 
 int main() {

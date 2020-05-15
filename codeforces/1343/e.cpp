@@ -33,27 +33,14 @@ const string dir = "DRUL";
 int N, M, a, b, c;
 vector<ll> p;
 vvec<int> G;
-vector<ll> d;
-void solve(){
 
-    cin >> N >> M >> a >> b >> c;
-    a--, b--, c--;
-    p.resize(M);
-    d.assign(N, 0);
-    G.resize(N);
-    rep(i,M)cin >> p[i];
-    rep(i,M){
-        int x, y;
-        cin >> x >> y;
-        x--, y--;
-        G[x].push_back(y);
-        G[y].push_back(x);
-    }
-
+vector<ll> dist(int s){
     queue<int> q;
     vec<bool> vis(N, false);
-    q.push(a);
-    vis[a] = true;
+    vec<ll> d(N, INFLL);
+    q.push(s);
+    d[s] = 0;
+    vis[s] = true;
     while(!q.empty()){
         int v = q.front();
         q.pop();
@@ -64,10 +51,43 @@ void solve(){
             vis[nv] = true;
         }
     }
-    print(d);
+    return d;
+}
+
+void solve(){
+
+    cin >> N >> M >> a >> b >> c;
+    a--, b--, c--;
+
+    p.resize(M);
+    rep(i,M)cin >> p[i];
+    sort(all(p));
+
+    G.resize(N);
+
+    rep(i,M){
+        int x, y;
+        cin >> x >> y;
+        x--, y--;
+        G[x].push_back(y);
+        G[y].push_back(x);
+    }
+    auto da = dist(a);
+    auto db = dist(b);
+    auto dc = dist(c);
+    // xを中継地点として、a -> x -> b -> x -> c
+    vector<ll> cum(M+1, 0);
+    rep(i,M)cum[i+1] = cum[i] + p[i];
+    ll ans = INFLL;
+    rep(x, N){
+        int idx = da[x] + db[x] + dc[x];
+        if(idx > M)continue;
+        ll tmp = cum[db[x]] + cum[idx];
+        chmin(ans, tmp);
+    }
+    cout << ans << endl;
     G.clear();
     p.clear();
-    d.clear();
 }
 int main() {
     cin.tie(0);

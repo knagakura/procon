@@ -29,22 +29,65 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-int sx, sy, gx, gy;
-int N;
 
-bool is_cross(int x)
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    cin >> sx >> sy >> gx >> gy >> N;
-    vector<int> x(N), y(N);
-    rep(i,N){
-        cin >> x[i] >> y[i];
+    string A, B;
+    cin >> A >> B;
+    int N = A.size();
+    string S = A;
+    string T = B;
+    sort(all(S));
+    sort(all(T));
+    if(S != T){
+        cout << "NO" << endl;
+        return 0;
     }
-    int cnt = 0;
+    bool exist = false;
     rep(i,N-1){
-        if(is_cross())
+        if(S[i] == S[i+1])exist = true;
     }
+    //構成する文字数は同じ
+    vec<int> v;
+    rep(i,N){
+        if(A[i] != B[i]){
+            v.push_back(i);
+        }
+    }
+    print(v);
+    //巡回置換の次数を数える
+    auto check = [&]()->bool{
+        int m = v.size();
+        if(m > 6)return false;
+        //0,1,2回のswap
+        if(exist){
+            //0回で一致
+            if(A == B)return true;
+            //1回で一致
+            rep(i,m)rep(j,m){
+                if(i >= j)continue;
+                string C = A;
+                string D = B;
+                swap(C[v[i]], C[v[j]]);
+                swap(D[v[i]], D[v[j]]);
+                if(C == D)return true;
+            }
+            //2回で一致
+            rep(i,m)rep(j,m)rep(k,m)rep(l{
+                if(i >= j)continue;
+                string C = A;
+                string D = B;
+                swap(C[v[i]], C[v[j]]);
+                swap(D[v[i]], D[v[j]]);
+                if(C == D)return true;
+            }
+        }
+        //3回ちょうどのswap
+
+    };
+
+    cout << (check() ? "YES" : "NO") << endl;
 }

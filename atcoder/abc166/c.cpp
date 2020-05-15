@@ -51,23 +51,10 @@ const string dir = "DRUL";
 int N, M;
 vector<int> H;
 vvec<int> G;
-vector<bool> used;
-
-vector<int> dfs(int cur, int pre, vector<int> &v) {
-    if (used[cur])return v;
-    used[cur] = true;
-    v.push_back(cur);
-    for (auto nv: G[cur]) {
-        if (nv == pre)continue;
-        dfs(nv, cur, v);
-    }
-    return v;
-}
 
 int main() {
     cin.tie(nullptr);
     ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
 
     cin >> N >> M;
     H.resize(N);
@@ -82,39 +69,11 @@ int main() {
         G[b].push_back(a);
     }
 
-    used.assign(N, false);
     int ans = 0;
-    /*
-    rep(i, N) {
-        if (used[i])continue;
-        vector<int> x;
-        dfs(i, -1, x);
-        print(x);
-        int mx = 0;
-        for (auto idx: x) {
-            chmax(mx, H[idx]);
-        }
-        int cnt = 0;
-        for (auto idx: x) {
-            if (mx == H[idx])cnt++;
-        }
-        if(cnt == 1)ans++;
-    }
-     */
     rep(i,N){
-        if(used[i])continue;
         bool ok = true;
         for(auto nv: G[i]){
-            if(H[i] < H[nv]){
-                ok = false;
-            }
-            else if(H[i] == H[nv]){
-                ok = false;
-                used[nv] = true;
-            }
-            else{
-                used[nv] = true;
-            }
+            if(H[i] <= H[nv])ok = false;
         }
         if(ok)ans++;
     }

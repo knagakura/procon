@@ -48,60 +48,56 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-template<typename T, typename U>
-T _pow(T a, U n) {
-    T res = 1;
-    rep(i, n)res *= a;
-    return res;
-}
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
+
+void solve(){
+    int N, K;
+    cin >> N >> K;
+    vector<int> a(N);
+    rep(i,N)cin >> a[i];
+    ll ok = 0;
+    ll ng = N;
+    auto xxx = [&](map<int,int> & mp, ll x) -> bool{
+        if(mp[-1] >= x)return false;
+        else{
+            return mp[-1] + mp[0] >= x;
         }
-        if (x == 1) break;
+    };
+    auto check = [&](ll len) -> bool{
+        map<int, int> mp;
+        rep(i,len){
+            if(a[i] < K)mp[-1]++;
+            if(a[i] == K)mp[0]++;
+            if(a[i] > K)mp[1]++;
+            if(xxx(mp, (len+1)/2))return true;
+        }
+        for(int l = 1, r = len; r < N; l++,r++){
+            if(a[l-1] < K)mp[-1]--;
+            if(a[l-1] == K)mp[0]--;
+            if(a[l-1] > K)mp[1]--;
+            if(a[r] < K)mp[-1]++;
+            if(a[r] == K)mp[0]++;
+            if(a[r] > K)mp[1]++;
+            if(xxx((mp), (len+1)/2))return true;
+        }
+        return false;
+    };
+    while(ng - ok > 1){
+        ll mid = (ok + ng) /2;
+        if(check(mid)) {
+            ok = mid;
+        }
+        else{
+            ng = mid;
+        }
     }
-    if (x != 1) mp[x]++;
-    return mp;
-}
-vector< int64_t > divisor(int64_t n) {
-  vector< int64_t > ret;
-  for(int64_t i = 1; i * i <= n; i++) {
-    if(n % i == 0) {
-      ret.push_back(i);
-      if(i * i != n) ret.push_back(n / i);
-    }
-  }
-  sort(begin(ret), end(ret));
-  return (ret);
+    cout << (ok == 0 ? "no": "yes") << endl;
 }
 int main() {
     cin.tie(nullptr);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    ll X;
-    cin >> X;
-    auto v = divisor(X);
-    int sz = v.size();
-    rep(i,sz){
-        //a-b = v[i]とする
-        //a = b + v[i]
-        for(ll b = -1000; b <= 1000;b++){
-            ll a = b + v[i];
-            ll sl  = _pow(a,5) - _pow(b,5);
-            if(sl == X){
-                cout << a << " " << b << endl;
-                return 0;
-            }
-            a = b - v[i];
-            sl  = _pow(a,5) - _pow(b,5);
-            if(sl == X){
-                cout << a << " " << b << endl;
-                return 0;
-            }
-        }
-    }
+
+    int t;
+    cin >> t;
+    while(t--) solve();
 }

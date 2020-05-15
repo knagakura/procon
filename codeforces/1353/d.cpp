@@ -22,34 +22,42 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 
 const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
-const ll MOD = (ll)1e9+7;
-const double PI = acos(-1.0);
-/*
-const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
-const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
-const string dir = "DRUL";
-*/
 
-int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
-
+void solve(){
     int N;
-    int a, b;
-    int K;
-    cin >> N >> a >> b >> K;
-    vector<int> P(K);
-    map<int,int> map;
-    map[a]++;
-    map[b]++;
-    rep(i,K){
-        cin >> P[i];
-        if(map[P[i]]){
-            cout << "NO" << endl;
-            return 0;
-        }
-        map[P[i]]++;
+    cin >> N;
+    vector<int> a(N,0);
+    priority_queue<i_i, vector<i_i>> pq;
+    //長さと左端
+    pq.push({N, 0});
+    int cnt = 0;
+    while(not pq.empty()){
+        auto tmp = pq.top();
+        cnt++;
+        pq.pop();
+        //[l,r)
+        int l = -tmp.second;
+        int r = l + tmp.first;
+        if(l == r)continue;
+        if(cnt > N)break;
+        int mid = ((r-l)&1) ? (l+r)/2 : (l+r)/2-1;
+        //cerr <<"(" << l << " " << r << "): " << mid << endl;
+        a[mid] = cnt;
+        //cerr << "add: " << "(" << l << " " << mid << ")" << endl;
+        //cerr << "add: " << "(" << mid+1 << " " << r << ")" << endl;
+        pq.push({mid-l, -l});
+        pq.push({r-mid-1, -mid-1});
     }
-    cout << "YES" << endl;
+    rep(i,N){
+        cout << a[i] << " ";
+    }
+    cout << endl;
+}
+int main() {
+
+    int t;
+    cin >> t;
+    while(t--){
+        solve();
+    }
 }

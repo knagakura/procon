@@ -30,26 +30,60 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    int N, K;
+    cin >> N >> K;
+    string S;
+    cin >> S;
+    int cnt1 = 0;
+    vvec<int> V(K);
+    rep(i,N){
+        V[i%K].push_back(S[i]-'0');
+        cnt1 += S[i] - '0';
+    }
+    ll ans = INFLL;
+    //i番目の分割
+    rep(i,K){
+        //00...111...000にする最小値 耳DP
+        int M = V[i].size();
+        vvec<ll> dp(M+1, vec<ll>(3,INFLL));
+        dp[0][0] = dp[0][1] = dp[0][2] = 0;
+        int tmp = 0;//この区間に含まれる1の数
+        //from 0
+        rep(j,M){
+            tmp += V[i][j];
+            {
+                //to 0
+                chmin(dp[j+1][0], dp[j][0] + V[i][j]);
+                //to 1
+                chmin(dp[j+1][1], dp[j][0] + (V[i][j]^1));
+            }
+            //from 1
+            {
+                // to 1
+                chmin(dp[j+1][1], dp[j][1] + (V[i][j]^1));
+                // to 2
+                chmin(dp[j+1][2], dp[j][1] + V[i][j]);
+            }
+            //from 2
+            {
+                // to 2
+                chmin(dp[j+1][2], dp[j][2] + V[i][j]);
+            }
+        }
+        ll minn = min({dp[M][0],dp[M][1], dp[M][2]});
+        chmin(ans, minn + cnt1 - tmp);
+    }
+    cout << ans << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    int a, b;
-    int K;
-    cin >> N >> a >> b >> K;
-    vector<int> P(K);
-    map<int,int> map;
-    map[a]++;
-    map[b]++;
-    rep(i,K){
-        cin >> P[i];
-        if(map[P[i]]){
-            cout << "NO" << endl;
-            return 0;
-        }
-        map[P[i]]++;
+    int t;
+    cin >> t;
+    while(t--){
+        solve();
     }
-    cout << "YES" << endl;
 }

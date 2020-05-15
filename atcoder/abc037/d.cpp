@@ -24,11 +24,11 @@ const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = (ll)1e9+7;
 const double PI = acos(-1.0);
-/*
+
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
-*/
+
 
 struct mint {
     long long x;
@@ -81,30 +81,43 @@ struct mint {
         return os;
     }
 };
-struct combination {
-    vector<mint> fact, ifact;
-    //constructor(initiation)
-    combination(int n):fact(n+1),ifact(n+1) {
-        assert(n < MOD);
-        fact[0] = 1;
-        for (int i = 1; i <= n; ++i) fact[i] = fact[i-1]*i;
-        ifact[n] = fact[n].inv();
-        for (int i = n; i >= 1; --i) ifact[i-1] = ifact[i]*i;
+int H, W;
+int a[1010][1010];
+bool visited[1010][1010];
+mint dp[1010][1010];
+
+bool IsIn(int x,int y){
+    return 0<=x&&x<H&&0<=y&&y<W;
+}
+mint dfs(int x, int y){
+    if(visited[x][y]){
+        return dp[x][y];
     }
-    mint Comb(int n, int k) {
-        if (k < 0 || k > n) return 0;
-        return fact[n]*ifact[k]*ifact[n-k];
+    visited[x][y] = true;
+    mint res = 1;
+    rep(j,4){
+        int nx = x + dx[j];
+        int ny = y + dy[j];
+        if(not IsIn(nx, ny))continue;
+        if(a[x][y] >= a[nx][ny])continue;
+        res += dfs(nx, ny);
     }
-    mint H(int n, int m){
-        return Comb(n + m - 1, m);
-    }
-}C(200010);
+    return dp[x][y] = res;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, K;
-    cin >> N >> K;
-    cout << C.H(N,K) << endl;
+    cin >> H >> W;
+    rep(i,H)rep(j,W){
+        cin >> a[i][j];
+        visited[i][j] = false;
+        dp[i][j] = 0;
+    }
+    mint ans = 0;
+    rep(i,H)rep(j,W){
+        ans += dfs(i,j);
+    }
+    cout << ans << endl;
 }

@@ -29,7 +29,6 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
 struct mint {
     long long x;
     mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
@@ -98,13 +97,17 @@ struct combination {
     mint H(int n, int m){
         return Comb(n + m - 1, m);
     }
-}C(200010);
+}C(20010);
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, K;
+    int N, K;
     cin >> N >> K;
-    cout << C.H(N,K) << endl;
+    if(N > K){
+        cout << C.H(N,K) << endl;
+        return 0;
+    }
+    cout << C.Comb(N,K%N) << endl;
 }

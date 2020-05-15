@@ -48,60 +48,44 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-template<typename T, typename U>
-T _pow(T a, U n) {
-    T res = 1;
-    rep(i, n)res *= a;
-    return res;
-}
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) mp[x]++;
-    return mp;
-}
-vector< int64_t > divisor(int64_t n) {
-  vector< int64_t > ret;
-  for(int64_t i = 1; i * i <= n; i++) {
-    if(n % i == 0) {
-      ret.push_back(i);
-      if(i * i != n) ret.push_back(n / i);
-    }
-  }
-  sort(begin(ret), end(ret));
-  return (ret);
-}
+
 int main() {
-    cin.tie(nullptr);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
-    ll X;
-    cin >> X;
-    auto v = divisor(X);
-    int sz = v.size();
-    rep(i,sz){
-        //a-b = v[i]とする
-        //a = b + v[i]
-        for(ll b = -1000; b <= 1000;b++){
-            ll a = b + v[i];
-            ll sl  = _pow(a,5) - _pow(b,5);
-            if(sl == X){
-                cout << a << " " << b << endl;
-                return 0;
-            }
-            a = b - v[i];
-            sl  = _pow(a,5) - _pow(b,5);
-            if(sl == X){
-                cout << a << " " << b << endl;
-                return 0;
-            }
+
+    ll N, K;
+    cin >> N >> K;
+    vector<int> A(N);
+    rep(i,N){
+        cin >> A[i];
+        A[i]--;
+    }
+    vector<bool> used(N, false);
+    deque<int> mv;
+    int cur = 0;
+    while(1){
+        used[cur] = true;
+        mv.push_back(cur+1);
+        int nx = A[cur];
+        if(used[nx]){
+            mv.push_back(nx+1);
+            break;
+        }
+        cur = nx;
+    }
+    if(K < (ll)mv.size()){
+        cout << mv[K] << endl;
+        return 0;
+    }
+    while(true){
+        if(mv.front() == mv.back()){
+            mv.pop_front();
+            K--;
+            break;
+        }
+        else{
+            K--;
+            mv.pop_front();
         }
     }
+    int sz = mv.size();
+    cout << mv[K%sz] << endl;
 }

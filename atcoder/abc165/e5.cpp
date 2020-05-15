@@ -35,21 +35,36 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    int a, b;
-    int K;
-    cin >> N >> a >> b >> K;
-    vector<int> P(K);
-    map<int,int> map;
-    map[a]++;
-    map[b]++;
-    rep(i,K){
-        cin >> P[i];
-        if(map[P[i]]){
-            cout << "NO" << endl;
-            return 0;
+    int N, M;
+    cin >> N >> M;
+    vector<i_i> ans;
+    //奇数は単純
+    if(N&1){
+        for(int l = 1, r = N;l < r;l++,r--){
+            ans.emplace_back(l, r);
         }
-        map[P[i]]++;
     }
-    cout << "YES" << endl;
+    //偶数は途中で変えないといけない
+    else{
+        bool f = false;
+        map<i_i, int> map;
+        for(int l = 1,r = N; l < r; l++, r--){
+            int a = r - l;
+            int b = N - a;
+            if(a > b)swap(a,b);
+            if(!f&&(map[{a,b}]>0||a==b)){
+                f = true;
+                r--;
+            }
+            a = r-l;
+            b = N-a;
+            if(a > b)swap(a,b);
+            ans.emplace_back(l, r);
+            map[{a,b}]++;
+        }
+        print(map);
+    }
+    rep(i,M){
+        cout << ans[i].first << " " << ans[i].second << endl;
+    }
 }

@@ -29,27 +29,32 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+template<typename T>
+vector<bool> sieve(T x){
+    vector<bool> is_prime(x + 1, true);
+    if(x >= 0)is_prime[0] = false;
+    if(x >= 1)is_prime[1] = false;
+    for(T i = 2; i * i <= x;i++){
+        if(!is_prime[i])continue;
+        for(T j = i + i; j <= x;j+=i){
+            is_prime[j] = false;
+        }
+    }
+    return is_prime;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
     int N;
-    int a, b;
-    int K;
-    cin >> N >> a >> b >> K;
-    vector<int> P(K);
-    map<int,int> map;
-    map[a]++;
-    map[b]++;
-    rep(i,K){
-        cin >> P[i];
-        if(map[P[i]]){
-            cout << "NO" << endl;
-            return 0;
-        }
-        map[P[i]]++;
+    cin >> N;
+    vector<int> a(N);
+    rep(i,N)cin >> a[i];
+    auto is_prime = sieve(*max_element(all(a))+1);
+    vector<int> sosu;
+    for(ll i = 0; i * i <= {
+        if(is_prime[i])sosu.push_back(i);
     }
-    cout << "YES" << endl;
+    dump(sosu.size());
+    
 }

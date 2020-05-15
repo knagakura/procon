@@ -55,11 +55,5 @@ int main() {
     cout << fixed << setprecision(20);
     string S;
     cin >> S;
-    if(S == "ABC"){
-        cout << "ARC" << endl;
-    }
-    else{
-        cout << "ABC" << endl;
-    }
-
+    cout << (S == "ABC" ? "ARC": "ABC") << endl;
 }

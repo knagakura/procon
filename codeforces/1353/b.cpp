@@ -30,26 +30,48 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    int N, K;
+    cin >> N >> K;
+    vector<l_l> v;
+    rep(i,N){
+        int a;
+        cin >> a;
+        v.push_back({a,0});
+    }
+    rep(i,N){
+        int a;
+        cin >> a;
+        v.push_back({a,1});
+    }
+    sort(all(v));
+    reverse(all(v));
+    int cnt = 0;
+    ll ans = 0;
+    rep(i,2*N){
+        if(cnt == N)break;
+        if(v[i].second == 1){
+            if(K > 0){
+                K--;
+                ans += v[i].first;
+                cnt++;
+            }
+        }
+        else{
+            ans += v[i].first;
+            cnt++;
+        }
+    }
+    cout << ans << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    int a, b;
-    int K;
-    cin >> N >> a >> b >> K;
-    vector<int> P(K);
-    map<int,int> map;
-    map[a]++;
-    map[b]++;
-    rep(i,K){
-        cin >> P[i];
-        if(map[P[i]]){
-            cout << "NO" << endl;
-            return 0;
-        }
-        map[P[i]]++;
+    int t;
+    cin >> t;
+    while(t--){
+        solve();
     }
-    cout << "YES" << endl;
 }

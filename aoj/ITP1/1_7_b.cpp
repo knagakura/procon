@@ -29,27 +29,23 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+int a, b;
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int N;
-    int a, b;
-    int K;
-    cin >> N >> a >> b >> K;
-    vector<int> P(K);
-    map<int,int> map;
-    map[a]++;
-    map[b]++;
-    rep(i,K){
-        cin >> P[i];
-        if(map[P[i]]){
-            cout << "NO" << endl;
-            return 0;
+    while(true){
+        int n, x;
+        cin >> n >> x;
+        int ans = 0;
+        if(n == 0 && x == 0)return 0;
+        for(int i = 1; i <= n; i++){
+            for(int j = i+1; j <= n;j++){
+                for(int k = j+1; k <= n;k++){
+                    if(i + j + k == x)ans++;
+                }
+            }
         }
-        map[P[i]]++;
+        cout << ans << endl;
     }
-    cout << "YES" << endl;
 }

@@ -103,7 +103,7 @@ int main() {
     bool a = true;
     rep(j, 2) {
         bool ok = true;
-        if(!a)contin
+        if(!a)continue;
         rep(k, 3) {
             if (dp[N][j][k] < 0)ok = false;
         }

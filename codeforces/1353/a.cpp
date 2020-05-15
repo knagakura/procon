@@ -34,22 +34,19 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int N;
-    int a, b;
-    int K;
-    cin >> N >> a >> b >> K;
-    vector<int> P(K);
-    map<int,int> map;
-    map[a]++;
-    map[b]++;
-    rep(i,K){
-        cin >> P[i];
-        if(map[P[i]]){
-            cout << "NO" << endl;
-            return 0;
+    int t;
+    cin >> t;
+    while(t--){
+        ll n,m;
+        cin >> n >> m;
+        ll ans;
+        if(n == 1){
+            ans = 0;
         }
-        map[P[i]]++;
+        else if(n == 2){
+            ans = m;
+        }
+        else ans = 2 * m;
+        cout << ans << endl;
     }
-    cout << "YES" << endl;
 }

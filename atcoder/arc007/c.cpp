@@ -35,21 +35,37 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    int a, b;
-    int K;
-    cin >> N >> a >> b >> K;
-    vector<int> P(K);
-    map<int,int> map;
-    map[a]++;
-    map[b]++;
-    rep(i,K){
-        cin >> P[i];
-        if(map[P[i]]){
-            cout << "NO" << endl;
-            return 0;
+    string S;
+    cin >> S;
+    int N = S.size();
+    S += S;
+    int ans = INF;
+    for(int i = 1; i < bit(N); i++){
+        vec<bool> ok(2*N,false);
+        int tmp = __builtin_popcount(i);
+        int last = 0;
+        rep(j,N){
+            if(bit(j)&i){
+                last = j;
+                for(int k = j; k < 2*N; k++){
+                    if(S[k-j] == 'o')ok[k] = true;
+                }
+            }
         }
-        map[P[i]]++;
+        auto check = [&](const vec<bool> &v)->bool{
+            for(int j = last+1;j < last+1+N;j++){
+                if(not v[j])return false;
+            }
+            return true;
+        };
+        /*
+        dump(i);
+        dump(last);
+        print(ok);
+        */
+        if(check(ok)){
+            chmin(ans, tmp);
+        }
     }
-    cout << "YES" << endl;
+    cout << ans << endl;
 }

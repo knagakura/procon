@@ -5,39 +5,70 @@ using namespace std;
 #define all(a) (a).begin(),(a).end()
 #define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
 #define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
-
+#define dump(x) cerr<<#x<<": "<<x<<endl;
+#define bit(k) (1LL<<(k))
 typedef long long ll;
-
+typedef pair<int, int> i_i;
+typedef pair<ll, ll> l_l;
+template <class T> using vec = vector<T>;
+template <class T> using vvec = vector<vec<T>>;
+template< typename T1, typename T2 >
+ostream &operator<<(ostream &os, const pair< T1, T2 >& p) {
+  os << "{" <<p.first << ", " << p.second << "}";
+  return os;
+}
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
 template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 
-const int INF = 1e9;
-const ll INFLL = 1e18;
-const ll MOD = 1e9+7;
+const int INF = (ll)1e9;
+const ll INFLL = (ll)1e18+1;
+const ll MOD = (ll)1e9+7;
 const double PI = acos(-1.0);
-
+/*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
+const string dir = "DRUL";
+*/
 
-/*------------------------------------/
-for library*/
-
-/*------------------------------------*/
-ll dp[123456];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N,M;
+    int N, M;
     string S;
-    cin>>N>>M>>S;
-    rep1(i,N+1){
-        dp[i] = INFLL;
+    cin >> N >> M >> S;
+    vector<int> tmp,v;;
+    rep(i,N+1){
+        if(S[i] == '0')tmp.push_back(i);
     }
-    dp[0] = 0;
-    set<int> set;
-    for(int i = 0; i < N+1; i++){
-        
+    //print(tmp);
+    rep(i,tmp.size()-1){
+        v.push_back(tmp[i+1] - tmp[i]);
     }
+    //print(v);
+    reverse(all(v));
+    vec<int> ans;
+    int sum = 0;
+    int sz = v.size();
+    rep(i,sz){
+        if(sum+v[i] <= M){
+            sum += v[i];
+        }
+        else{
+            ans.push_back(sum);
+            if(v[i] > M){
+                cout << -1 <<  endl;
+                return 0;
+            }
+            sum = v[i];
+        }
+    }
+    ans.push_back(sum);
+    reverse(all(ans));
+    //print(ans);
+    rep(i,ans.size()){
+        cout << ans[i] <<  " ";
+    }
+    cout << endl;
 }

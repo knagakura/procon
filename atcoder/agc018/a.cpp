@@ -35,26 +35,25 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N, M;
-    cin >> N >> M;
-    vvec<int> G(N,vec<int>(N,0));
-    rep(i,M){
-        int x, y;
-        cin >> x >> y;
-        x--, y--;
-        G[x][y] = G[y][x] = 1;
+    ll N, K;
+    cin >> N >> K;
+    vec<ll> A(N);
+    rep(i,N)cin >> A[i];
+    sort(all(A));
+    if(K > A.back()){
+        cout << "IMPOSSIBLE" << endl;
+        return 0;
     }
-    int ans = 0;
-    for(int i = 0; i < bit(N);i++){
-        /*calc*/
-        int tmp = __builtin_popcount(i);
-        bool ok = true;
-        /*check*/
-        rep(j,N)rep(k,N){
-            if(j >= k)continue;
-            if(i & bit(j) && i & bit(k) && not G[j][k])ok = false;
-        }
-        if(ok)chmax(ans, tmp);
+    ll G = A[0];
+    rep(i,N)G = __gcd(G, A[i]);
+    if(G == 1){
+        cout << "POSSIBLE" << endl;
+        return 0;
     }
-    cout << ans << endl;
+    if(__gcd(K, G) == 1){
+        cout << "IMPOSSIBLE"  << endl;
+    }
+    else{
+        cout << "POSSIBLE" << endl;
+    }
 }

@@ -35,26 +35,34 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N, M;
-    cin >> N >> M;
-    vvec<int> G(N,vec<int>(N,0));
-    rep(i,M){
-        int x, y;
-        cin >> x >> y;
-        x--, y--;
-        G[x][y] = G[y][x] = 1;
-    }
-    int ans = 0;
-    for(int i = 0; i < bit(N);i++){
-        /*calc*/
-        int tmp = __builtin_popcount(i);
-        bool ok = true;
-        /*check*/
-        rep(j,N)rep(k,N){
-            if(j >= k)continue;
-            if(i & bit(j) && i & bit(k) && not G[j][k])ok = false;
+    string S;
+    cin >> S;
+    int N = S.size();
+    map<int, int> mp;
+    rep(i,N)mp[S[i]-'a']++;
+    ll ans = INF;
+    rep(i,26){
+        if(!mp.count(i))continue;
+        string pre = S;
+        string nxt = "";
+        ll cnt = 0;
+        while(true){
+            bool ok = true;
+            nxt = "";
+            int M = pre.size();
+            rep(j,M-1){
+                if(pre[j]-'a' != i || pre[j+1] - 'a' != i)ok = false;
+                /*calc*/
+                if(pre[j]-'a' == i || pre[j+1] - 'a' == i){
+                    nxt.push_back(char('a'+i));
+                }
+                else nxt.push_back(pre[j]);
+            }
+            if(ok)break;
+            cnt++;
+            swap(pre, nxt);
         }
-        if(ok)chmax(ans, tmp);
+        chmin(ans, cnt);
     }
     cout << ans << endl;
 }

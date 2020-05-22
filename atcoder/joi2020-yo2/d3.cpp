@@ -24,11 +24,12 @@ const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = (ll)1e9+7;
 const double PI = acos(-1.0);
-/*
+
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
-*/
+
+
 template<class T> class Dijkstra {
 public:
     int N;
@@ -87,33 +88,45 @@ GigaCode2019 E - 車の乗り継ぎ
 https://atcoder.jp/contests/gigacode-2019/submissions/8651446
 
 */
+int M,R;
+int f(int i, int j){
+    return i * 3 + j;
+}
+int g(int i, int j, int k){
+    return f(i,j)*M + k;
+}
+bool IsIn(int x,int y){
+    return 0<=x&&x<4&&0<=y&&y<3;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    ll N,M,T;
-    cin >> N >> M >> T;
-    vec<ll> A(N);
-    rep(i,N)cin >> A[i];
-    Dijkstra<ll> G(N+1, INFLL);
-    Dijkstra<ll> G2(N+1, INFLL);
-    rep(i,M){
-        int a,b,c;
-        cin >> a >> b >> c;
-        a--,b--;
-        if(b == 0)b = N;
-        G.make_edge(a,b,c);
-        G2.make_edge(b,a,c);
+    cin >> M >> R;
+    Dijkstra<ll> G(M*20, INFLL);
+    int S[4][3] =   {{0,-1,-1},
+                     {1, 2, 3},
+                     {4, 5, 6},
+                     {7, 8, 9}
+                    };
+    rep(i,4)rep(j,3)rep(k,M){
+        rep(l,4){
+            int ni = i + dx[l];
+            int nj = j + dy[l];
+            if(!IsIn(ni, nj))continue;
+            if(S[ni][nj] == -1)continue;
+            G.make_edge(g(i,j,k), g(ni,nj,k),1);
+            //G.make_edge(g(ni,nj,k), g(i,j,k),1);
+        }
+        if(S[i][j]!=-1){
+            int nk = (k * 10 + S[i][j])%M;
+            G.make_edge(g(i,j,k), g(i,j,nk),1);
+        }
     }
-    G.solve(0);
-    G2.solve(N);
-    ll ans = T * A[0];
-    rep(i,N){
-        ll rem = T - G.cost[i] - G2.cost[i];
-        if(rem < 0)continue;
-        ll tmp = A[i] * rem;
-        chmax(ans, tmp);
+    G.solve(g(0,0,0));
+    ll ans = INFLL;
+    rep(i,4)rep(j,3){
+        chmin(ans, G.cost[g(i,j,R)]);
     }
     cout << ans << endl;
 }

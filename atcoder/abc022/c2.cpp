@@ -29,11 +29,46 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+struct edge{
+    int from;
+    int to;
+    int w;
+    edge(int f,int t, int we){
+        from = f;
+        to = t;
+        w = we;
+    }
+};
+ll dist[333][333];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-     
+    int N, M;
+    cin >> N >> M;
+    vector<edge> ve;
+    rep(i,N)rep(j,N){
+        if(i == j)dist[i][j] = 0;
+        else dist[i][j] = INFLL;
+    }
+    rep(i,M){
+        int u, v, w;
+        cin >> u >> v >> w;
+        u--;v--;
+        if(u == 0)ve.emplace_back(u,v,w);
+        else{
+            dist[u][v] = dist[v][u] = w;
+        }
+    }
+    rep(k,N)rep(i,N)rep(j,N){
+            dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j]);
+    }
+    int sz = ve.size();
+    ll ans = INFLL;
+    rep(i,sz)rep(j,sz){
+        if(i >= j)continue;
+        ll tmp = ve[i].w + dist[ve[i].to][ve[j].to] + ve[j].w;
+        chmin(ans,tmp);
+    }
+    cout << ((ans == INFLL) ? -1 : ans) << endl;
 }

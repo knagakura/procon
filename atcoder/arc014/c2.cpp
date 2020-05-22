@@ -35,5 +35,21 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-     
+    int N;
+    cin >> N;
+    string S;
+    cin >> S;
+    map<char,int> mp;
+    mp['R'] = 0;
+    mp['G'] = 1;
+    mp['B'] = 2;
+    vector<int> v[3];
+    rep(i,N){
+        v[mp[S[i]]].push_back(i);
+    }
+    int ans = 0;
+    rep(i,3){
+        ans += v[i].size() % 2;
+    }
+    cout << ans << endl;
 }

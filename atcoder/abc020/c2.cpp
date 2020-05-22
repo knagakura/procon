@@ -24,11 +24,19 @@ const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = (ll)1e9+7;
 const double PI = acos(-1.0);
-/*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
-*/
+int H, W, T;
+vector<string> S;
+int si,sj;
+int gi,gj;
+int f(int i, int j){
+    return i * W + j;
+}
+bool IsIn(int x,int y){
+    return 0<=x&&x<H&&0<=y&&y<W;
+}
 template<class T> class Dijkstra {
 public:
     int N;
@@ -92,28 +100,42 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N,M,T;
-    cin >> N >> M >> T;
-    vec<ll> A(N);
-    rep(i,N)cin >> A[i];
-    Dijkstra<ll> G(N+1, INFLL);
-    Dijkstra<ll> G2(N+1, INFLL);
-    rep(i,M){
-        int a,b,c;
-        cin >> a >> b >> c;
-        a--,b--;
-        if(b == 0)b = N;
-        G.make_edge(a,b,c);
-        G2.make_edge(b,a,c);
+    cin >> H >> W >> T;
+    S.resize(H);
+    rep(i,H)cin >> S[i];
+    rep(i,H)rep(j,W){
+        if(S[i][j] == 'S'){
+            si = i;
+            sj = j;
+        }
+        if(S[i][j]  == 'G'){
+            gi = i;
+            gj = j;
+        }
     }
-    G.solve(0);
-    G2.solve(N);
-    ll ans = T * A[0];
-    rep(i,N){
-        ll rem = T - G.cost[i] - G2.cost[i];
-        if(rem < 0)continue;
-        ll tmp = A[i] * rem;
-        chmax(ans, tmp);
+    auto check = [&](ll X) -> bool{
+        Dijkstra<ll> G((H+1)*(W+1),INFLL);
+        /*make edges*/
+        rep(i,H)rep(j,W){
+            rep(k,4){
+                int ni = i + dx[k];
+                int nj = j + dy[k];
+                if(not IsIn(ni,nj))continue;
+                if(S[ni][nj] == '.')G.make_edge(f(i,j), f(ni,nj),1);
+                if(S[ni][nj] == '#')G.make_edge(f(i,j), f(ni,nj),X);
+                if(S[ni][nj] == 'S')G.make_edge(f(i,j), f(ni,nj),1);
+                if(S[ni][nj] == 'G')G.make_edge(f(i,j), f(ni,nj),1);
+            }
+        }
+        G.solve(f(si,sj));
+        return G.cost[f(gi,gj)] <= T;
+    };
+    ll ok = 1;
+    ll ng = INF;
+    while(ng - ok > 1){
+        ll mid = (ok+ng)>>1;
+        if(check(mid))ok = mid;
+        else ng = mid;
     }
-    cout << ans << endl;
+    cout << ok << endl;
 }

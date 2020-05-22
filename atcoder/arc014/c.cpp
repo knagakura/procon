@@ -30,10 +30,23 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+int dp[55][4][4][4][4];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-     
+    int N;
+    string S;
+    cin >> N >> S;
+    rep(i,N+1)rep(j,4)rep(k,4)rep(l,4)rep(m,4)dp[i][j][k][l][m] = INF;
+ 
+    dp[0][0][0][0][0] = 0;
+    rep(i,N){
+        int to = mp[S[i]];
+        //lが端,rが一個中
+        rep(j,4)rep(k,4)rep(l,4)rep(k,4){
+
+        }
+    }
 }

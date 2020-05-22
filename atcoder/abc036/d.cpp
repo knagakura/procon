@@ -30,10 +30,21 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+vvec<int> G;
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-     
+    int N;
+    cin >> N;
+    G.resize(N);
+    rep(i,N-1){
+        int a,b;
+        cin >> a >> b;
+        a--;b--;
+        G[a].push_back(b);
+        G[b].push_back(a);
+        
+    }
 }

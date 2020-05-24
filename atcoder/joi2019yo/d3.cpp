@@ -29,37 +29,44 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-const int sz = 100010;
+
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N, C;
-    cin >> N >> C;
-    vec<int> s(N),t(N),c(N);
-    vvec<int> imos(30, vec<int>(sz,0));
+    int N;
+    cin >> N;
+    set<int> st;
+    vector<int> A(N+2,0);
+    vector<bool> used(N+2,false);
+    used[0] = used[N+1] = true;
+    vector<i_i> B;
+    rep1(i,N+1){
+        cin >> A[i];
+        st.insert(A[i]);
+        B.push_back({A[i],i});
+    }
+    if(st.size() == 1){
+        if(A[0] == 0)cout << 0 << endl;
+        else  cout << 1 << endl;
+        return 0;
+    }
+    sort(all(B));
+    B.push_back({INF,-1});
+    //print(B);
+    int cnt = 0;
+    int ans = 0;
     rep(i,N){
-        cin >> s[i] >> t[i] >> c[i];
-        c[i]--;
-        imos[c[i]][s[i]]++;
-        imos[c[i]][t[i]]--;
-    }
-    rep(j,30)rep(i,sz-1){
-        imos[j][i+1] += imos[j][i];
-    }
-    rep(j,30)rep(i,sz-1){
-        if(imos[j][i+1] == 1 && imos[j][i] == 0){
-            imos[j][i] = 1;
+        int idx = B[i].second;
+        if(not used[idx-1] && not used[idx+1])cnt++;
+        if(used[idx-1] && used[idx+1])cnt--;
+        used[idx] = true;
+        if(B[i].first != B[i+1].first){
+            //dump(idx);
+            //dump(cnt);
+            chmax(ans, cnt);
         }
-    }
-    ll ans = 0;
-    rep(i,sz){
-        ll tmp = 0;
-        rep(j,30){
-            tmp += imos[j][i];
-        }
-        chmax(ans, tmp);
     }
     cout << ans << endl;
 }

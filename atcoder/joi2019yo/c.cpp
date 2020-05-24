@@ -29,37 +29,55 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-const int sz = 100010;
+
+template<typename T>
+vector<pair<T,long long>> RunLengthEncoder(vector<T> &v){
+    vector<pair<T,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
+    }
+    return RLE;
+}
+
+vector<pair<char,long long>> RunLengthEncoder_ForString(string v){
+    vector<pair<char,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
+    }
+    return RLE;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N, C;
-    cin >> N >> C;
-    vec<int> s(N),t(N),c(N);
-    vvec<int> imos(30, vec<int>(sz,0));
-    rep(i,N){
-        cin >> s[i] >> t[i] >> c[i];
-        c[i]--;
-        imos[c[i]][s[i]]++;
-        imos[c[i]][t[i]]--;
-    }
-    rep(j,30)rep(i,sz-1){
-        imos[j][i+1] += imos[j][i];
-    }
-    rep(j,30)rep(i,sz-1){
-        if(imos[j][i+1] == 1 && imos[j][i] == 0){
-            imos[j][i] = 1;
+    int N;
+    string S;
+    cin >> N >> S;
+    int ans = 0;
+    rep(i,N-1){
+        if(S[i] != S[i+1]){
+            ans++;
+            i++;
         }
-    }
-    ll ans = 0;
-    rep(i,sz){
-        ll tmp = 0;
-        rep(j,30){
-            tmp += imos[j][i];
-        }
-        chmax(ans, tmp);
     }
     cout << ans << endl;
 }

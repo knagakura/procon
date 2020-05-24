@@ -29,37 +29,16 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-const int sz = 100010;
+
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N, C;
-    cin >> N >> C;
-    vec<int> s(N),t(N),c(N);
-    vvec<int> imos(30, vec<int>(sz,0));
+    int N, K;
+    cin >> N >> K;
+    vec<int> x(N),y(N);
     rep(i,N){
-        cin >> s[i] >> t[i] >> c[i];
-        c[i]--;
-        imos[c[i]][s[i]]++;
-        imos[c[i]][t[i]]--;
+
     }
-    rep(j,30)rep(i,sz-1){
-        imos[j][i+1] += imos[j][i];
-    }
-    rep(j,30)rep(i,sz-1){
-        if(imos[j][i+1] == 1 && imos[j][i] == 0){
-            imos[j][i] = 1;
-        }
-    }
-    ll ans = 0;
-    rep(i,sz){
-        ll tmp = 0;
-        rep(j,30){
-            tmp += imos[j][i];
-        }
-        chmax(ans, tmp);
-    }
-    cout << ans << endl;
 }

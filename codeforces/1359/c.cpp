@@ -48,39 +48,50 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-int N;
-ll a[30030][6];
-map<i_i, double> mp;
 
-double dfs(int s, int p = -1) {
-    if(s == 12)return 2;
-    if (mp[{s, p}] > 0) {
-        return mp[{s, p}];
+void solve() {
+    long double h, c, t;
+    cin >> h >> c >> t;
+    auto tmpa = [&](ll x) -> long double {
+        long double res = (long double)(x * h + (x - 1) * c) / (long double)(2 * x - 1);
+        return res;
+    };
+    if (h + c >= 2 * t) {
+        cout << 2 << endl;
+        return;
     }
-    if (s <= p) {
-        return mp[{s, p}] = (double) 1 / (double) 6;
+    //回数の二分探索
+    ll ok = 0;
+    ll ng = INF;
+    while (ng - ok > 1) {
+        ll mid = (ok + ng) / 2;
+        if (tmpa(mid) > t) {
+            ok = mid;
+        } else ng = mid;
     }
-    double res = 0;
-    rep(j, 6) {
-        res += dfs(a[1][j], s) / (double) 6;
+    long double a = tmpa(ok);
+    long double b = tmpa(ng);
+    long double ave = (h + c) / 2;
+    long double diff[] = {abs(a - t), abs(b - t), abs(ave - t)};
+    cerr << ok << " " << ng << endl;
+    print(diff);
+    if (diff[2] < diff[0] && diff[2] < diff[1]) {
+        cout << 2 << endl;
+    } else if (diff[0] <= diff[1]) {
+        cout << 2 * ok - 1 << endl;
+    } else {
+        cout << 2 * ng - 1 << endl;
     }
-    cerr << p << " " << s << endl;
-    return mp[{s, p}] = res;
 }
 
 int main() {
-    cin.tie(nullptr);
+    cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    cin >> N;
-    rep(i, N) {
-        rep(j, 6)cin >> a[i][j];
+    int t;
+    cin >> t;
+    while (t-- > 0) {
+        solve();
     }
-    double ans = 0;
-    rep(j, 6) {
-        ans += dfs(a[0][j]);
-    }
-    print(mp);
-    cout << ans << endl;
 }

@@ -48,39 +48,50 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-int N;
-ll a[30030][6];
-map<i_i, double> mp;
 
-double dfs(int s, int p = -1) {
-    if(s == 12)return 2;
-    if (mp[{s, p}] > 0) {
-        return mp[{s, p}];
+void solve() {
+    ll N, X;
+    cin >> N >> X;
+    vec<ll> d(N);
+    rep(i, N)cin >> d[i];
+    rep(i, N)d.emplace_back(d[i]);
+    rep(i, N)d.emplace_back(d[i]);
+    reverse(all(d));
+    int r = 0;
+    ll len = 0;
+    ll tmp = 0;
+    //1 + 2 + ... + x
+    auto calc = [&](ll x) -> ll {
+        return x * (x + 1) / 2;
+    };
+    // x + x - 1 + ... + x - k + 1
+    auto calc2 = [&](ll x, ll k) -> ll {
+        if (x < k)return 0LL;
+        return calc(x) - calc(x - k);
+    };
+
+    ll ans = 0;
+    for (int l = 0; l < 2 * N; l++) {
+        while (r < 2 * N && len + d[r] <= X) {
+            len += d[r];
+            tmp += calc(d[r]);
+            r++;
+        }
+        //[l, r)になっているはず
+        // X - lenだけ残っている
+        chmax(ans, tmp + calc2(d[r], X - len));
+        if (l == r)r++;
+        else {
+            len -= d[l];
+            tmp -= calc(d[l]);
+        }
     }
-    if (s <= p) {
-        return mp[{s, p}] = (double) 1 / (double) 6;
-    }
-    double res = 0;
-    rep(j, 6) {
-        res += dfs(a[1][j], s) / (double) 6;
-    }
-    cerr << p << " " << s << endl;
-    return mp[{s, p}] = res;
+    cout << ans << endl;
 }
 
 int main() {
     cin.tie(nullptr);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    cin >> N;
-    rep(i, N) {
-        rep(j, 6)cin >> a[i][j];
-    }
-    double ans = 0;
-    rep(j, 6) {
-        ans += dfs(a[0][j]);
-    }
-    print(mp);
-    cout << ans << endl;
+    solve();
 }

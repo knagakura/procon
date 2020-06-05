@@ -40,8 +40,8 @@ void dfs(int v,int p, int d){
         dfs(nv, v, d+1);
     }
 }
-void init(int V){
-    dfs(0,-1,0);
+void init(int V,int s){
+    dfs(s,-1,0);
     for(int k = 0; k + 1 < MAX_LOG_V; ++k){
         for(int v = 0; v < V; ++v){
             if(parent[k][v]<0)parent[k+1][v] = -1;
@@ -78,10 +78,14 @@ int main() {
     cout << fixed << setprecision(20);
     int V;
     cin>>V;
+    int oya;
     rep(i,V){
         int p;
         cin>>p;
-        if(p == -1)continue;
+        if(p == -1){
+            oya = i;
+            continue;
+        }
         p--;
         G[i].push_back(p);
         G[p].push_back(i);
@@ -95,7 +99,7 @@ int main() {
         G[y].push_back(x);
     }
     */
-    init(V);
+    init(V,oya);
     int Q;
     cin>>Q;
     rep(i,Q){

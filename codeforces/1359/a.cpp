@@ -48,39 +48,24 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-int N;
-ll a[30030][6];
-map<i_i, double> mp;
 
-double dfs(int s, int p = -1) {
-    if(s == 12)return 2;
-    if (mp[{s, p}] > 0) {
-        return mp[{s, p}];
+void solve(){
+    int N, M, K;
+    cin >> N >> M >> K;
+    int cnt = N / K;//一人当たりの枚数
+    //全部配れる
+    if(M <= cnt){
+        cout << M << endl;
+        return;
     }
-    if (s <= p) {
-        return mp[{s, p}] = (double) 1 / (double) 6;
-    }
-    double res = 0;
-    rep(j, 6) {
-        res += dfs(a[1][j], s) / (double) 6;
-    }
-    cerr << p << " " << s << endl;
-    return mp[{s, p}] = res;
+    M -= cnt;
+    //残りのM枚をK-1人で分ける
+    int maxx = (M+(K-1)-1) / (K-1);
+    cout << cnt - maxx << endl;
 }
-
 int main() {
-    cin.tie(nullptr);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
 
-    cin >> N;
-    rep(i, N) {
-        rep(j, 6)cin >> a[i][j];
-    }
-    double ans = 0;
-    rep(j, 6) {
-        ans += dfs(a[0][j]);
-    }
-    print(mp);
-    cout << ans << endl;
+    int t;
+    cin >> t;
+    while(t--) solve();
 }

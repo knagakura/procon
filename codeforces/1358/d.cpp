@@ -48,39 +48,42 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-int N;
-ll a[30030][6];
-map<i_i, double> mp;
-
-double dfs(int s, int p = -1) {
-    if(s == 12)return 2;
-    if (mp[{s, p}] > 0) {
-        return mp[{s, p}];
-    }
-    if (s <= p) {
-        return mp[{s, p}] = (double) 1 / (double) 6;
-    }
-    double res = 0;
-    rep(j, 6) {
-        res += dfs(a[1][j], s) / (double) 6;
-    }
-    cerr << p << " " << s << endl;
-    return mp[{s, p}] = res;
-}
 
 int main() {
     cin.tie(nullptr);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    cin >> N;
-    rep(i, N) {
-        rep(j, 6)cin >> a[i][j];
+    ll N, x;
+    cin >> N >> x;
+    vec<ll> d(N);
+    rep(i, N)cin >> d[i];
+    rep(i,N)d.push_back(d[i]);
+    int r = 0;
+    ll sum = 0;
+    ll ans = 0;
+    rep(l, 2*N) {
+        while (r < 2*N && sum + d[r] <= x) {
+            sum += d[r];
+            r++;
+        }
+        if (sum == x)chmax(ans, sum);
+        else {
+            ll diff = x - sum;
+            ll tmp = sum;
+            if(l == 0)chmax(ans, tmp);/*usironodiffこ*/
+            else{
+                if(d[l-1] >= diff){
+                    tmp += d[l-1] * (d[l-1]+1)/2 - (d[l-1]-diff) * (d[l-1]-diff+1) / 2;
+                }
+                else{
+                    tmp += d[l-1] * (d[l-1]+1)/2;
+                }
+                chmax(ans, tmp);
+            }
+        }
+        sum -= d[l];
     }
-    double ans = 0;
-    rep(j, 6) {
-        ans += dfs(a[0][j]);
-    }
-    print(mp);
     cout << ans << endl;
+
 }

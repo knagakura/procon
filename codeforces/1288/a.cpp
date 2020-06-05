@@ -48,39 +48,51 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-int N;
-ll a[30030][6];
-map<i_i, double> mp;
 
-double dfs(int s, int p = -1) {
-    if(s == 12)return 2;
-    if (mp[{s, p}] > 0) {
-        return mp[{s, p}];
+template<typename T>
+vector<T> divisor(T N) {
+    vector<T> res;
+    for(T i = 1; i * i <= N; i++){
+        if(N % i == 0){
+            res.push_back(i);
+            if(i * i != N)res.push_back(N / i);
+        }
     }
-    if (s <= p) {
-        return mp[{s, p}] = (double) 1 / (double) 6;
-    }
-    double res = 0;
-    rep(j, 6) {
-        res += dfs(a[1][j], s) / (double) 6;
-    }
-    cerr << p << " " << s << endl;
-    return mp[{s, p}] = res;
+    sort(res.begin(), res.end());
+    return res;
 }
-
+void solve() {
+    ll N, D;
+    cin >> N >> D;
+    if(N >= D){
+        cout <<"YES" << endl;
+        return ;
+    }
+    ll ok = -1;
+    ll ng = D;
+    auto check = [&](ll X){
+        return X + (D + X) / (X + 1) > X + 1 + (D + X + 1) / (X + 2);
+    };
+    while(ng - ok > 1){
+        ll mid = (ok + ng) / 2;
+        if(check(mid))ok = mid;
+        else ng = mid;
+    }
+    ok++;
+    ll ans = ok + (D + ok) / (ok + 1);
+    if(ans <= N){
+        cout << "YES" << endl;
+    }
+    else{
+        cout << "NO" << endl;
+    }
+}
 int main() {
     cin.tie(nullptr);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    cin >> N;
-    rep(i, N) {
-        rep(j, 6)cin >> a[i][j];
-    }
-    double ans = 0;
-    rep(j, 6) {
-        ans += dfs(a[0][j]);
-    }
-    print(mp);
-    cout << ans << endl;
+    int t;
+    cin >> t;
+    while (t--) solve();
 }

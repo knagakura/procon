@@ -48,24 +48,30 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-int N;
-ll a[30030][6];
-map<i_i, double> mp;
 
-double dfs(int s, int p = -1) {
-    if(s == 12)return 2;
-    if (mp[{s, p}] > 0) {
-        return mp[{s, p}];
+void solve() {
+    int N;
+    cin >> N;
+    vec<int> a, b;
+    rep(i, N) {
+        int x;
+        cin >> x;
+        if (x & 1)a.push_back(x);
+        else b.push_back(x);
     }
-    if (s <= p) {
-        return mp[{s, p}] = (double) 1 / (double) 6;
+    if (a.size() % 2 == 0) {
+        cout << "YES" << endl;
+    } else {
+        rep(i, a.size()) {
+            rep(j, b.size()) {
+                if (abs(a[i] - b[j]) == 1) {
+                    cout << "YES" << endl;
+                    return;
+                }
+            }
+        }
+        cout << "NO" << endl;
     }
-    double res = 0;
-    rep(j, 6) {
-        res += dfs(a[1][j], s) / (double) 6;
-    }
-    cerr << p << " " << s << endl;
-    return mp[{s, p}] = res;
 }
 
 int main() {
@@ -73,14 +79,7 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    cin >> N;
-    rep(i, N) {
-        rep(j, 6)cin >> a[i][j];
-    }
-    double ans = 0;
-    rep(j, 6) {
-        ans += dfs(a[0][j]);
-    }
-    print(mp);
-    cout << ans << endl;
+    int t;
+    cin >> t;
+    while (t--) solve();
 }

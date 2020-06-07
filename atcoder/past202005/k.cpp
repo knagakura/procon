@@ -31,23 +31,50 @@ const string dir = "DRUL";
 */
 
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
 
-    ll N, C, K;
-    cin >> N >> C >> K;
-    vector<ll> T(N);
-    rep(i,N)cin >> T[i];
-    sort(all(T));
-    int r = 0;
-    int ans = 0;
-    for(int l = 0; l < N;){
-        while(r+1 < N && r+1 - l + 1 <= C && T[r+1] <= T[l] + K){
-            r++;
+    int N, Q;
+    cin >> N >> Q;
+    vec<int> top(N);
+    rep(i,N)top[i] = i;
+    //下上
+    vec<i_i> conte(2*N);
+    rep(i,2*N){
+        if(i < N){
+            conte[i] = {N+i, -1};
         }
-        l = r+1;
-        ans++;
+        else{
+            conte[i] = {-1, i-N};
+        }
     }
-    cout << ans << endl;
+    while(Q--){
+        int f, t, x;
+        cin >> f >> t >> x;
+        f--;t--;x--;
+        //fromの処理
+        int tmp_topf = top[f];
+        //topが下になる
+        top[f] = conte[x].first;
+        //その上はなし
+        conte[top[f]].second = -1;
+
+        //toの処理
+        //移動先のtopが下になる
+        conte[x].first = top[t];
+        conte[top[t]].second = x;
+        //移動前のtopが移動先のtopになる
+        top[t] = tmp_topf;
+    }
+    vec<int> ans(N);
+    rep(i,N){
+        int from = N+i;
+        while(1){
+            int to = conte[from].second;
+            if(to == -1)break;
+            ans[to] = i+1;
+            from = to;
+        }
+    }
+    rep(i,N){
+        cout << ans[i] << endl;
+    }
 }

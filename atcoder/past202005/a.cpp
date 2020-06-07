@@ -35,19 +35,20 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, C, K;
-    cin >> N >> C >> K;
-    vector<ll> T(N);
-    rep(i,N)cin >> T[i];
-    sort(all(T));
-    int r = 0;
-    int ans = 0;
-    for(int l = 0; l < N;){
-        while(r+1 < N && r+1 - l + 1 <= C && T[r+1] <= T[l] + K){
-            r++;
-        }
-        l = r+1;
-        ans++;
+    string s[2];
+    cin >> s[0] >> s[1];
+    string S[2];
+    rep(j,2)rep(i,3){
+        if(s[j][i] - 'a' >= 0)S[j].push_back(s[j][i]);
+        else S[j].push_back(char(s[j][i]-'A'+'a'));
     }
-    cout << ans << endl;
+    if(s[0] == s[1]){
+        cout << "same" << endl;
+    }
+    else if(S[0] == S[1]){
+        cout << "case-insensitive" << endl;
+    }
+    else{
+        cout << "different" << endl;
+    }
 }

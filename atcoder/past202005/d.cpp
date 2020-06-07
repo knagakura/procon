@@ -35,19 +35,35 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, C, K;
-    cin >> N >> C >> K;
-    vector<ll> T(N);
-    rep(i,N)cin >> T[i];
-    sort(all(T));
-    int r = 0;
-    int ans = 0;
-    for(int l = 0; l < N;){
-        while(r+1 < N && r+1 - l + 1 <= C && T[r+1] <= T[l] + K){
-            r++;
+    int N;
+    cin >> N;
+    vec<string> S(5);
+    rep(i,5){
+        cin >> S[i];
+    }
+    string tehon[] = {
+        "####.##.##.####", 
+        ".#.##..#..#.###", 
+        "###..#####..###", 
+        "###..####..####", 
+        "#.##.####..#..#", 
+        "####..###..####", 
+        "####..####.####", 
+        "###..#..#..#..#", 
+        "####.#####.####", 
+        "####.####..####"
+    };
+    string ans;
+    for(int j = 1; j < 4*N+1; j+= 4){
+        string tmp;
+        rep(i,5)rep(k,3){
+            tmp.push_back(S[i][j+k]);
         }
-        l = r+1;
-        ans++;
+        rep(l,10){
+            if(tmp == tehon[l]){
+                ans.push_back(char(l + '0'));
+            }
+        }
     }
     cout << ans << endl;
 }

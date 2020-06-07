@@ -58,7 +58,9 @@ class BIT{
     // 0-indexed sum of range
     T sum0(int l, int r){return sum0(r) - sum0(l-1);}
     // show the value
-    void debug(){print(data);}
+    void debug(){
+        vector<T> tmp(N);
+    }
     // k-th number (k is 1 - indexed)
     T get(int k){
         T res = 0;
@@ -77,11 +79,10 @@ struct Section{
     int l;
     int r;
     int type;
-    Section(int l_, int r_, int type_):l(l_), r(r_), type(type_){};
+    int idx;
+    Section(int l_, int r_, int type_, int idx_):l(l_), r(r_), type(type_), idx(idx_){};
     bool operator<(const Section& b){
-        if(r < b.r)return true;
-        else if(r == b.r) return type < b.type;
-        else return false;
+        return make_pair(r, idx) < make_pair(b.r, b.idx);
     }
 };
 int main() {
@@ -95,17 +96,31 @@ int main() {
     rep(i,M){
         int l, r;
         cin >> l >> r;
-        Section x(l, r, 1);
+        Section x(l, r, 0, -1);
         Sections.push_back(x);
     }
     rep(i,Q){
         int l, r;
         cin >> l >> r;
-        Section y(l, r, 2);
+        Section y(l, r, 1, i);
         Sections.push_back(y);
     }
     sort(all(Sections));
+    /*
     rep(i,M+Q){
         cerr << Sections[i].l << " " << Sections[i].r << " " << Sections[i].type << endl;
+    }*/
+    BIT<ll> B(1000);
+    vector<int> ans(Q);
+    rep(i,M+Q){
+        if(Sections[i].type){
+            ans[Sections[i].idx] =  B.sum(Sections[i].l, Sections[i].r);
+        }
+        else{
+            B.add(Sections[i].l, 1);
+        }
+    }
+    rep(i,Q){
+        cout << ans[i] << endl;
     }
 }

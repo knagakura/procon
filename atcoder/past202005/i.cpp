@@ -35,19 +35,56 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, C, K;
-    cin >> N >> C >> K;
-    vector<ll> T(N);
-    rep(i,N)cin >> T[i];
-    sort(all(T));
-    int r = 0;
-    int ans = 0;
-    for(int l = 0; l < N;){
-        while(r+1 < N && r+1 - l + 1 <= C && T[r+1] <= T[l] + K){
-            r++;
-        }
-        l = r+1;
-        ans++;
+    int N,Q;
+    cin >> N >> Q;
+    /*
+    vvec<int> A(N,vec<int>(N));
+    rep(i,N)rep(j,N){
+        A[i][j] = N*i+j;
+    }*/
+    vec<ll> gyo(N);
+    vec<ll> retu(N);
+    rep(i,N){
+        gyo[i] = i;
+        retu[i] = i;
     }
-    cout << ans << endl;
+    int cnt = 0;
+    while(Q--){
+        int ord,a,b;
+        cin >> ord;
+        if(ord == 1){
+            cin >> a >> b;
+            a--,b--;
+            if(cnt&1){
+                swap(retu[a],retu[b]);
+            }
+            else{
+                swap(gyo[a],gyo[b]);
+            }
+        }
+        if(ord == 2){
+            cin >> a >> b;
+            a--,b--;
+            if(cnt&1){
+                swap(gyo[a],gyo[b]);
+            }
+            else{
+                swap(retu[a],retu[b]);
+            }
+        }
+        if(ord == 3){
+            /*転置*/
+            cnt++;
+        }
+        if(ord == 4){
+            cin >> a >> b;
+            a--,b--;
+            if(cnt&1){
+                cout << gyo[b] * N + retu[a] << endl;
+            }
+            else {
+                cout << gyo[a] * N + retu[b] << endl;
+            }
+        }
+    }
 }

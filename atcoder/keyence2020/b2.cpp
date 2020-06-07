@@ -35,19 +35,26 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, C, K;
-    cin >> N >> C >> K;
-    vector<ll> T(N);
-    rep(i,N)cin >> T[i];
-    sort(all(T));
-    int r = 0;
-    int ans = 0;
-    for(int l = 0; l < N;){
-        while(r+1 < N && r+1 - l + 1 <= C && T[r+1] <= T[l] + K){
-            r++;
+    ll N;
+    cin >> N;
+    vec<l_l> v;
+    rep(i,N){
+        ll X, L;
+        cin >> X >> L;
+        v.emplace_back(X+L-1,X-L);
+    }
+    //終端ソート
+    sort(all(v));
+    //print(v);
+    ll ans = 0;
+    ll r = -INFLL;
+    for(int i = 0; i < N; i++){
+        ll nr = v[i].first;
+        ll nl = v[i].second;
+        if(r < nl){
+            r = nr;
+            ans++;
         }
-        l = r+1;
-        ans++;
     }
     cout << ans << endl;
 }

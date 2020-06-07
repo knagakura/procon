@@ -29,25 +29,47 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+ll dp[100010][2];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, C, K;
-    cin >> N >> C >> K;
-    vector<ll> T(N);
-    rep(i,N)cin >> T[i];
-    sort(all(T));
-    int r = 0;
-    int ans = 0;
-    for(int l = 0; l < N;){
-        while(r+1 < N && r+1 - l + 1 <= C && T[r+1] <= T[l] + K){
-            r++;
-        }
-        l = r+1;
-        ans++;
+    int N,L;
+    cin >> N >> L;
+    vec<int> S(L+1,0);//ハードルの有無
+    rep(i,N){
+        int x;
+        cin >> x;
+        S[x] = 1;
     }
-    cout << ans << endl;
+    ll T[3];
+    rep(i,3)cin >> T[i];
+    rep(i,L+1)rep(j,2)dp[i][j] = INF;
+    dp[0][0] = 0;
+    rep(i,L+1){
+        //0
+        {
+            ll cost = T[0] + (S[i+1] ? T[2]:0);
+            chmin(dp[i+1][0], dp[i][0] + cost);
+        }
+        //1
+        {
+            ll cost = T[0] + T[1] + (S[i+2] ? T[2]:0);
+            chmin(dp[i+2][0], dp[i][0] + cost);
+            //ジャンプして通過の最小値
+            chmin(dp[i+1][1], dp[i][0] + T[0]/2+T[1]/2);
+        }
+        //2
+        {
+            ll cost = T[0] + 3*T[1] + (S[i+4] ? T[2]: 0);
+            chmin(dp[i+4][0], dp[i][0] + cost);
+            //ジャンプ
+            for(int k = 1; k <= 3; k++){
+                cost = T[0]/2 + T[1]/2 + (k-1)*T[1];
+                chmin(dp[i+k][1], dp[i][0] + cost);
+            }
+        }
+    }
+    cout << min(dp[L][0],dp[L][1]) << endl;
 }

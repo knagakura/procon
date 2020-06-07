@@ -35,19 +35,34 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, C, K;
-    cin >> N >> C >> K;
-    vector<ll> T(N);
-    rep(i,N)cin >> T[i];
-    sort(all(T));
-    int r = 0;
-    int ans = 0;
-    for(int l = 0; l < N;){
-        while(r+1 < N && r+1 - l + 1 <= C && T[r+1] <= T[l] + K){
-            r++;
-        }
-        l = r+1;
-        ans++;
+    int N,M,Q;
+    cin >> N >> M >> Q;
+    vvec<int> G(N);
+    rep(i,M){
+        int u, v;
+        cin >> u >> v;
+        u--,v--;
+        G[u].push_back(v);
+        G[v].push_back(u);
     }
-    cout << ans << endl;
+    vec<int> col(N);
+    rep(i,N)cin >> col[i];
+    while(Q--){
+        int ord, x,y;
+        cin >> ord;
+        if(ord == 1){
+            cin >> x;
+            x--;
+            cout << col[x] << endl;
+            for(auto &nv: G[x]){
+                col[nv] = col[x];
+            }
+        }
+        else{
+            cin >> x >> y;
+            x--;
+            cout << col[x] << endl;
+            col[x] = y;
+        }
+    }
 }

@@ -35,19 +35,39 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, C, K;
-    cin >> N >> C >> K;
-    vector<ll> T(N);
-    rep(i,N)cin >> T[i];
-    sort(all(T));
-    int r = 0;
-    int ans = 0;
-    for(int l = 0; l < N;){
-        while(r+1 < N && r+1 - l + 1 <= C && T[r+1] <= T[l] + K){
-            r++;
+    int N;
+    cin >> N;
+    vec<string> S(N);
+    vec<map<char,int>> vmp(N);
+    rep(i,N){
+        cin >> S[i];
+        rep(j,N){
+            vmp[i][S[i][j]]++;
         }
-        l = r+1;
-        ans++;
     }
+    string ans;
+    string cent;
+    rep(l,N){
+        int r = N - l - 1;
+        if(l > r)break;
+        if(l == r){
+            cent.push_back(S[l][0]);
+            break;
+        }
+        bool ok = false;
+        rep(j,26){
+            if(vmp[l][char(j+'a')] > 0 && vmp[r][char(j + 'a')]){
+                ans.push_back(char(j + 'a'));
+                ok = true;
+                break;
+            }
+        }
+        if(!ok){
+            cout << -1 << endl;
+            return 0;
+        }
+    }
+    cout << ans << cent;
+    reverse(all(ans));
     cout << ans << endl;
 }

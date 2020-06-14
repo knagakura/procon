@@ -30,43 +30,27 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-void solve(){
-    int N;
-    string S;
-    cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin>>A[i];
-    cin >> S;
-    if(S.back() == '1'){
-        cout << 1 << endl;
-        return;
-    }
-    map<ll, int> mp[2];
-    mp[0][0] = 1;
-    mp[1][0] = 1;
-    for(int i = 0; i < N; i++){
-        if(S[i] - '0' == 0){
-            for(auto &p: mp[0]){
-                mp[0][p.first ^ A[i]] = 1;
-            }
+template<typename T> 
+map<T,int> factorize(T x){
+    map<T,int> mp;
+    for (T i = 2; i*i <= x; i++){
+        while (x%i == 0) {
+            x /= i;
+            mp[i]++;
         }
-        else{
-            for(auto &p: mp[1]){
-                mp[1][p.first ^ A[i]] = 1;
-            }
-        }
+        if (x == 1) break;
     }
-    cerr << mp[0].size() << endl;
-    cerr << mp[1].size() << endl;
+    if (x != 1) mp[x]++;
+    return mp;
 }
+
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int t;
-    cin >> t;
-    while(t--){
-        solve();
-    }
+    ll N, M;
+    cin >> N >> M;
+    auto mp = factorize(M);
+    print(mp);
 }

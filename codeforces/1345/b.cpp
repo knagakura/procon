@@ -29,35 +29,22 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
 void solve(){
-    int N;
-    string S;
+    ll N;
     cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin>>A[i];
-    cin >> S;
-    if(S.back() == '1'){
-        cout << 1 << endl;
-        return;
-    }
-    map<ll, int> mp[2];
-    mp[0][0] = 1;
-    mp[1][0] = 1;
-    for(int i = 0; i < N; i++){
-        if(S[i] - '0' == 0){
-            for(auto &p: mp[0]){
-                mp[0][p.first ^ A[i]] = 1;
-            }
+    ll ans = 0;
+    while(N >= 2){
+        ll ok = 0;
+        ll ng = 1e7;
+        while(ng - ok > 1){
+            ll mid = (ok + ng) >> 1;
+            if(mid * (3 * mid + 1) / 2 <= N) ok = mid;
+            else ng = mid;
         }
-        else{
-            for(auto &p: mp[1]){
-                mp[1][p.first ^ A[i]] = 1;
-            }
-        }
+        N -= ok * (3 * ok + 1) / 2;
+        ans++;
     }
-    cerr << mp[0].size() << endl;
-    cerr << mp[1].size() << endl;
+    cout << ans << endl;
 }
 int main() {
     cin.tie(0);

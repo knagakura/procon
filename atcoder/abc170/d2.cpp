@@ -29,42 +29,34 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-template<typename T>
-vector<T> divisor(T N) {
-    vector<T> res;
-    for(T i = 1; i * i <= N; i++){
-        if(N % i == 0){
-            res.push_back(i);
-            if(i * i != N)res.push_back(N / i);
-        }
-    }
-    sort(res.begin(), res.end());
-    return res;
-}
 
-int A[200010];
-int mp[2000100];
 int main() {
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
+
     int N;
     cin >> N;
+    vector<ll> A(N);
+    map<ll,int> mp;
     rep(i, N){
         cin >> A[i];
         mp[A[i]]++;
     }
-    int ans = 0;
+    sort(all(A));
+    vec<bool> ok(N, true);
+    vector<ll> v;
     rep(i,N){
-        if(mp[A[i]] > 1)continue;
-        bool ok = true;
-        mp[A[i]]--;
-        auto v = divisor(A[i]);
-        for(auto &p: v){
-            if(mp[p] > 0){
-                ok = false;
-                break;
-            }
+        if(mp[A[i]] >= 2){
+            ok[i] = false;
+            if(v.empty() || v.back() != A[i])v.push_back(A[i]);
         }
-        mp[A[i]]++;
-        if(ok)ans++;
+        for(auto &p: v){
+            if(A[i]%p == 0)ok[i] = false;
+        }
+        if(ok[i])v.push_back(A[i]);
     }
+    ll ans = 0;
+    rep(i,N)if(ok[i])ans++;
     cout << ans << endl;
 }

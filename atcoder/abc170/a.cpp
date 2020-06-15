@@ -54,5 +54,11 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    
+    int x[5];
+    rep(i,5)cin >> x[i];
+    rep(i,5){
+        if(x[i] == 0){
+            cout << i + 1 << endl;
+        }
+    }
 }

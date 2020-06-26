@@ -30,20 +30,23 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    int N, M, K;
+    cin >> N >> M >> K;
+    //jokerを1人に多く配る -> x
+    int x = min(M, N/K);
+    M -= x;
+    //その他のjokerをK-1人に均等に配る
+    //その最大値との差
+    K--;
+    int y = (M+K-1)/K;
+    cout << x - y << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
-    }
-    cout << S << endl;
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

@@ -35,15 +35,25 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    map<ll, ll> mp;
+    ll sum = 0;
+    rep(i, N){
+        cin >> A[i];
+        sum += A[i];
+        mp[A[i]]++;
+    }
     int Q;
     cin >> Q;
     while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+        ll B, C;
+        cin >> B >> C;
+        sum -= B * mp[B];
+        sum += C * mp[B];
+        mp[C] += mp[B];
+        mp[B] = 0;
+        cout << sum << endl;
     }
-    cout << S << endl;
 }

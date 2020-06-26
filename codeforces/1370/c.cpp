@@ -29,31 +29,72 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+template<typename T>
+vector<T> divisor(T N) {
+    vector<T> res;
+    for(T i = 1; i * i <= N; i++){
+        if(N % i == 0){
+            if(i % 2 == 1&&i!=1)res.push_back(i);
+            if(i * i != N){
+                if(N/i % 2 == 1)res.push_back(N / i);
+            }
+        }
+    }
+    sort(res.begin(), res.end());
+    return res;
+}
+template<typename T> 
+map<T,int> factorize(T x){
+    map<T,int> mp;
+    for (T i = 2; i*i <= x; i++){
+        while (x%i == 0) {
+            x /= i;
+            mp[i]++;
+        }
+        if (x == 1) break;
+    }
+    if (x != 1) mp[x]++;
+    return mp;
+}
+
 
 void solve(){
-    long double h, c, t;
-    cin >> h >> c >> t;
-    
-    if(t <= (h+c)/2){
-        cout << 2 << endl;
+    string ans[] = {"Ashishgup","FastestFinger"};
+    ll N;
+    cin >> N;
+    if(N==1){
+        cout << ans[1] << endl;
         return;
     }
-    auto calc = [&](long double n) -> long double{
-        return ((n+1)*h + n * c) / (2*n + 1);
-    };
-    auto check = [&](long double n) -> bool{
-        long double tmp = calc(n);
-        return t < tmp;
-    };
-    ll ok = 0;
-    ll ng = 1e9;
-    while(ng - ok > 1){
-        ll mid = (ng + ok) >> 1;
-        if(check(mid))ok = mid;
-        else ng = mid;
+    if(N%2 == 1){
+        cout << ans[0] << endl;
+        return;
     }
-    long double diff[] = {abs(calc(ok)-t), abs(calc(ng)-t)};
-    cout << ((diff[0] <= diff[1]) ? 2*ok+1: 2*ng+1) << endl;
+    if(N == 2){
+        cout << ans[0] << endl;
+        return;
+    }
+    //N > 2の偶数
+    auto v = divisor(N);
+    auto mp = factorize(N);
+    if(mp.size() == 1){//
+        cout << ans[1] << endl;
+    }
+    else if(mp[2] == 1){
+        int cnt = 0;
+        for(auto p:mp){
+            if(p.first > 2)cnt += p.second;
+        }
+        if(cnt == 1){
+            cout << ans[1] << endl;
+        }
+        else{
+            cout << ans[0] << endl;
+        }
+    }
+    else{//
+        cout << ans[0] << endl;
+    }
 }
 int main() {
     cin.tie(0);

@@ -31,19 +31,23 @@ const string dir = "DRUL";
 */
 
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
-
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    vector<ll> cnt(1000100,0);
+    vector<bool> ok(1000100, true);
+    rep(i, N){
+        cin >> A[i];
+        cnt[A[i]]++;
     }
-    cout << S << endl;
+    sort(all(A));
+    int ans = 0;
+    rep(i,N){
+        if(cnt[A[i]] == 1 && ok[A[i]])ans++;
+        if(!ok[A[i]])continue;
+        for(int j = A[i]; j <= 1000000;j += A[i]){
+            ok[j] = false;
+        }
+    }
+    cout << ans << endl;
 }

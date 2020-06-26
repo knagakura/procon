@@ -30,20 +30,40 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    ll k;
+    cin >> k;
+    ll ng = 0;
+    ll ok = 1000;
+    auto check = [&](ll X){
+        vec<ll> tmp(10);
+        rep(i,10)tmp[i] = X / 10;
+        rep(i,X%10)tmp[i] += 1;
+        ll cnt = 1;
+        rep(i,10)cnt *= tmp[i];
+        return cnt >= k;
+    };
+    while(ok - ng > 1){
+        ll mid = (ok + ng) >> 1;
+        if(check(mid))ok = mid;
+        else ng = mid;
     }
-    cout << S << endl;
+    string s = "codeforces";
+    string ans = "";
+    vec<ll> tmp(10);
+    rep(i,10){
+        tmp[i] = ok / 10;
+    }
+    rep(i,ok%10)tmp[i] += 1;
+    rep(i,10){
+        rep(j,tmp[i]){
+            ans += s[i];
+        }
+    }
+    cout << ans << endl;
 }

@@ -30,20 +30,43 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    string S;
+    cin >> S;
+    int N = S.size();
+    vector<int> cum(N+1,0);
+    rep(i,N){
+        cum[i+1] += cum[i] + (S[i] == '+' ? 1:-1);
+    }
+
+    //最初に-iになるまでのindexの位置
+    vector<int> idx(N+1,-1);
+    rep1(i,N+1){
+        if(cum[i] >= 0)continue;
+        //cum[i] < 0
+        if(idx[-cum[i]] >= 0)continue;
+        idx[-cum[i]] = i;
+    }
+    //
+    int minn = INF;
+    rep1(i,N+1){
+        chmin(minn, cum[i]);
+    }
+    ll ans = N;
+    if(minn >= 0){
+        cout << ans << endl;        
+        return;
+    }
+    for(int i = 1; i <= abs(minn); i++){
+        ans += idx[i];
+    }
+    cout << ans << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
-    }
-    cout << S << endl;
+    int t;
+    cin >> t;
+    while(t--)solve();  
 }

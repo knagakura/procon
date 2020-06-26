@@ -29,21 +29,29 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+void solve(){
+    ll N, K;
+    cin >> N >> K;
+    for(int len = 1; len <= 11; len++){
+        if(len == 1){
+            for(int x = 0; x+k <= 9; x++){
+                
+            }
+        }
+        else if(len == 2){
 
+        }
+        else{
+
+        }
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
-    }
-    cout << S << endl;
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

@@ -30,30 +30,60 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+ll dp[2][200010][10];
 void solve(){
-    long double h, c, t;
-    cin >> h >> c >> t;
-    
-    if(t <= (h+c)/2){
-        cout << 2 << endl;
-        return;
+    int N;
+    cin >> N;
+    vector<ll> a(N);
+    rep(i, N)cin >> a[i];
+    ll ans = 0;
+    rep(i,N)if(i%2 == 0)ans += a[i];
+    // 数列を二つ作る
+    vvec<ll> v(2);
+    rep(j,2){
+        for(int i = j; i+1 < N; i+= 2){
+            if(j == 0){
+                v[j].push_back(a[i+1]-a[i]);
+            }
+            else{
+                v[j].push_back(a[i] - a[i+1]);
+            }
+        }
     }
-    auto calc = [&](long double n) -> long double{
-        return ((n+1)*h + n * c) / (2*n + 1);
-    };
-    auto check = [&](long double n) -> bool{
-        long double tmp = calc(n);
-        return t < tmp;
-    };
-    ll ok = 0;
-    ll ng = 1e9;
-    while(ng - ok > 1){
-        ll mid = (ng + ok) >> 1;
-        if(check(mid))ok = mid;
-        else ng = mid;
+    //print(v[0]);
+    //print(v[1]);
+    //dp part
+    rep(j,2)rep(i,N+1)rep(k,5)dp[j][i][k] = 0;
+    rep(j,2){
+        int M = v[j].size();
+        rep(i,M){
+            //from 0 to 1
+            {
+                chmax(dp[j][i+1][1], dp[j][i][0] + v[j][i]);
+            }
+            //from 1 to 1
+            {
+                chmax(dp[j][i+1][1], dp[j][i][1] + v[j][i]);
+                //chmax(dp[j][i+1][1], dp[j][i][1]);
+            }
+            //from 1 to 2
+            {
+                chmax(dp[j][i+1][2], dp[j][i][1] + v[j][i]);
+            }
+        }
     }
-    long double diff[] = {abs(calc(ok)-t), abs(calc(ng)-t)};
-    cout << ((diff[0] <= diff[1]) ? 2*ok+1: 2*ng+1) << endl;
+    /*
+    rep(j,2){
+        rep(i,N+1){
+            cerr << dp[j][i][0] << " " << dp[j][i][1] << " " << dp[j][i][2] << endl;
+        }
+    }*/
+    ll maxx = 0;
+    rep(j,2)rep(i,N+1){
+        chmax(maxx, dp[j][i][2]);
+    }
+    ans += maxx;
+    cout << ans << endl;
 }
 int main() {
     cin.tie(0);

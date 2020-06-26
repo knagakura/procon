@@ -35,15 +35,8 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
-    }
-    cout << S << endl;
+    int X;
+    cin >> X;
+    ll d = lcm(360, X) / X;
+    cout << d << endl;
 }

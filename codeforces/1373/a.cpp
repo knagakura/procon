@@ -29,21 +29,34 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+void solve(){
+    ll a, b, c;
+    cin >> a >> b >> c;
+    if(a < c){
+        cout << 1 << " ";
+        if(a * b > c){
+            cout << b << endl;
+        }
+        else{
+            cout << -1 << endl;
+        }
+    }
+    else{
+        cout << -1 << " ";
+        if(a * b > c){
+            cout << b << endl;
+        }
+        else{
+            cout << -1 << endl;
+        }
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
-    }
-    cout << S << endl;
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

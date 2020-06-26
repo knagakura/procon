@@ -35,15 +35,14 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    int N, K;
+    cin >> N >> K;
+    vector<ll> A(N);
+    rep(i, N)cin >> A[i];
+    sort(all(A));
+    ll ans = 0;
+    rep(i,K){
+        ans += A[i];
     }
-    cout << S << endl;
+    cout << ans << endl;
 }

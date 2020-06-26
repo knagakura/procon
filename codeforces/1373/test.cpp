@@ -3,9 +3,9 @@ using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
 #define rep1(i,N) for(int i=1;i<int(N);++i)
 #define all(a) (a).begin(),(a).end()
-#define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
-#define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
-#define dump(x) cerr<<#x<<": "<<x<<endl;
+#define print(v) { cout<<#v<<": [ "; for(auto _ : v) cout<<_<<", "; cout<<"]"<<endl; }
+#define printpair(v) { cout<<#v<<": [ "; for(auto _ : v) cout<<"{"<<_.first<<","<<_.second<<"}"<<", "; cout<<"]"<<endl; }
+#define dump(x) cout<<#x<<": "<<x<<endl;
 #define bit(k) (1LL<<(k))
 typedef long long ll;
 typedef pair<int, int> i_i;
@@ -34,16 +34,34 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    auto calc = [&](ll X){
+        ll res = 0;
+        while(X > 0){
+            res += X%10;
+            X /= 10;
+        }
+        return res;
+    };
+    for(int k = 3; k <= 9; k++){
+        for(int n = 1; n <= 150; n++){
+            cout << n << " " << k << endl;
+            bool ok = false;
+            for(ll x = 0; x <= 1e12; x++){
+                ll sum = 0;
+                vec<int> v;
+                rep(i,k+1){
+                    sum += calc(x + i);
+                    v.push_back(x + i);
+                }
+                if(sum == n){
+                    print(v);
+                    ok = true;
+                    break;
+                }
+            }
+            if(!ok){
+                cout << -1 << endl;
+            }
+        }
     }
-    cout << S << endl;
 }

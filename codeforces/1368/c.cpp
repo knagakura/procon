@@ -24,26 +24,26 @@ const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = (ll)1e9+7;
 const double PI = acos(-1.0);
-/*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
-*/
 
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    int N;
+    cin >> N;
+    set<i_i> st;
+    for(int i = 1; i <= N; i++){
+        st.insert({i,i});
+        rep(j,4)st.insert({i+dx[j],i+dy[j]});
     }
-    cout << S << endl;
+    st.insert({0,0});
+    st.insert({N+1,N+1});
+    cout << st.size() << endl;
+    for(auto &p: st){
+        cout << p.first << " " << p.second << endl;
+    }
 }

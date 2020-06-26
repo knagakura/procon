@@ -29,21 +29,45 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
+    vector<string> v;
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    rep(i,26){
+        string tmp;
+        tmp += char(i + 'a');
+        v.push_back(tmp);
     }
-    cout << S << endl;
+    rep(i,26)rep(j,26){
+        string tmp;
+        tmp += char('a' + i);
+        tmp += char('a' + j);
+        v.push_back(tmp);
+    }
+    
+    rep(i,26)rep(j,26)rep(k,26){
+        string tmp;
+        tmp += char('a' + i);
+        tmp += char('a' + j);
+        tmp += char('a' + k);
+        v.push_back(tmp);
+    }
+    auto comp = [](string &a, string &b){
+        if(a.size() == b.size())return a < b;
+        else{
+            return a.size() < b.size();
+        }
+    };
+    sort(all(v), comp);
+    print(v);
+    int size = v.size();
+    int cnt = 0;
+    rep(i,size){
+        cout << cnt << " " << v[i]<< endl;
+        cnt++;
+        if(v[i].size() != v[i+1].size())cnt = 0;
+    }
+
 }

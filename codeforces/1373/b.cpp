@@ -29,21 +29,23 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+void solve(){
+    string S;
+    cin >> S;
+    int N = S.size();
+    int cnt[2] = {0,0};
+    rep(i,N){
+        cnt[S[i]-'0']++;
+    }
+    int diff = min(cnt[0], cnt[1]);
+    cout << ((diff&1) ? "DA":"NET") << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
-    }
-    cout << S << endl;
+    int t;
+    cin >> t;
+    while(t--)solve();
+    
 }

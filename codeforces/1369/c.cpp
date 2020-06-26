@@ -30,20 +30,38 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    ll N, K;
+    cin >> N >> K;
+    vector<ll> A(N),W(K);
+    rep(i, N)cin >> A[i];
+    rep(i, K)cin >> W[i];
+    sort(all(A));
+    sort(all(W), greater<>());
+    int idx = 0;
+    ll ans = 0;
+    rep(i,K){
+        int cnt = W[i] - 1;
+        if(cnt == 0){
+            ans += 2*A[N-1];
+            N--;
+        }
+        rep(j,cnt){
+            if(j == 0)ans += A[idx];
+            idx++;
+        }
+    }
+    for(int i = idx; i < N; i++){
+        ans += A[i];
+    }
+    cout << ans << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
-    }
-    cout << S << endl;
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

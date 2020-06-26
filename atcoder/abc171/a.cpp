@@ -35,15 +35,12 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    char s;
+    cin >> s;
+    if(s-'a' >= 0 && s - 'a' < 26){
+        cout << 'a' << endl;
     }
-    cout << S << endl;
+    else{
+        cout << 'A' << endl;
+    }
 }

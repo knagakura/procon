@@ -35,15 +35,23 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i, N)cin >> A[i];
+    vec<int> cnt(21, 0);
+    rep(i,N){
+        rep(j,21){
+            if(bit(j) & A[i])cnt[j]++;
+        }
     }
-    cout << S << endl;
+    ll ans = 0;
+    rep(i,N){
+        ll tmp = 0;
+        rep(j,21){
+            if(cnt[j] >= i+1)tmp += bit(j);
+        }
+        ans += tmp * tmp;
+    }
+    cout << ans << endl;
 }

@@ -35,15 +35,40 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    int t;
+    cin >> t;
+    while(t--){
+        ll N;
+        cin >> N;
+        vector<l_l> cnt[2];
+        rep(i,2*N){
+            ll a;
+            cin >> a;
+            cnt[a%2].push_back({a,i+1});
+        }
+        //print(cnt[0]);
+        //print(cnt[1]);
+        if(cnt[0].size() % 2 == 1){
+            cnt[0].pop_back();
+            cnt[1].pop_back();
+        }
+        else{
+            if(cnt[0].size() >= 2){
+                cnt[0].pop_back();
+                cnt[0].pop_back();
+            }
+            else{
+                cnt[1].pop_back();
+                cnt[1].pop_back();
+            }
+        }
+        rep(i,cnt[0].size()){
+            cout << cnt[0][i].second << " " << cnt[0][i+1].second << endl;
+            i++;
+        }
+        rep(i,cnt[1].size()){
+            cout << cnt[1][i].second << " " << cnt[1][i+1].second << endl;
+            i++;
+        }
     }
-    cout << S << endl;
 }

@@ -35,15 +35,13 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i, N)cin >> A[i];
+    ll ans = 0;
+    rep(i,N)rep(j,N){
+        chmax(ans, A[i]^A[j]);
     }
-    cout << S << endl;
+    cout << ans << endl;
 }

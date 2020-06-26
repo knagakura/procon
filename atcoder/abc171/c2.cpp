@@ -35,15 +35,14 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    cin >> S;
-    int Q;
-    cin >> Q;
-    while(Q--){
-        int l, r;
-        cin >> l >> r;
-        l--;r--;
-        reverse(S.begin() + l, S.begin() +r+1);
+    ll N;
+    cin >> N;
+    string ans;
+    while(N){
+        N--;
+        ans.push_back(char('a'+N%26));
+        N /= 26;
     }
-    cout << S << endl;
+    reverse(all(ans));
+    cout << ans << endl;
 }

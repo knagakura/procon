@@ -13,8 +13,10 @@ typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
 template <class T> using vvec = vector<vec<T>>;
 template< typename T1, typename T2 >
-ostream &operator<<(ostream &os, const pair< T1, T2 >& p) {os << "{" <<p.first << ", " << p.second << "}";return os;}
-
+ostream &operator<<(ostream &os, const pair< T1, T2 >& p) {
+  os << "{" <<p.first << ", " << p.second << "}";
+  return os;
+}
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
 template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 
@@ -28,9 +30,38 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i, N)cin >> A[i];
+    ll ans = 0;
+    rep(i,N){
+        if(i%2 == 0)ans += A[i];
+    }
+    vector<ll> v[2];
+    rep(i,N-1){
+        if(i&1)v[0].push_back(A[i]-A[i+1]);
+        else v[1].push_back(A[i+1]-A[i]);
+    }
+    ll maxx = 0;
+    rep(j,2){
+        ll sum = 0;
+        ll minn = 0;
+        rep(i,v[j].size()){
+            sum += v[j][i];
+            chmax(maxx, sum - minn);
+            chmin(minn, sum);
+        }
+    }
+    cout << ans + maxx << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

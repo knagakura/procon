@@ -13,8 +13,10 @@ typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
 template <class T> using vvec = vector<vec<T>>;
 template< typename T1, typename T2 >
-ostream &operator<<(ostream &os, const pair< T1, T2 >& p) {os << "{" <<p.first << ", " << p.second << "}";return os;}
-
+ostream &operator<<(ostream &os, const pair< T1, T2 >& p) {
+  os << "{" <<p.first << ", " << p.second << "}";
+  return os;
+}
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
 template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 
@@ -33,4 +35,21 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
+    ll N, K;
+    cin >> N >> K;
+    ll ans = 0;
+    if(K%2 == 1){
+        //Nの中のKの倍数の個数
+        cout << (N / K) * (N / K) * (N / K) << endl;
+        return 0;
+    }
+    ll cnt = 0;
+    ll cnt0 = 0;
+    for(int i = 1; i <= N; i++){
+        cnt += (i % K == K / 2);
+        cnt0 += (i % K == 0);
+    }
+    ans += cnt * cnt * cnt;
+    ans += cnt0 * cnt0 * cnt0;
+    cout << ans << endl;
 }

@@ -13,8 +13,10 @@ typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
 template <class T> using vvec = vector<vec<T>>;
 template< typename T1, typename T2 >
-ostream &operator<<(ostream &os, const pair< T1, T2 >& p) {os << "{" <<p.first << ", " << p.second << "}";return os;}
-
+ostream &operator<<(ostream &os, const pair< T1, T2 >& p) {
+  os << "{" <<p.first << ", " << p.second << "}";
+  return os;
+}
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
 template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 
@@ -33,4 +35,23 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
+    string S = "choku";
+    string X;
+    cin >> X;
+    int N = X.size();
+    bool ok = true;
+    for(int i = 0; i < N; i++){
+        if(X[i] == 'o')continue;
+        if(X[i] == 'k')continue;
+        if(X[i] == 'u')continue;
+        if(X[i] == 'c'){
+            if(i+1 < N && X[i+1] == 'h'){
+                i++;
+                continue;
+            }
+        }
+        ok = false;
+    }
+    if(ok)cout << "YES" << endl;
+    else cout << "NO" << endl;
 }

@@ -35,18 +35,54 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll M, K;
-    cin >> M >> K;
-    
-    if(K == 0){
-        ll cnt = 0;
-        for(ll i = 0; i < bit(M+1); i++){
-            cout << cnt << " ";
-            if(i&1)cnt++;
+    int N;
+    cin >> N;
+    vector<int> v, v2;
+    ll cnt_ = 0;
+    for(int i = 0; i < bit(N+1); i++){
+        v.push_back(i);
+        v2.push_back(cnt_);
+        if(i&1)cnt_++;
+    }
+    print(v);
+    print(v2);
+    sort(all(v));
+    map<vector<int>, int> mp;
+    auto calc = [&](vector<int> &w){
+        set<int> res;
+        for(int i = 0; i < bit(N);i++){
+            int prod = 0;
+            int cnt = 0;
+            for(int j = 0; j < bit(N+1); j++){
+                if(w[j] == i){
+                    cnt++;
+                }
+                else if(cnt == 1)prod ^= w[j];
+                if(cnt == 2)break;
+            }
+            res.insert(prod);
         }
-        cout << endl;
-    }
-    else{
-        cout << -1 << endl;
-    }
+        return res;
+    };
+    int count  = 0;
+    int ans = 0;
+    do{
+        vector<int> tmp(bit(N+1));
+        for(int i = 0; i < bit(N+1); i++){
+            tmp[i] = v2[v[i]];
+        }
+        if(mp.count(tmp))continue;
+        mp[tmp]++;
+        auto st = calc(tmp);
+        if(st.size() == 1 && *st.begin() != 0){
+            print(tmp);
+            print(st);
+            ans++;
+        }
+        if(count % 1000 == 0){
+            dump(count);
+            dump(ans);
+        }
+        count++;
+    }while(next_permutation(all(v)));
 }

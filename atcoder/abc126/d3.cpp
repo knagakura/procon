@@ -30,23 +30,34 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+vvec<pair<int,int>> G;
+vec<int> ans;
+void dfs(int cur = 0, int pre = -1, int col = 0){
+    ans[cur] = col;
+    for(auto nxt: G[cur]){
+        if(nxt.first == pre)continue;
+        dfs(nxt.first, cur, (col + nxt.second)%2);
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll M, K;
-    cin >> M >> K;
-    
-    if(K == 0){
-        ll cnt = 0;
-        for(ll i = 0; i < bit(M+1); i++){
-            cout << cnt << " ";
-            if(i&1)cnt++;
-        }
-        cout << endl;
+    int N;
+    cin >> N;
+    G.resize(N);
+    ans.resize(N);
+    rep(i,N-1){
+        int u, v, w;
+        cin >> u >> v >> w;
+        u--;v--;
+        w &=1;
+        G[u].push_back({v,w});
+        G[v].push_back({u,w});
     }
-    else{
-        cout << -1 << endl;
+    dfs();
+    rep(i,N){
+        cout << ans[i] << endl;
     }
 }

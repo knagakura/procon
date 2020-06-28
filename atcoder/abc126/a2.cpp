@@ -34,19 +34,29 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    ll M, K;
-    cin >> M >> K;
-    
-    if(K == 0){
-        ll cnt = 0;
-        for(ll i = 0; i < bit(M+1); i++){
-            cout << cnt << " ";
-            if(i&1)cnt++;
+    long double N, K;
+    cin >> N >> K;
+    vector<ll> cnt(N+1,0);
+    for(ll i = 1; i <= N; i++){
+        ll tmp = i;
+        while(tmp < K){
+            tmp <<= 1;
+            cnt[i]++;
         }
-        cout << endl;
     }
-    else{
-        cout << -1 << endl;
+    ll maxx = *max_element(all(cnt));
+    if(maxx == 0){
+        cout << 1 << endl;
+        return 0;
     }
+    long double ans = 0;
+
+    // calc
+    for(int i = 1; i <= N; i++){
+        ans += bit(maxx - cnt[i]);
+    }
+    //
+    ans /= bit(maxx);
+    ans /= N;
+    cout << ans << endl;
 }

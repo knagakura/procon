@@ -30,18 +30,38 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    ll N, K;
+    cin >> N >> K;
+    vector<ll> a(N);
+    map<ll,ll> mp;
+    rep(i,N){
+        cin >> a[i];
+        a[i] %= K;
+        if(a[i] == 0)continue;
+        mp[K-a[i]]++;
+    }
+    ll maxx = 0;
+    ll rem_mx = 0;
+    for(auto p: mp){
+        if(maxx <= p.second){
+            maxx = p.second;
+            rem_mx = p.first;
+        }
+    }
+    if(maxx == 0){
+        cout << 0 << endl;
+        return;
+    }
+    ll ans = K * (maxx - 1) + rem_mx+1;
+    cout << ans << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S, T;
-    cin >> S >> T;
-    map<char, int> mp;
-    int N = S.size();
-    rep(i,N){
-        mp[S[i]]++;
-        mp[T[i]]--;
-    }
-    print(mp);
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

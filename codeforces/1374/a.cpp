@@ -30,18 +30,24 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    ll x, y, n;
+    cin >> x >> y >> n;
+    ll ok = 0;
+    ll ng = INF;
+    while(ng - ok > 1){
+        ll mid = (ok + ng) / 2;
+        if(x * mid + y <= n)ok = mid;
+        else ng = mid;
+    }
+    cout << x * ok + y << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S, T;
-    cin >> S >> T;
-    map<char, int> mp;
-    int N = S.size();
-    rep(i,N){
-        mp[S[i]]++;
-        mp[T[i]]--;
-    }
-    print(mp);
+    int t;
+    cin >> t;
+    while(t--)solve();  
 }

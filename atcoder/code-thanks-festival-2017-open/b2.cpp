@@ -29,19 +29,27 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+bool IsPalindrome(string &t){
+    string u = string(t.rbegin(), t.rend());
+    return u == t;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S, T;
-    cin >> S >> T;
-    map<char, int> mp;
+    string S;
+    cin >> S;
     int N = S.size();
-    rep(i,N){
-        mp[S[i]]++;
-        mp[T[i]]--;
+    for(int i = 0; i < N; i++){
+        //i文字追加
+        string tmp = S;
+        string add = S.substr(0, i);
+        reverse(all(add));
+        tmp += add;
+        if(IsPalindrome(tmp)){
+            cout << i << endl;
+            return 0;
+        }
     }
-    print(mp);
 }

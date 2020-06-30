@@ -35,13 +35,15 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S, T;
-    cin >> S >> T;
-    map<char, int> mp;
-    int N = S.size();
-    rep(i,N){
-        mp[S[i]]++;
-        mp[T[i]]--;
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i, N)cin >> A[i];
+    sort(all(A));
+    for(int i = A.size() - 1; i >= 0; i--){
+        if(A[i] != A[i-1]){
+            cout << A[i-1] << endl;
+            return 0;
+        }
     }
-    print(mp);
 }

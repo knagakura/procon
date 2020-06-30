@@ -35,13 +35,9 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S, T;
-    cin >> S >> T;
-    map<char, int> mp;
-    int N = S.size();
-    rep(i,N){
-        mp[S[i]]++;
-        mp[T[i]]--;
-    }
-    print(mp);
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i, N)cin >> A[i];
+    cout << *min_element(all(A)) << endl;
 }

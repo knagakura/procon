@@ -20,7 +20,7 @@ ostream &operator<<(ostream &os, const pair< T1, T2 >& p) {
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
 template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 
-const int INF = (ll)1e9;
+const int INF = (ll)3 * 1e9;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = (ll)1e9+7;
 const double PI = acos(-1.0);
@@ -29,19 +29,36 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+vector<ll> v[2][2];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S, T;
-    cin >> S >> T;
-    map<char, int> mp;
-    int N = S.size();
+    ll N, K;
+    cin >> N >> K;
     rep(i,N){
-        mp[S[i]]++;
-        mp[T[i]]--;
+        ll t, a, b;
+        cin >> t >> a >> b;
+        v[a][b].push_back(t);
     }
-    print(mp);
+    rep(i,2)rep(j,2){
+        rep(k,K){
+            v[i][j].push_back(INF);
+        }
+        sort(all(v[i][j]));
+    }
+    ll ans = INF;
+    ll sum = 0;
+    rep(i,K){
+        sum += v[1][1][i];
+    }
+    chmin(ans,sum);
+    rep(i,K){
+        sum -= v[1][1][K-1-i];
+        sum += v[1][0][i];
+        sum += v[0][1][i];
+        chmin(ans, sum);
+    }
+    cout << ((ans == INF) ? -1: ans) << endl;
 }

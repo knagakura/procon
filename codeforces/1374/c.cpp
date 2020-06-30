@@ -30,18 +30,25 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    int N;
+    cin >> N;
+    string S;
+    cin >> S;
+    ll maxx = 0;
+    ll cnt = 0;
+    rep(i,N){
+        if(S[i] == ')')cnt--;
+        else cnt++;
+        if(cnt < 0)chmax(maxx, abs(cnt));
+    }
+    cout << maxx << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    string S, T;
-    cin >> S >> T;
-    map<char, int> mp;
-    int N = S.size();
-    rep(i,N){
-        mp[S[i]]++;
-        mp[T[i]]--;
-    }
-    print(mp);
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

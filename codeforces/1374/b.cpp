@@ -30,18 +30,60 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+template<typename T> 
+map<T,int> factorize(T x){
+    map<T,int> mp;
+    for (T i = 2; i*i <= x; i++){
+        while (x%i == 0) {
+            x /= i;
+            mp[i]++;
+        }
+        if (x == 1) break;
+    }
+    if (x != 1) mp[x]++;
+    return mp;
+}
+
+
+void solve(){
+    ll N;
+    cin >> N;
+    int cnt2 = 0;
+    int cnt3 = 0;
+    while(N){
+        if(N%2 == 0){
+            N/=2;
+            cnt2++;
+        }
+        else{
+            break;
+        }
+    }
+    while(N){
+        if(N%3 == 0){
+            N /= 3;
+            cnt3++;
+        }
+        else{
+            break;
+        }
+    }
+    if(N != 1){
+        cout << -1 << endl;
+    }
+    else if(cnt2 > cnt3){
+        cout << -1 << endl;
+    }
+    else{
+        cout << cnt3 - cnt2 + cnt3 << endl;
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S, T;
-    cin >> S >> T;
-    map<char, int> mp;
-    int N = S.size();
-    rep(i,N){
-        mp[S[i]]++;
-        mp[T[i]]--;
-    }
-    print(mp);
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

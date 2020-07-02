@@ -31,7 +31,13 @@ const string dir = "DRUL";
 */
 
 int main() {
-    char s;
-    cin >> s;
-    cout << ((islower(s) ? 'a': 'A')) << endl;
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
+
+    ll N;
+    cin >> N;
+
+    string ans;
+    cerr << ans << endl;
 }

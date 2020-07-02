@@ -30,8 +30,39 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    ll a, b, N, M;
+    cin >> a >> b >> N >> M;
+    if(a + b < N + M){
+        cout << "No" << endl;
+        return;
+    }
+    if(a == 0 && b > 0){
+        if(b == M && N == 0){
+            cout << "Yes" << endl;
+        }
+        else{
+            cout << "No" << endl;
+        }
+    }
+    else if(a > 0 && b == 0){
+        if(a == N && M == 0){
+            cout << "Yes" << endl;
+        }
+        else{
+            cout << "No" << endl;
+        }
+    }
+    else{
+        cout << "Yes" << endl;
+    }
+}
 int main() {
-    char s;
-    cin >> s;
-    cout << ((islower(s) ? 'a': 'A')) << endl;
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
+
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

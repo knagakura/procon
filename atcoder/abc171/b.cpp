@@ -40,9 +40,5 @@ int main() {
     vector<ll> A(N);
     rep(i, N)cin >> A[i];
     sort(all(A));
-    ll ans = 0;
-    rep(i,K){
-        ans += A[i];
-    }
-    cout << ans << endl;
+    cout << accumulate(A.begin(), A.begin()+K, 0LL) << endl;
 }

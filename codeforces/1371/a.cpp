@@ -30,8 +30,17 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    int N;
+    cin >> N;
+    cout << (N+1) / 2 << endl;
+}
 int main() {
-    char s;
-    cin >> s;
-    cout << ((islower(s) ? 'a': 'A')) << endl;
+    cin.tie(0);
+    ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
+
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

@@ -30,27 +30,56 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-void solve(){
-    ll a, b, N, M;
-    cin >> a >> b >> N >> M;
-    if(a + b < N + M){
-        cout << "No" << endl;
-        return;
-    }
-    if(min(a, b) < M){
-        cout << "No" << endl;
-        return;
-    }
-    else{
-        cout << "Yes" << endl;
-    }
-}
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
 
-    int t;
-    cin >> t;
-    while(t--)solve();
+    ll N, p;
+    cin >> N >> p;
+    map<ll,ll> mp;
+    vector<ll> a(N);
+    rep(i, N){
+        cin >> a[i];
+        mp[a[i]]++;
+    }
+    sort(all(a));
+    ll ok = INFLL;
+    ll ng = 0;
+    auto check = [&](ll X){
+        int r = 0;
+        for(int l = 0; l < N; l++){
+            while(r < N && a[r] <= X){
+                r++;
+            }
+            if((r - l) <= 0)return false;
+            X++;
+        }
+        return true;
+    };
+    while(abs(ng - ok) > 1){
+        ll mid = (ok + ng) >> 1;
+        if(check(mid))ok = mid;
+        else ng = mid;
+    }
+    ll ok2 = ok-1;
+    ll ng2 = INFLL;
+    auto check2 = [&](ll X){
+        int r = 0;
+        rep(l,N){
+            while(r < N && a[r] <= X){
+                r++;
+            }
+            if((r - l) % p == 0)return false;
+            X++;
+        }
+        return true;
+    };
+    while(ng2 - ok2 > 1){
+        ll mid = (ng2 + ok2) >> 1;
+        if(check2(mid))ok2 = mid;
+        else ng2 = mid;
+    }
+    cout << ok2 - ok + 1 << endl;
+    for(ll ans = ok; ans <=ok2; ans++){
+        cout << ans << " ";
+    }
+    cout << endl;
 }

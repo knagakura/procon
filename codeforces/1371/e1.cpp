@@ -30,27 +30,39 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-void solve(){
-    ll a, b, N, M;
-    cin >> a >> b >> N >> M;
-    if(a + b < N + M){
-        cout << "No" << endl;
-        return;
-    }
-    if(min(a, b) < M){
-        cout << "No" << endl;
-        return;
-    }
-    else{
-        cout << "Yes" << endl;
-    }
-}
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
 
-    int t;
-    cin >> t;
-    while(t--)solve();
+    ll N, p; // p is prime number
+    cin >> N >> p;
+    vector<ll> a(N);
+    rep(i, N)cin >> a[i];
+    sort(all(a));
+    // f(x): xから始まって全部に勝てる順列の数 -> できそう
+    // f(x) is good if f(x) is not divisible by p.
+    // その順列は前から候補を決めていく
+    vector<ll> ans;
+    // ansの候補を試す
+    for(ll xx = 1; xx <= a[N-1]; xx++){
+        ll x = xx;
+        //dump(xx);
+        bool ok = true;
+        int l = 0;
+        int r = 0;
+        for(int i = 0; i < N; i++){
+            while(r < N && a[r] <= x){
+                r++;
+            }
+            //cerr << x << " " << "[" << l << ", " << r << ")" << endl;
+            if((r - l) <= 0)ok = false;
+            if((r - l) % p == 0)ok = false;
+            l++;
+            x++;
+        }
+        if(ok)ans.push_back(xx);
+    }
+    cout << ans.size() << endl;
+    for(auto &val: ans){
+        cout << val << " ";
+    }
+    cout << endl;
 }

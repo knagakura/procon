@@ -31,18 +31,46 @@ const string dir = "DRUL";
 */
 
 void solve(){
-    ll a, b, N, M;
-    cin >> a >> b >> N >> M;
-    if(a + b < N + M){
-        cout << "No" << endl;
-        return;
+    ll N, K;
+    cin >> N >> K;
+    vvec<int> v(N,vec<int>(N,0));
+    int p = 0, q = 0;
+    while(K--){
+        cerr << p << " " << q << endl;
+        v[p][q] = 1;
+        p = (p + 1) % N;
+        q = (q + 1) % N;
+        if(p == 0)q = (q + 1) % N;
     }
-    if(min(a, b) < M){
-        cout << "No" << endl;
-        return;
+    ll ans = 0;
+    ll maxx = 0;
+    ll minn = INFLL;
+    rep(i,N){
+        ll sum = 0;
+        rep(j,N){
+            sum += v[i][j];
+        }
+        chmax(maxx, sum);
+        chmin(minn, sum);
     }
-    else{
-        cout << "Yes" << endl;
+    ans += (maxx - minn) * (maxx - minn);
+    maxx = 0;
+    minn = INFLL;
+    rep(j,N){
+        ll sum = 0;
+        rep(i,N){
+            sum += v[i][j];
+        }
+        chmax(maxx, sum);
+        chmin(minn, sum);
+    }
+    ans += (maxx - minn) * (maxx - minn);
+    cout << ans << endl;
+    rep(i,N){
+        rep(j,N){
+            cout << v[i][j];
+        }
+        cout << endl;
     }
 }
 int main() {

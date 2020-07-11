@@ -35,13 +35,17 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    vector<int> a(4);
-    rep(i,4)cin >> a[i];
-    sort(all(a));
-    if(a[0] == 1 && a[1] == 4 && a[2] == 7 && a[3] == 9){
-        cout << "YES" << endl;
+    ll N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i, N)cin >> A[i];
+    sort(all(A));
+    reverse(all(A));
+    vector<ll> v;
+    v.push_back(A[0]);
+    rep1(i,N){
+        v.push_back(A[i]);
+        v.push_back(A[i]);
     }
-    else{
-        cout << "NO" << endl;
-    }
+    cout << accumulate(v.begin(), v.begin() + N - 1, 0LL) << endl;
 }

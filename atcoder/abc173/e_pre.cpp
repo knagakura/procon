@@ -80,77 +80,77 @@ struct mint {
         return os;
     }
 };
-
-
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N, M;
-    cin >> N >> M;
-    vector<ll> A(N), B(M);
-    vector<i_i> v(N*M+1,{-1,-1});
-    bool ok = true;
+    int N, K;
+    cin >> N >> K;
+    vector<ll> s(K,0),f(K,0);
+    vector<ll> A;
+    int cnt0 = 0;
     rep(i,N){
-        cin >> A[i];
-        if(v[A[i]].first != -1)ok = false;
-        v[A[i]].first = i;
+        ll a;
+        cin >> a;
+        A.push_back(abs(a));
+        if(a == 0)cnt0++;
+        if(a > 0){
+            s.push_back(a);
+        }
+        if(a < 0){
+            f.push_back(-a);
+        }
     }
-    rep(j,M){
-        cin >> B[j];
-        if(v[B[j]].second != -1)ok = false;
-        v[B[j]].second = j;
-    }
-    if(!ok){
-        puts("0");
+    if(N - cnt0 < K){
+        cout << 0 << endl;
         return 0;
     }
-    //print(v);
-    //N*Mから決めていく
+    sort(all(A));
+    sort(all(s), greater<>());
+    sort(all(f), greater<>());
+    //
     mint ans = 1;
-    if(v[N*M].first == -1 || v[N*M].second == -1)ans = 0;
-    //iより大きい数で埋まっている行, 列の数
-    ll cnt[2] = {1,1};
-    //iより大きい数で埋まっている行列の交差している座標の数
-    ll cnt_cross = 0;
-    //i未満の数が最大にならなければならないがために埋められない行、列の数
-    for(ll i = N * M - 1; i >= 1; i--){
-        /*
-        dump(i);
-        dump(v[i]);
-        dump(ans);
-        dump(cnt_cross);
-        print(cnt);
-        cerr << endl;
-        */
-        //{-1, -1}
-        if(v[i].first == -1 && v[i].second == -1){
-            ans *= cnt_cross;
-            cnt_cross--;
-            continue;
+    if(N == K){
+        rep(i,N){
+            ans *= mint(A[i]);
         }
-        //{-1, X}
-        if(v[i].first == -1 && v[i].second >= 0){
-            ans *= cnt[0];
-            cnt_cross += cnt[0]-1;
-            cnt[1]++;
-            continue;
+        if((f.size()-K) % 2 == 1){
+            ans = -ans;
         }
-        //{X, -1}
-        if(v[i].first >=  0 && v[i].second == -1){
-            ans *= cnt[1];
-            cnt_cross += cnt[1]-1;
-            cnt[0]++;
-            continue;
+        cout << ans << endl;
+        return 0;
+    }
+    int idx[] = {0,0};
+    if(K&1){
+        if(s[0] > 0){
+            ans *= s[0];
+            idx[0]++;
         }
-        //{X, X} OK
-        if(v[i].first >= 0 && v[i].second >= 0){
-            cnt_cross += cnt[0] + cnt[1];
-            cnt[0]++;
-            cnt[1]++;
-            continue;
+        // A > 0 がない場合
+        else{
+            rep(i,K){
+                ans *= A[i];
+            }
+            ans = -ans;
+            cout << ans << endl;
+            return 0;
+        }
+        K--;
+    }
+    rep(_, K/2){
+        ll tmp[] = {1,1};
+        tmp[0] = s[idx[0]] * s[idx[0]+1];
+        tmp[1] = f[idx[1]] * f[idx[1]+1];
+        if(tmp[0] < tmp[1]){
+            ans *= tmp[1];
+            idx[1] += 2;
+        }
+        else{
+            ans *= tmp[0];
+            idx[0] += 2;
         }
     }
+    // あと一個を選ぶ
     cout << ans << endl;
 }

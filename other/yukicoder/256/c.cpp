@@ -35,13 +35,30 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    vector<int> a(4);
-    rep(i,4)cin >> a[i];
-    sort(all(a));
-    if(a[0] == 1 && a[1] == 4 && a[2] == 7 && a[3] == 9){
-        cout << "YES" << endl;
+    ll N;
+    cin >> N;
+    vector<ll> T(N);
+    rep(i,N)cin >>T[i];
+    sort(all(T));
+    int v[] = {0,2,4,5,7,9,11};
+    int cnt = 0;
+    int ans;
+    rep(k,12){
+        map<ll, int> mp;
+        rep(j,7)mp[(k + v[j]) % 12]++;
+        bool ok = true;
+        rep(i,N){
+            if(mp[T[i]] == 0)ok = false;
+        }
+        if(ok){
+            cnt++;
+            ans = k;
+        }
+    }
+    if(cnt == 1){
+        cout << ans << endl;
     }
     else{
-        cout << "NO" << endl;
+        cout << -1 << endl;
     }
 }

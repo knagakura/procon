@@ -29,6 +29,7 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+
 struct mint {
     long long x;
     mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
@@ -80,77 +81,59 @@ struct mint {
         return os;
     }
 };
-
-
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N, M;
-    cin >> N >> M;
-    vector<ll> A(N), B(M);
-    vector<i_i> v(N*M+1,{-1,-1});
-    bool ok = true;
+    ll N, K;
+    cin >> N >> K;
+    vector<pair<ll, int>> v;
     rep(i,N){
-        cin >> A[i];
-        if(v[A[i]].first != -1)ok = false;
-        v[A[i]].first = i;
+        ll a;
+        cin >> a;
+        if(a >= 0)v.push_back({a, 1});
+        else v.push_back({-a,0});
     }
-    rep(j,M){
-        cin >> B[j];
-        if(v[B[j]].second != -1)ok = false;
-        v[B[j]].second = j;
+    sort(all(v), greater<>());
+    print(v);
+    mint ans = 1;
+    ll cntz = 0, cntpl = 0, cntmi = 0;
+    ll last_mi;
+    rep(i,K){
+        ans *= mint(v[i].first);
+        if(v[i].first == 0)cntz++;
+        else if(v[i].second) cntpl++;
+        else {
+            cntmi++;
+            last_mi = v[i].first;
+        }
     }
-    if(!ok){
-        puts("0");
+    if(cntz > 0){
+        cout << 0 << endl;
         return 0;
     }
-    //print(v);
-    //N*Mから決めていく
-    mint ans = 1;
-    if(v[N*M].first == -1 || v[N*M].second == -1)ans = 0;
-    //iより大きい数で埋まっている行, 列の数
-    ll cnt[2] = {1,1};
-    //iより大きい数で埋まっている行列の交差している座標の数
-    ll cnt_cross = 0;
-    //i未満の数が最大にならなければならないがために埋められない行、列の数
-    for(ll i = N * M - 1; i >= 1; i--){
-        /*
-        dump(i);
-        dump(v[i]);
-        dump(ans);
-        dump(cnt_cross);
-        print(cnt);
-        cerr << endl;
-        */
-        //{-1, -1}
-        if(v[i].first == -1 && v[i].second == -1){
-            ans *= cnt_cross;
-            cnt_cross--;
-            continue;
+    // cntz = 0
+    if(cntmi%2 == 1){
+        // 
+        ans /= last_mi;
+        // さらに後ろに+があるか調べる
+        bool exist = false;
+        for(int i = K; i < N; i++){
+            if(v[i].second){
+                ans *= v[i].first;
+                exist = true;
+                break;
+            }
         }
-        //{-1, X}
-        if(v[i].first == -1 && v[i].second >= 0){
-            ans *= cnt[0];
-            cnt_cross += cnt[0]-1;
-            cnt[1]++;
-            continue;
+        if(!exist){
+            
+            cout << -ans << endl;
+            return 0;
         }
-        //{X, -1}
-        if(v[i].first >=  0 && v[i].second == -1){
-            ans *= cnt[1];
-            cnt_cross += cnt[1]-1;
-            cnt[0]++;
-            continue;
-        }
-        //{X, X} OK
-        if(v[i].first >= 0 && v[i].second >= 0){
-            cnt_cross += cnt[0] + cnt[1];
-            cnt[0]++;
-            cnt[1]++;
-            continue;
-        }
+        cout << ans << endl;
+        return 0;
     }
+    // cntmi % 2 == 0
     cout << ans << endl;
 }

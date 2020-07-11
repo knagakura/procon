@@ -35,13 +35,23 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    vector<int> a(4);
-    rep(i,4)cin >> a[i];
-    sort(all(a));
-    if(a[0] == 1 && a[1] == 4 && a[2] == 7 && a[3] == 9){
-        cout << "YES" << endl;
+    ll N, D;
+    cin >> N >> D;
+    vector<l_l> A;
+    rep(i, N){
+        ll a;
+        cin >> a;
+        A.push_back({a, i});
     }
-    else{
-        cout << "NO" << endl;
+    sort(all(A));
+    // あるiについてA_j <= A_i - Dとなるjの個数
+    vector<ll> ans(N);
+    rep(i,N){
+        int idx = A[i].second;
+        l_l ue = make_pair(A[i].first - D, INFLL);
+        ans[idx] = upper_bound(all(A), ue) - A.begin();
+    }
+    rep(i,N){
+        cout << ans[i] << endl;
     }
 }

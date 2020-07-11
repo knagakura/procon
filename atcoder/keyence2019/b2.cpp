@@ -35,13 +35,23 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    vector<int> a(4);
-    rep(i,4)cin >> a[i];
-    sort(all(a));
-    if(a[0] == 1 && a[1] == 4 && a[2] == 7 && a[3] == 9){
-        cout << "YES" << endl;
+    string S;
+    cin >> S;
+    int N = S.size();
+    // 7文字とる
+    for(int i = 0; i < N; i++){
+        string tmp;
+        for(int j = 0; j < N; j++){
+            bool ok = true;
+            rep(k,N-7){
+                if(j == i + k)ok = false;
+            }
+            if(ok)tmp.push_back(S[j]);
+        }
+        if(tmp == "keyence"){
+            cout << "YES" << endl;
+            return 0;
+        }
     }
-    else{
-        cout << "NO" << endl;
-    }
+    cout << "NO" << endl;
 }

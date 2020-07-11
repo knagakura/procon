@@ -35,13 +35,8 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    vector<int> a(4);
-    rep(i,4)cin >> a[i];
-    sort(all(a));
-    if(a[0] == 1 && a[1] == 4 && a[2] == 7 && a[3] == 9){
-        cout << "YES" << endl;
-    }
-    else{
-        cout << "NO" << endl;
-    }
+    ll N;
+    cin >> N;
+    ll cnt = (N + 1000 - 1) / 1000;
+    cout << 1000 * cnt - N << endl;
 }

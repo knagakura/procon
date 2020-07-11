@@ -34,14 +34,10 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    vector<int> a(4);
-    rep(i,4)cin >> a[i];
-    sort(all(a));
-    if(a[0] == 1 && a[1] == 4 && a[2] == 7 && a[3] == 9){
-        cout << "YES" << endl;
-    }
-    else{
-        cout << "NO" << endl;
+    ll K, M, N;
+    cin >> K >> M >> N;
+    rep(i,M){
+        ll p, q, r;
+        cin >> p >> q >> r;
     }
 }

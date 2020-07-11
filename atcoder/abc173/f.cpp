@@ -35,13 +35,21 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    vector<int> a(4);
-    rep(i,4)cin >> a[i];
-    sort(all(a));
-    if(a[0] == 1 && a[1] == 4 && a[2] == 7 && a[3] == 9){
-        cout << "YES" << endl;
+    ll N;
+    cin >> N;
+    // \sum{連結成分数} = \sum{頂点数 - 辺数}
+    // = \sum{頂点数} - \sum{辺数}
+    // 主客転倒して考える
+    ll ans = 0;
+    for(int i = 1; i <= N; i++){
+        ans += i * (N - i + 1);
     }
-    else{
-        cout << "NO" << endl;
+    rep(i,N-1){
+        ll u, v;
+        cin >> u >> v;
+        if(u > v)swap(u,v);
+        //この辺が選ばれる回数
+        ans -= u * (N - v + 1);
     }
+    cout << ans << endl;
 }

@@ -35,13 +35,16 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    vector<int> a(4);
-    rep(i,4)cin >> a[i];
-    sort(all(a));
-    if(a[0] == 1 && a[1] == 4 && a[2] == 7 && a[3] == 9){
-        cout << "YES" << endl;
+    int N;
+    cin >> N;
+    map<string,ll> mp;
+    rep(i,N){
+        string S;
+        cin >> S;
+        mp[S]++;
     }
-    else{
-        cout << "NO" << endl;
+    string tmp[] = {"AC","WA","TLE","RE"};
+    for(auto &s: tmp){
+        cout << s << " x " << mp[s] << endl;
     }
 }

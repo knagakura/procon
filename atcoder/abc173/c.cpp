@@ -35,13 +35,35 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    vector<int> a(4);
-    rep(i,4)cin >> a[i];
-    sort(all(a));
-    if(a[0] == 1 && a[1] == 4 && a[2] == 7 && a[3] == 9){
-        cout << "YES" << endl;
+    ll H, W, K;
+    cin >> H >> W >> K;
+    vector<string> c(H);
+    rep(i,H)cin >> c[i];
+    auto check = [&](ll s, ll t){
+        set<pair<int,int>> st;
+        rep(i,H){
+            if(!(bit(i) & s)){
+                rep(j,W){
+                    if(bit(j) & t)continue;
+                    if(c[i][j] == '#')st.insert(make_pair(i,j));
+                }
+            }
+        }
+        rep(j,W){
+            if(!(bit(j) & t)){
+                rep(i,H){
+                    if(bit(i) & s)continue;
+                    if(c[i][j] == '#')st.insert(make_pair(i,j));
+                }
+            }
+        }
+        return st.size() == K;
+    };
+    ll ans = 0;
+    for(ll x = 0; x < bit(H); x++){
+        for(ll y = 0; y < bit(W); y++){
+            if(check(x, y))ans++;
+        }
     }
-    else{
-        cout << "NO" << endl;
-    }
+    cout << ans << endl;
 }

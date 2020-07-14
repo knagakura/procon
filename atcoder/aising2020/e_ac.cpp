@@ -30,16 +30,49 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
-
-    int l, r, d;
-    cin >> l >> r >> d;
-    int ans = 0;
-    for(int i = l; i <= r; i++){
-        ans += (i % d == 0);
+ll N;
+ll calc(vector<l_l> &v){
+    ll res = 0;
+    int sz = v.size();
+    priority_queue<ll> pq;
+    sort(all(v));
+    //大きい方から
+    int idx = sz-1;
+    for(int i = N - 1; i >= 0; i--){
+        while(idx >= 0 && v[idx].first == i){
+            pq.push(v[idx].second);
+            idx--;
+        }
+        if(pq.empty())continue;
+        res += pq.top();
+        pq.pop();
     }
+    return res;
+}
+void solve(){
+    cin >> N;
+    vector<l_l> lefts;
+    vector<l_l> rights;
+    ll base = 0;
+    rep(i,N){
+        ll K, L, R;
+        cin >> K >> L >> R;
+        K--;
+        if(L >= R){
+            base += R;
+            lefts.emplace_back(K, L-R);
+        }
+        else{
+            base += L;
+            K++;
+            rights.emplace_back(N-1-K, R-L);
+        }
+    }
+    ll ans = base + calc(lefts) + calc(rights);
     cout << ans << endl;
+}
+int main() {
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

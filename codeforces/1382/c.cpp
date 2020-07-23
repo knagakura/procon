@@ -29,24 +29,54 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+void solve(){
+    int N;
+    cin >> N;
+    string a, b;
+    cin >> a >> b;
+    vector<int> x(N), y(N);
+    rep(i,N){
+        x[i] = a[i] - '0';
+        y[i] = b[i] - '0';
+    }
+    int l = 0;
+    int r = N-1;
+    int cnt_all = 0;
+    vector<int> cnt(N,0);
+    vector<int> ans;
+    for(int i = N-1; i >= 0; i--){
+        int xr = x[r] + cnt_all + cnt[r];
+        int xl = x[l] + cnt_all + cnt[l];
+        xr %= 2;
+        xl %= 2;
+        if(xr == y[i]){
+            if(l < r)r--;
+            else r++;
+            continue;
+        }
+        if(xl != xr){
+            xl ^= 1;
+            cnt[l]++;
+            ans.push_back(1);
+        }
+        swap(l,r);
+        ans.push_back(i+1);
+        cnt_all++;
+        if(l < r)r--;
+        else r++;
+    }
+    cout << ans.size() << " ";
+    for(auto v: ans){
+        cout << v << " ";
+    }
+    cout << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    vector<vector<int>> v;
-    v.push_back({1,2,3,4,5,6});
-    int N;
-    cin >> N;
-    for(int i = 0 ; ; i++){
-        auto tmp = v.back();
-        swap(tmp[i%5], tmp[i%5+1]);
-        if(tmp == v[0])break;
-        v.push_back(tmp);
-    }
-    int sz = v.size();
-    rep(i,6){
-        cout << v[N%sz][i];
-    }
-    cout << endl;
+
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

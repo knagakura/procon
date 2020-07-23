@@ -34,19 +34,8 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    vector<vector<int>> v;
-    v.push_back({1,2,3,4,5,6});
-    int N;
-    cin >> N;
-    for(int i = 0 ; ; i++){
-        auto tmp = v.back();
-        swap(tmp[i%5], tmp[i%5+1]);
-        if(tmp == v[0])break;
-        v.push_back(tmp);
-    }
-    int sz = v.size();
-    rep(i,6){
-        cout << v[N%sz][i];
-    }
-    cout << endl;
+
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

@@ -1,27 +1,48 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
-#define rep1(i,N) for(int i=1;i<int(N);++i)
-#define all(a) (a).begin(),(a).end()
-#define print(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<_<<", "; cerr<<"]"<<endl; }
-#define printpair(v) { cerr<<#v<<": [ "; for(auto _ : v) cerr<<"{"<<_.first<<","<<_.second<<"}"<<", "; cerr<<"]"<<endl; }
 
-using P = pair<int, int>;
-typedef long long ll;
-
-const int MOD = 1e9+7;
-const int INF = 1e9;
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
     int N;
-    cin>>N;
-    vector<ll> C(N);
-    rep(i,N)cin>>C[i];
-    
-    int ans;
-    
-    cout<<ans<<endl;
+    cin >> N;
+    vector<int> C(N);
+    rep(i, N)cin >> C[i];
+    vector<int> cnt(N,0);
+    rep(i,N)rep(j,N){
+        if(i == j)continue;
+        if(C[j]%C[i] == 0)cnt[j]++;
+    }
 
+    long double kai = 1;
+    for(int i = 1; i <= N; i++)kai /= i;
+    vector<long double> fact(N+1);
+    fact[0] = kai;
+    rep(i,N)fact[i+1] = fact[i] * (i+1);
+
+    auto comb = [&](int a, int b) -> long double{
+        if(a == 0 || b == 0)return 1;
+        if(b > a)return 0;
+        return fact[a] / fact[a-b] / fact[b] * kai;
+    };
+    auto perm = [&](int a, int b) -> long double{
+        if(a == 0 || b == 0)return 1;
+        if(b > a)return 0;
+        return fact[a] / fact[a - b];
+    };
+
+    long double ans = 0; 
+    // あるコインiが場所jにいて
+    // 自分より左にk個、右にcnt[i] - k個おくときの場合の数
+    // kは偶数のみ
+    rep(i,N)rep(j,N){
+        for(int k = 0; k <= j && k <= cnt[i]; k+=2){
+            int S = cnt[i];
+            if(k > j)continue;
+            if(S-k > N-1-j)continue;
+            long double tmp = comb(S,k) * perm(j,k) * perm(N-1-j,S-k) * fact[N-1-S];
+            ans += tmp;
+        }
+    }
+    cout << ans << endl;
 }

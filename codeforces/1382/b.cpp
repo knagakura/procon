@@ -29,24 +29,38 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+void solve(){
+    int N;
+    cin >> N;
+    vector<ll> a(N);
+    ll cnt = 0;
+    rep(i, N)cin >> a[i];
+    reverse(all(a));
+    cnt++;
+    rep1(i,N){
+        if(a[i] == 1)cnt++;
+        else{
+            if(cnt&1){
+                cnt+=2;
+            }
+            else{
+                cnt++;
+            }
+        }
+    }
+    if(cnt&1){
+        cout << "First" << endl;
+    }
+    else{
+        cout << "Second" << endl;
+    }
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    vector<vector<int>> v;
-    v.push_back({1,2,3,4,5,6});
-    int N;
-    cin >> N;
-    for(int i = 0 ; ; i++){
-        auto tmp = v.back();
-        swap(tmp[i%5], tmp[i%5+1]);
-        if(tmp == v[0])break;
-        v.push_back(tmp);
-    }
-    int sz = v.size();
-    rep(i,6){
-        cout << v[N%sz][i];
-    }
-    cout << endl;
+
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

@@ -21,7 +21,7 @@ template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true
 template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 
 const int INF = (ll)1e9;
-const ll INFLL = (ll)1e18+1;
+const ll INFLL = (ll)1e17+1;
 const ll MOD = (ll)1e9+7;
 const double PI = acos(-1.0);
 /*
@@ -35,21 +35,43 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin >> N;
-    vector<ll> c(N);
-    rep(i, N)cin >> c[i];
-    vector<ll> dp(N+1,INFLL);
-    rep(i,N){
-        int idx = lower_bound(all(dp), c[i]) - dp.begin();
-        dp[idx] = c[i];
-    }
-    int ans = 0;
-    rep(i,N+1){
-        if(dp[i] == INFLL){
-            ans = i;
-            break;
+    int N, K;
+    ll L,R;
+    cin >> N >> K;
+    cin >> L >> R;
+    vector<ll> a(N);
+    rep(i, N)cin >> a[i];
+    sort(all(a));
+    int l = N/2;
+    int r = N - N/2;
+    vector<pair<ll,ll>> v[2];
+    map<pair<ll,ll>,ll> mp;
+    for(int i = 0; i < bit(l);i++){
+        ll sum = 0;
+        ll cnt = __builtin_popcount(i);
+        for(int j = 0; j < l; j++){
+            if(i&bit(j))sum += a[j];
         }
+        v[0].emplace_back(cnt, sum);
+    }
+    for(int i = 0; i < bit(r); i++){
+        ll sum = 0;
+        ll cnt = __builtin_popcount(i);
+        for(int j = 0; j < r; j++){
+            if(i&bit(j))sum += a[l+j];
+        }
+        v[1].emplace_back(cnt, sum);
+        // mp[{sum,cnt}]++;
+    }
+    int sz = v[0].size();
+    sort(all(v[1]));
+    ll ans = 0;
+    rep(i,sz){
+        ll sum = v[0][i].second;
+        ll cnt = v[0][i].first;
+        ll add = upper_bound(all(v[1]), make_pair(K-cnt,R-sum))
+                -lower_bound(all(v[1]), make_pair(K-cnt,L-sum));
+        ans += add;
     }
     cout << ans << endl;
 }

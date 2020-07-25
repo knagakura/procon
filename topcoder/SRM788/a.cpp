@@ -35,21 +35,5 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin >> N;
-    vector<ll> c(N);
-    rep(i, N)cin >> c[i];
-    vector<ll> dp(N+1,INFLL);
-    rep(i,N){
-        int idx = lower_bound(all(dp), c[i]) - dp.begin();
-        dp[idx] = c[i];
-    }
-    int ans = 0;
-    rep(i,N+1){
-        if(dp[i] == INFLL){
-            ans = i;
-            break;
-        }
-    }
-    cout << ans << endl;
+    
 }

@@ -35,14 +35,29 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll R, G, B;
+    ll R,G,B;
     cin >> R >> G >> B;
-
-    auto f = [&](ll x) -> ll{
-        if(x < 0)return INF;
+    auto f = [&](ll x){
         return x * (x+1) / 2;
     };
+    auto g = [&](ll l, ll r, ll x, ll cnt){
+        ll res = 0;
+        if(l <= x && x <= r){
+            res += f(abs(x-l));
+            res += f(abs(r-x));
+        }
+        else if(r < x){
+            res += cnt * abs(x - r);
+            res += f(cnt - 1);
+        }
+        else{
+            res += cnt * abs(x - l);
+            res += f(cnt-1);
+        }
+        return res;
+    };
     ll ans = INFLL;
+
     // 左にi個、右にG-1-i個
     for(ll i = 0; i <= G-1; i++){
         ll sum1 = 0;
@@ -96,6 +111,22 @@ int main() {
                 }
             }
         }
+    }
+    
+    for(ll i = -3000; i <= 3000; i++){
+        ll tmp = 0;
+        ll l = i;
+        ll r = l + R - 1;
+        tmp += g(l,r,-100,R);
+        
+        l = r+1;
+        r = l+G-1;
+        tmp += g(l,r,0,G);
+
+        l = r+1;
+        r = l+B-1;
+        tmp += g(l,r,100,B);
+        chmin(ans, tmp);
     }
     cout << ans << endl;
 }

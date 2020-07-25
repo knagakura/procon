@@ -35,21 +35,21 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin >> N;
-    vector<ll> c(N);
-    rep(i, N)cin >> c[i];
-    vector<ll> dp(N+1,INFLL);
-    rep(i,N){
-        int idx = lower_bound(all(dp), c[i]) - dp.begin();
-        dp[idx] = c[i];
+    ll R, G, B;
+    cin >> R >> G >> B;
+    for(ll i = -3000; i <= 3000; i++){
+        ll tmp = 0;
+        ll l = i;
+        ll r = l + R - 1;
+        tmp += g(l,r,-100,R);
+        
+        l = r+1;
+        r = l+G-1;
+        tmp += g(l,r,0,G);
+
+        l = r+1;
+        r = l+B-1;
+        tmp += g(l,r,100,B);
+        chmin(ans, tmp);
     }
-    int ans = 0;
-    rep(i,N+1){
-        if(dp[i] == INFLL){
-            ans = i;
-            break;
-        }
-    }
-    cout << ans << endl;
 }

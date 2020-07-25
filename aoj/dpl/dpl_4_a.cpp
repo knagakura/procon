@@ -35,21 +35,22 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin >> N;
-    vector<ll> c(N);
-    rep(i, N)cin >> c[i];
-    vector<ll> dp(N+1,INFLL);
-    rep(i,N){
-        int idx = lower_bound(all(dp), c[i]) - dp.begin();
-        dp[idx] = c[i];
-    }
-    int ans = 0;
-    rep(i,N+1){
-        if(dp[i] == INFLL){
-            ans = i;
-            break;
-        }
-    }
+    ll N, V;
+    cin >> N >> V;
+    vector<ll> a(N),b(N),c(N),d(N);
+    rep(i,N)cin >> a[i];
+    rep(i,N)cin >> b[i];
+    rep(i,N)cin >> c[i];
+    rep(i,N)cin >> d[i];
+
+    vector<ll> v;
+    map<ll,int> mp;
+    rep(i,N)rep(j,N)v.emplace_back(a[i]+b[j]);
+    rep(i,N)rep(j,N)mp[c[i]+d[j]]++;
+
+    int sz = v.size();
+    ll ans = 0;
+    rep(i,sz)ans += mp[V - v[i]];
     cout << ans << endl;
 }
+

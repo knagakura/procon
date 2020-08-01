@@ -35,30 +35,20 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    int T;
-    cin >> S >> T;
-    int x = 0, y = 0;
-    int N = S.size();
-    int cnt = 0;
-    rep(i,N){
-        if(S[i] == 'L')x--;
-        if(S[i] == 'R')x++;
-        if(S[i] == 'U')y++;
-        if(S[i] == 'D')y--;
-        if(S[i] == '?')cnt++;
+    ll A, K;
+    cin >> A >> K;
+    ll M = 2 * 1e12;
+    if(K == 0){
+        cout << M - A << endl;
+        return 0;
     }
-    ll ans = abs(x) + abs(y);
-    if(T == 1){
-        ans += cnt;
-    }
-    else{
-        if(ans > cnt)ans -= cnt;
-        else{
-            cnt -= ans;
-            ans = 0;
-            if(cnt&1)ans++;
+    ll tmp = A;
+    for(ll i = 1; i <= 100; i++){
+        ll nxt = tmp + 1 + K * tmp;
+        if(nxt >= M){
+            cout << i << endl;
+            return 0;
         }
+        tmp = nxt;
     }
-    cout << ans << endl;
 }

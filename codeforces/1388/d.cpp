@@ -29,36 +29,62 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+vvec<ll> G;
+void solve(){
+    ll N;
+    cin >> N;
+    vector<ll> a(N), b(N);
+    rep(i,N)cin >> a[i];
+    rep(i,N){
+        cin >> b[i];
+        if(b[i] > 0)b[i]--;
+    }
+    G.resize(N);
+    vector<ll> used(N,false);
+    deque<ll> v;
+    vector<int> cnt(N,0);// 入次数
+    ll ans = 0;
+    rep(i,N){
+        if(b[i] == -1)continue;
+        if(a[i] > 0){
+            G[i].emplace_back(b[i]);
+            cnt[b[i]]++;
+        }
+    }
+    // Gをトポロジカルソート
+    queue<int> q;
+    rep(i,N){
+        if(a[i] < 0)continue;
+        if(cnt[i] == 0)q.push(i);
+    }
+    while(not q.empty()){
+        int cur = q.front();
+        q.pop();
+        if(a[cur] < 0)continue;
+        ans += a[cur];
+        used[cur] = true;
+        v.push_back(cur);
+        for(auto nxt: G[cur]){
+            a[nxt] += a[cur];
+            cnt[nxt]--;
+            if(cnt[nxt] == 0)q.push(nxt);
+        }
+    }
+    rep(i,N){
+        if(not used[i]){
+            v.push_back(i);
+            ans += a[i];
+        }
+    }
+    cout << ans << endl;
+    rep(i,N)cout << v[i]+1 << " ";
+    cout << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    int T;
-    cin >> S >> T;
-    int x = 0, y = 0;
-    int N = S.size();
-    int cnt = 0;
-    rep(i,N){
-        if(S[i] == 'L')x--;
-        if(S[i] == 'R')x++;
-        if(S[i] == 'U')y++;
-        if(S[i] == 'D')y--;
-        if(S[i] == '?')cnt++;
-    }
-    ll ans = abs(x) + abs(y);
-    if(T == 1){
-        ans += cnt;
-    }
-    else{
-        if(ans > cnt)ans -= cnt;
-        else{
-            cnt -= ans;
-            ans = 0;
-            if(cnt&1)ans++;
-        }
-    }
-    cout << ans << endl;
+    int t = 1;
+    while(t--)solve();
 }

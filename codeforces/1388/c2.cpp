@@ -30,35 +30,54 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+void solve(){
+    ll N, M;
+    cin >> N >> M;
+    vector<ll> p(N), h(N);
+    rep(i,N)cin >> p[i];
+    rep(i,N)cin >> h[i];
+    vvec<int> G(N);
+    rep(i,N-1){
+        int a, b;
+        cin >> a >> b;
+        a--,b--;
+        G[a].push_back(b);
+        G[b].push_back(a);
+    }
+
+    vector<ll> cnt(N,0),happy(N,0),unhappy(N,0);
+    bool ok = true;
+    auto dfs = [&](auto && self, int cur = 0, int pre = -1) -> pair<ll,ll>{
+        cnt[cur] += p[cur];
+        ll happy_sum = 0;
+        ll unhappy_sum = 0;
+        for(int nxt: G[cur]){
+            if(nxt == pre)continue;
+            auto nxt_p = self(self, nxt, cur);
+            happy_sum += nxt_p.first;
+            unhappy_sum += nxt_p.second;
+            cnt[cur] += cnt[nxt];
+        }
+        ll tmp = h[cur] + cnt[cur];
+        if(tmp < 0)ok = false;
+        if(tmp % 2 == 1)ok = false;
+        happy[cur] = tmp / 2;
+        unhappy[cur] = cnt[cur] - happy[cur];
+        if(happy[cur] < 0)ok = false;
+        if(unhappy[cur] < 0)ok = false;
+        if(happy[cur] < happy_sum)ok = false;
+        return make_pair(happy[cur], unhappy[cur]);
+    };
+
+    dfs(dfs, 0, -1);
+    cout << (ok ? "YES": "NO") << endl;
+}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    int T;
-    cin >> S >> T;
-    int x = 0, y = 0;
-    int N = S.size();
-    int cnt = 0;
-    rep(i,N){
-        if(S[i] == 'L')x--;
-        if(S[i] == 'R')x++;
-        if(S[i] == 'U')y++;
-        if(S[i] == 'D')y--;
-        if(S[i] == '?')cnt++;
-    }
-    ll ans = abs(x) + abs(y);
-    if(T == 1){
-        ans += cnt;
-    }
-    else{
-        if(ans > cnt)ans -= cnt;
-        else{
-            cnt -= ans;
-            ans = 0;
-            if(cnt&1)ans++;
-        }
-    }
-    cout << ans << endl;
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

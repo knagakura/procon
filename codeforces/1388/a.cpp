@@ -29,36 +29,40 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
+void solve(){
+    ll N;
+    cin >> N;
+    if(N > 30){
+        ll ans[] = {6, 10, 14, N - 30};
+        if(N-30 == 6){
+            ans[2] = 15;
+            ans[3] = N - 31;
+        }
+        if(N - 30 == 10){
+            ans[1] = 15;
+            ans[3] = N - 35;
+        }
+        if(N - 30 == 14){
+            ans[2] = 15;
+            ans[3] = N - 31;
+        }
+        cout << "YES" << endl;
+        rep(i,4){
+            cout << ans[i] << " ";
+        }
+        cout << endl;
+    }
+    else{
+        cout << "NO" << endl;
+    }
+}
 int main() {
+
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    string S;
-    int T;
-    cin >> S >> T;
-    int x = 0, y = 0;
-    int N = S.size();
-    int cnt = 0;
-    rep(i,N){
-        if(S[i] == 'L')x--;
-        if(S[i] == 'R')x++;
-        if(S[i] == 'U')y++;
-        if(S[i] == 'D')y--;
-        if(S[i] == '?')cnt++;
-    }
-    ll ans = abs(x) + abs(y);
-    if(T == 1){
-        ans += cnt;
-    }
-    else{
-        if(ans > cnt)ans -= cnt;
-        else{
-            cnt -= ans;
-            ans = 0;
-            if(cnt&1)ans++;
-        }
-    }
-    cout << ans << endl;
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

@@ -34,31 +34,24 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    string S;
-    int T;
-    cin >> S >> T;
-    int x = 0, y = 0;
-    int N = S.size();
+    vector<int> S(6),T(6);
+    int B;
+    rep(i,6)cin >> S[i];
+    cin >> B;
+    rep(i,6)cin >> T[i];
+    sort(all(S));
+    sort(all(T));
     int cnt = 0;
-    rep(i,N){
-        if(S[i] == 'L')x--;
-        if(S[i] == 'R')x++;
-        if(S[i] == 'U')y++;
-        if(S[i] == 'D')y--;
-        if(S[i] == '?')cnt++;
+    rep(i,6)cnt += S[i] == T[i];
+    int ans = 0;
+    if(cnt == 6)ans = 1;
+    if(cnt == 5){
+        ans = 3;
+        int diff;
+        rep(i,6)if(S[i] != T[i])diff = S[i];
+        if(diff == B)ans--;
     }
-    ll ans = abs(x) + abs(y);
-    if(T == 1){
-        ans += cnt;
-    }
-    else{
-        if(ans > cnt)ans -= cnt;
-        else{
-            cnt -= ans;
-            ans = 0;
-            if(cnt&1)ans++;
-        }
-    }
+    if(cnt == 4)ans = 4;
+    if(cnt == 3)ans = 5;
     cout << ans << endl;
 }

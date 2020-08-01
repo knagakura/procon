@@ -37,11 +37,30 @@ int main() {
 
     string S, T;
     cin >> S >> T;
-    map<char, int> mp;
     int N = S.size();
+    bool ok = true;
+    string t = "atcoder";
     rep(i,N){
-        mp[S[i]]++;
-        mp[T[i]]--;
+        if(S[i] == T[i])continue;
+        // S[i] != T[i]
+        if(S[i] == '@'){
+            bool ok2 = false;
+            rep(j,7)if(T[i] == t[j])ok2 = true;
+            if(not ok2)ok = false;
+            continue;
+        }
+        if(T[i] == '@'){
+            bool ok2 = false;
+            rep(j,7)if(S[i] == t[j])ok2 = true;
+            if(not ok2)ok = false;
+            continue;
+        }
+        ok = false;
     }
-    print(mp);
+    if(ok){
+        cout << "You can win" << endl;
+    }
+    else{
+        cout << "You will lose" << endl;
+    }
 }

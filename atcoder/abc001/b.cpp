@@ -36,11 +36,29 @@ int main() {
     cout << fixed << setprecision(20);
 
     ll M;
-    if(M < 100){
-        cout << "00" << endl;
-        return 0;
+    cin >> M;
+    string ans;
+    if(M < 100)ans = "00";
+    else if(M <= 5000){
+        M *= 10;
+        M /= 1000;
+        ans = to_string(M);
+        if(ans.size() == 1)ans = "0"+ans;
     }
-    if(M <= 5000){
-        
+    else if(M <= 30000){
+        M /= 1000;
+        M += 50;
+        ans = to_string(M);
     }
+    else if(M <= 70000){
+        M -= 30000;
+        M /= 5;
+        M += 80000;
+        M /= 1000;
+        ans = to_string(M);
+    }
+    else{
+        ans = "89";
+    }
+    cout << ans << endl;
 }

@@ -39,14 +39,6 @@ set<plli> v;
 bool debug;
 ll cnt;
 void dfs(ll l, ll r, ll idx, ll start){
-    cnt++;
-    if(cnt%1000 == 0){
-        dump(cnt);
-        cerr << "dfsへ入りました" << endl;
-        // dump(v.size());
-        // dump(cnt + v.size());
-        cerr << l << " " << r << " " << idx << " " << start << endl;
-    }
     plli x = {{r, -INFLL},-1};
     while(not v.empty()){
         auto it = v.upper_bound(x);

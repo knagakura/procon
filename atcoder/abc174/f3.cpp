@@ -30,55 +30,32 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-template<typename T>
-vector<pair<T,long long>> RunLengthEncoder(vector<T> &v){
-    vector<pair<T,long long>> RLE;
-    long long cnt = 1;
-    for(int i = 0; i < (int)v.size(); ++i){
-        if(i == (int)v.size()-1){
-            RLE.push_back(make_pair(v[i], cnt));
-            continue;
-        }
-        if(v[i] == v[i+1])cnt++;
-        else{
-            RLE.push_back(make_pair(v[i],cnt));
-            cnt = 1;
-        }
-    }
-    return RLE;
-}
-
-vector<pair<char,long long>> RunLengthEncoder_ForString(string v){
-    vector<pair<char,long long>> RLE;
-    long long cnt = 1;
-    for(int i = 0; i < (int)v.size(); ++i){
-        if(i == (int)v.size()-1){
-            RLE.push_back(make_pair(v[i], cnt));
-            continue;
-        }
-        if(v[i] == v[i+1])cnt++;
-        else{
-            RLE.push_back(make_pair(v[i],cnt));
-            cnt = 1;
-        }
-    }
-    return RLE;
-}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int N;
-    cin >> N;
-    string S;
-    cin >> S;
-    ll cntr = 0;
-    rep(i,N)cntr += S[i] == 'R';
-    auto v = RunLengthEncoder_ForString(S);
-    ll ans = 0;
-    rep(i,cntr){
-        ans += S[i] == 'W';
+    int N, Q;
+    cin >> N >> Q;
+    vector<ll> A(N);
+    vvec<ll> v(N);
+    rep(i, N){
+        cin >> A[i];
+        A[i]--;
+        v[A[i]].emplace_back(i);
     }
-    cout << ans << endl;
+    vector<int> l(Q),r(Q);
+    rep(i,Q){
+        cin >> l[i] >> r[i];
+        l[i]--;r[i]--;
+        cerr << l[i] << " " << r[i] << endl;
+        ll ans = 0;
+        rep(i,N){
+            int cnt = upper_bound(all(v[i]), r[i]+1) - lower_bound(all(v[i]), l[i]-1);
+            dump(cnt);
+            if(cnt > 0)ans++;
+        }
+        cout << ans << endl;
+    }
+    rep(i,N)print(v[i]);
 }

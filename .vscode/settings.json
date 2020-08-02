@@ -17,6 +17,7 @@
         "regex": "cpp",
         "valarray": "cpp",
         "*.tcc": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "iosfwd": "cpp"
     }
 }

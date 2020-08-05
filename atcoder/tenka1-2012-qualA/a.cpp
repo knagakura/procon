@@ -31,11 +31,13 @@ const string dir = "DRUL";
 */
 
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
-
-    ll A, B, C;
-    cin >> A >> B >> C;
-    
+    ll N;
+    cin >> N;
+    vector<ll> a(N+1);
+    a[0] = 1;
+    a[1] = 1;
+    for(int i = 2; i <= N; i++){
+        a[i] = a[i-1] + a[i-2];
+    }
+    cout << a[N] << endl;
 }

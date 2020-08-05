@@ -33,25 +33,45 @@ const string dir = "DRUL";
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
-    vector<int> S(6),T(6);
-    int B;
-    rep(i,6)cin >> S[i];
-    cin >> B;
-    rep(i,6)cin >> T[i];
-    sort(all(S));
-    sort(all(T));
-    int cnt = 0;
-    rep(i,6)cnt += S[i] == T[i];
-    int ans = 0;
-    if(cnt == 6)ans = 1;
-    if(cnt == 5){
-        ans = 3;
-        int diff;
-        rep(i,6)if(S[i] != T[i])diff = S[i];
-        if(diff == B)ans--;
+
+    map<int,int> mp;
+    rep(i,6){
+        int a;
+        cin >> a;
+        mp[a]++;
     }
-    if(cnt == 4)ans = 4;
-    if(cnt == 3)ans = 5;
-    cout << ans << endl;
+    int b;
+    cin >> b;
+    rep(i,6){
+        int a;
+        cin >> a;
+        mp[a]--;
+    }
+    ll c = -1;
+    int ans = 0;
+    for(auto p: mp){
+        if(p.second == 0)ans++;
+        if(p.second == -1)c = p.first;
+    }
+    if(ans == 6){
+        cout << 1 << endl;
+    }
+    else if(ans == 5){
+        if(b == c){
+            cout << 2 << endl;
+        }
+        else{
+            cout << 3 << endl;
+        }
+    }
+    else if(ans == 4){
+        cout << 4 << endl;
+    }
+    else if(ans == 3){
+        cout << 5 << endl;
+    }
+    else{
+        cout << 0 << endl;
+    }
+
 }

@@ -30,41 +30,16 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-void solve(){
-    int N;
-    cin >> N;
-    vector<ll> w(N);
-    map<ll, int> mp;
-    rep(i, N){
-        cin >> w[i];
-        mp[w[i]]++;
-    }
-    ll ans = 0;
-    ll maxx = 0;
-    for(int s = 2; s <= 2*N; s++){
-        // auto tmp = mp;
-        ll cnt = 0;
-        for(int i = 1; i <= s-1; i++){
-            if(s-i > i)continue;
-            if(s-i == i){
-                cnt += mp[i]/2;
-                continue;
-            }
-            cnt += min(mp[i], mp[s-i]);
-        }
-        if(chmax(maxx, cnt)){
-            ans = s;
-        }
-    }
-    cout << maxx << endl;
-
-}
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    int t;
-    cin >> t;
-    while(t--)solve();
+    ll N;
+    cin >> N;
+    ll ans = 0;
+    ans += N/10 * 100;
+    N %= 10;
+    ans += min(N*15, 100LL);
+    cout << ans << endl;
 }

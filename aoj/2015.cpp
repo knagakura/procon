@@ -29,42 +29,37 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-void solve(){
-    int N;
-    cin >> N;
-    vector<ll> w(N);
-    map<ll, int> mp;
-    rep(i, N){
-        cin >> w[i];
-        mp[w[i]]++;
+bool solve(){
+    ll N, M;
+    cin >> N >> M;
+    if(N == 0 && M == 0)return true;
+    vector<ll> h(N),w(M);
+    vector<ll> x(1,0), y(1,0);
+    rep(i,N){
+        cin >> h[i];
+        x.push_back(x.back() + h[i]);
+    }
+    rep(j,M){
+        cin >> w[j];
+        y.push_back(y.back() + w[j]);
+    }
+    map<ll,int> mp[2];
+    rep(i,N+1)rep(j,i){
+        mp[0][abs(x[i] - x[j])]++;
+    }
+    rep(i,M+1)rep(j,i){
+        mp[1][abs(y[i] - y[j])]++;
     }
     ll ans = 0;
-    ll maxx = 0;
-    for(int s = 2; s <= 2*N; s++){
-        // auto tmp = mp;
-        ll cnt = 0;
-        for(int i = 1; i <= s-1; i++){
-            if(s-i > i)continue;
-            if(s-i == i){
-                cnt += mp[i]/2;
-                continue;
-            }
-            cnt += min(mp[i], mp[s-i]);
-        }
-        if(chmax(maxx, cnt)){
-            ans = s;
-        }
+    for(auto p: mp[0]){
+        ans += mp[1][p.first] * p.second;
     }
-    cout << maxx << endl;
-
+    cout << ans << endl;
+    return false;
 }
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-
-    int t;
-    cin >> t;
-    while(t--)solve();
+    while(1)if(solve())break;
 }

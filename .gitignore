@@ -9,6 +9,8 @@
 /paiza/*
 *.md
 *.txt
+*.in
+*.out
 a.out
 tempCodeRunnerFile.cpp
 *.json

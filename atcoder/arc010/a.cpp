@@ -34,11 +34,19 @@ int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
-    intmax_t a;
-    intmax_t b0, b1;
-    scanf("%jd %jd.%jd", &a, &b0, &b1);
-    intmax_t b = b0 * 100 + b1;
-    a *= b;
-    a /= 100;
-    printf("%jd\n", a);
+
+    ll N, M, A, B;
+    cin >> N >> M >> A >> B;
+    ll sum = 0;
+    rep(i,M){
+        if(N <= A)N+=B;
+        ll c;
+        cin >> c;
+        if(N - c < 0){
+            cout << i + 1 << endl;
+            return 0;
+        }
+        N -= c;
+    }
+    cout << "complete" << endl;
 }

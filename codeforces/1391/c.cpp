@@ -22,14 +22,14 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 
 const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
-//const ll MOD = (ll)1e9+7;
-const ll MOD = (ll)998244353;
+const ll MOD = (ll)1e9+7;
 const double PI = acos(-1.0);
 /*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+
 struct mint {
     long long x;
     mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
@@ -81,39 +81,36 @@ struct mint {
         return os;
     }
 };
-mint dp[3030][3030][2];
+struct combination {
+    vector<mint> fact, ifact;
+    //constructor(initiation)
+    combination(int n):fact(n+1),ifact(n+1) {
+        assert(n < MOD);
+        fact[0] = 1;
+        for (int i = 1; i <= n; ++i) fact[i] = fact[i-1]*i;
+        ifact[n] = fact[n].inv();
+        for (int i = n; i >= 1; --i) ifact[i-1] = ifact[i]*i;
+    }
+    mint Comb(int n, int k) {
+        if (k < 0 || k > n) return 0;
+        return fact[n]*ifact[k]*ifact[n-k];
+    }
+    mint H(int n, int m){
+        return Comb(n + m - 1, m);
+    }
+}C(2000100);
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll N, S;
-    cin >> N >> S;
-    vec<ll> A(N);
-    rep(i,N)cin >> A[i];
-    rep(i,N+1)rep(j,S+2)rep(k,2)dp[i][j][k] = 0;
-    dp[0][0][0] = 1;
-    rep(i,N)rep(j,S+1){
-        ll tj = min(S+1, j + A[i]);
-        // from 0 to 0
-        {
-            dp[i+1][j][0] += dp[i][j][0];
-        }
-        // from 0 to 1
-        {
-            dp[i+1][j][1] += dp[i][j][0];
-            dp[i+1][tj][1] += dp[i][j][0];
-        }
-        // from 1 to 0
-        {
-            dp[i+1][j][0] += dp[i][j][1];
-        }
-        // from 1 to 1
-        {
-            dp[i+1][j][1] += dp[i][j][1];
-            dp[i+1][tj][1] += dp[i][j][1];
-        }
+    ll N;
+    cin >> N;
+
+    mint ans = C.fact[N];
+    // 5の位置がiと決める
+    rep(i,N){
+        ans -= C.Comb(N-1, i);
     }
-    mint ans = dp[N][S][0] + dp[N][S][1];
     cout << ans << endl;
 }

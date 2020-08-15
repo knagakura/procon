@@ -32,7 +32,7 @@ const string dir = "DRUL";
 template<typename T>
 class BIT{
   public:
-    int N;
+int N;
     vector<T> data;
     BIT(T _N):N(_N){
         data.assign(N+1, 0);

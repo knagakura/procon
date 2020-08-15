@@ -36,17 +36,20 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll m, n, N;
-    cin >> m >> n >> N;
-    ll cnt = N;
-    ll rem = 0;
-    ll ans = 0;
-    while(cnt + rem >= m){
-        ans += cnt;
-        ll nxt_cnt = (cnt + rem) / m * n;
-        rem = (cnt + rem) % m;
-        cnt = nxt_cnt;
+    ll N;
+    cin >> N;
+    vector<ll> a(100);
+    a[0] = N;
+    auto calc = [&](ll X){
+        ll res = 0;
+        while(X > 0){
+            res += X%10;
+            X /= 10;
+        }
+        return res;
+    };
+    rep(i,100){
+        a[i+1] = calc(a[i]);
     }
-    ans += cnt;
-    cout << ans << endl;
+    cout << a[99] << endl;
 }

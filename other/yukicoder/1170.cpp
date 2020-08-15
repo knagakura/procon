@@ -30,23 +30,22 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll m, n, N;
-    cin >> m >> n >> N;
-    ll cnt = N;
-    ll rem = 0;
-    ll ans = 0;
-    while(cnt + rem >= m){
-        ans += cnt;
-        ll nxt_cnt = (cnt + rem) / m * n;
-        rem = (cnt + rem) % m;
-        cnt = nxt_cnt;
+    ll N, A, B;
+    cin >> N >> A >> B;
+    vector<ll> x(N);
+    rep(i,N)cin >> x[i];
+    vector<ll> cnt(N,1);
+    int l1 = 0, r1 = 0;
+    int l2 = 0, r2 = 0;
+    for(int i = 0; i < N; i++){
+        ll xl1= x[i] - B;
+        ll xr1 = x[i] - A;
+        ll xl2 = x[i] + A;
+        ll xr2 = x[i] + B;
     }
-    ans += cnt;
-    cout << ans << endl;
 }

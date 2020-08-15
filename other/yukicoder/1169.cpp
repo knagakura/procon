@@ -36,17 +36,36 @@ int main() {
     ios::sync_with_stdio(false);
     cout << fixed << setprecision(20);
 
-    ll m, n, N;
-    cin >> m >> n >> N;
-    ll cnt = N;
-    ll rem = 0;
-    ll ans = 0;
-    while(cnt + rem >= m){
-        ans += cnt;
-        ll nxt_cnt = (cnt + rem) / m * n;
-        rem = (cnt + rem) % m;
-        cnt = nxt_cnt;
+    ll N;
+    cin >> N;
+    vvec<ll> ans(N,vec<ll>(N,-1));
+    auto ok = [&](int x, int y, int v){
+        if(x == v-1 || y == v-1)return false;// 行列が一致するのはダメ
+        rep(i,N)if(ans[i][y] == v)return false;
+        rep(j,N)if(ans[x][j] == v)return false;
+        return true;
+    };
+    rep(i,N){
+        for(int j = i; j < i+5; j++){
+            if(i == j){
+                ans[i][j] = i + 1;
+                continue;
+            }
+            rep(k,N){
+                if(ok(i,j%5,k+1)){
+                    ans[i][j] = k + 1;
+                    break;
+                }
+            }
+        }
     }
-    ans += cnt;
-    cout << ans << endl;
+    rep(i,N){
+        rep(j,N){
+            if(ans[i][j] == -1){
+                cout << "." <<" ";
+            }
+            else cout << ans[i][j] << " ";
+        }
+        cout << endl;
+    }
 }

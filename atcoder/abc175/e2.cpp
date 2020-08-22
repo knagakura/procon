@@ -22,6 +22,8 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 
 const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
+const ll MOD = 1'000'000'007;
+// const ll MOD = 998244353;
 const double PI = acos(-1.0);
 /*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
@@ -29,39 +31,20 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-ll dp[3001][3001][4][2];
 int main() {
     cin.tie(0);
     ios::sync_with_stdio(false);
+    cout << fixed << setprecision(20);
 
     ll H, W, K;
     cin >> H >> W >> K;
-    vvec<ll> S(H+1, vec<ll>(W+1,0));
+    vvec<l_l> v(H);
     rep(i,K){
-        int r, c;
-        ll v;
-        cin >> r >> c >> v;
+        int r, c, val;
+        cin >> r >> c >> val;
         r--;c--;
-        S[r][c] = v;
+        v[r].emplace_back(c,val);
     }
-    // rep(i,H+1)print(S[i]);
-    rep(i,H)rep(j,W)rep(k,4)rep(l,2)dp[i][j][k][l] = -1;
-    dp[0][0][0][0] = 0;
-    dp[0][0][1][0] = S[0][0];
-    rep(i,H)rep(j,W)rep(k,4)rep(l,2){
-        // 横方向
-        //　使わない
-        chmax(dp[i][j+1][k][0], dp[i][j][k][l]);
-        // 使う
-        chmax(dp[i][j+1][k+(S[i][j+1] > 0)][0], dp[i][j][k][l] + S[i][j+1]);
-        // 縦方向
-        // 使わない
-        chmax(dp[i+1][j][0][1], dp[i][j][k][l]);
-        // 使う
-        chmax(dp[i+1][j][(S[i+1][j] > 0)][1], dp[i][j][k][l] + S[i+1][j]);
-    }
-    ll ans = 0;
-    rep(i,H)rep(j,W)rep(k,4)rep(l,2)chmax(ans, dp[i][j][k][l]);
-    cout << ans << endl;
+    rep(i,H)sort(all(v[i]));
+    rep(i,H)print(v[i]);
 }
-

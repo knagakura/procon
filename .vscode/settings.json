@@ -19,6 +19,8 @@
         "*.tcc": "cpp",
         "functional": "cpp",
         "iosfwd": "cpp",
-        "*.snippet": "cpp"
+        "*.snippet": "cpp",
+        "cmath": "cpp",
+        "complex": "cpp"
     }
 }

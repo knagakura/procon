@@ -52,10 +52,6 @@ map<T,int> factorize(T x){
 
 
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
-
     int N;
     cin >> N;
     vector<ll> A(N);
@@ -68,7 +64,11 @@ int main() {
         auto v = factorize(A[i]);
         for(auto p: v){
             cnt[p.first]++;
-            if(cnt[p.first] >= 2)ok = false;
+            if(cnt[p.first] >= 2){
+                ok = false;
+                i = N+1;
+                break;
+            }
         }
     }
     if(ok)cout << "pairwise coprime" << endl;

@@ -30,20 +30,15 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+
 template<typename T>
 vector<T> smallest_prime_factors(T n) {
-
     vector<T> spf(n + 1);
     for (int i = 0; i <= n; i++) spf[i] = i;
-
-
     for (T i = 2; i * i <= n; i++) {
-
         // 素数だったら
         if (spf[i] == i) {
-
             for (T j = i * i; j <= n; j += i) {
-
                 // iを持つ整数かつまだ素数が決まっていないなら
                 if (spf[j] == j) {
                     spf[j] = i;
@@ -51,46 +46,31 @@ vector<T> smallest_prime_factors(T n) {
             }
         }
     }
-
     return spf;
 }
 
 template<typename T>
 map<T, int> factolization(T x, vector<T> &spf) {
-    // vector<T> ret;
     map<T, int> mp;
     while (x != 1) {
-        // ret.push_back(spf[x]);
         mp[spf[x]]++;
         x /= spf[x];
     }
-    // sort(ret.begin(), ret.end());
-    // return ret;
     return mp;
 }
 int main(){
-    constexpr int MAX = 1000000;
-
+    constexpr ll MAX = 1000000;
     auto spf = smallest_prime_factors(MAX);
-
-    int Q;
-    cin >> Q;
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i,N)cin >> A[i];
     vector<int> v(MAX, 0);
-    ll G = -1;
-    while (Q--) {
-        int x;
-        cin >> x;
-        if(G == -1)G = x;
-        else{
-            G = gcd(G, x);
-        }
-        auto result = factolization(x, spf);
-        // for (auto z: result)cout << z << " ";
-        // cout << endl;
-        // print(result);
-        for(auto p: result){
-            v[p.first]++;
-        }
+    ll G = 0;
+    rep(i,N) {
+        G = gcd(G, A[i]);
+        auto result = factolization(A[i], spf);
+        for(auto p: result)v[p.first]++;
     }
     bool ok = true;
     rep(i,MAX)if(v[i] >= 2)ok = false;

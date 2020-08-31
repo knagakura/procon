@@ -6,6 +6,7 @@ typedef long long ll;
 #define all(a) (a).begin(),(a).end()
 #define bit(k) (1LL<<(k))
 #define SUM(v) accumulate(all(v), 0LL)
+
 typedef pair<int, int> i_i;
 typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
@@ -45,25 +46,22 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
+
+int ketawa(int x){
+    int res = 0;
+    while(x > 0){
+        res += x % 10;
+        x /= 10;
+    }
+    return res;
+}
+int main() {
     int N;
     cin >> N;
-    vector<ll> a(N);
-    rep(i,N)cin >> a[i];
-    sort(all(a));
-    if(N == 2){
-        if(a[0] == a[1])cout << "HL" << endl;
-        else cout << "T" << endl;
-        return;
+    vector<int> dp(N+1, 1);
+    for(int i = 1; i <= N; i++){
+        if(i + ketawa(i) > N)continue;
+        dp[i+ketawa(i)] += dp[i];
     }
-    if(2 * a[N-1] <= SUM(a) && SUM(a) % 2 == 0){
-        cout << "HL" << endl;
-    }else{
-        cout << "T" << endl;
-    }
-}
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+    cout << dp[N] << endl;
 }

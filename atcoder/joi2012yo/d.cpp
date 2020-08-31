@@ -6,6 +6,7 @@ typedef long long ll;
 #define all(a) (a).begin(),(a).end()
 #define bit(k) (1LL<<(k))
 #define SUM(v) accumulate(all(v), 0LL)
+
 typedef pair<int, int> i_i;
 typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
@@ -45,25 +46,42 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
-    int N;
-    cin >> N;
-    vector<ll> a(N);
-    rep(i,N)cin >> a[i];
-    sort(all(a));
-    if(N == 2){
-        if(a[0] == a[1])cout << "HL" << endl;
-        else cout << "T" << endl;
-        return;
+
+// 前2日分の予定を把握する
+ll dp[110][110];
+int main() {
+    const int M = 10000;
+    ll N, K;
+    cin >> N >> K;
+    vector<ll> A(K), B(K);
+    vector<ll> v(N,-1);
+    rep(i,K){
+        cin >> A[i] >> B[i];
+        A[i]--;
+        v[A[i]] = B[i];
     }
-    if(2 * a[N-1] <= SUM(a) && SUM(a) % 2 == 0){
-        cout << "HL" << endl;
-    }else{
-        cout << "T" << endl;
+    rep(i,101)rep(j,101)dp[i][j] = 0;
+    dp[0][0] = 1;
+    rep(i,N){
+        rep(j,16){
+            int a = j / 4 % 4;
+            int b = j % 4;
+            // 全てに遷移する -> 1, 2, 3
+            if(v[i] == -1){
+                rep1(c, 4){
+                    if(a == b && a == c)continue;
+                    (dp[i+1][b*4+c] += dp[i][j])%=M;
+                }
+            }
+            // v[i]に遷移する -> v[i]
+            else{
+                if(a == b && a == v[i])continue;
+                (dp[i+1][b * 4 + v[i]] += dp[i][j])%=M;
+            }
+        }
     }
+    ll ans = 0;
+    rep(j,16)(ans += dp[N][j]) %= M;
+    cout << ans << endl;
 }
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
-}
+

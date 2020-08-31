@@ -6,6 +6,7 @@ typedef long long ll;
 #define all(a) (a).begin(),(a).end()
 #define bit(k) (1LL<<(k))
 #define SUM(v) accumulate(all(v), 0LL)
+
 typedef pair<int, int> i_i;
 typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
@@ -45,25 +46,38 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
+
+
+int main() {
     int N;
     cin >> N;
-    vector<ll> a(N);
-    rep(i,N)cin >> a[i];
-    sort(all(a));
-    if(N == 2){
-        if(a[0] == a[1])cout << "HL" << endl;
-        else cout << "T" << endl;
-        return;
+    vector<ll> v(N,0);
+    int M = N * (N-1) / 2;
+    rep(i,M){
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        int c, d;
+        cin >> c >> d;
+        if(c > d)swap(a, b);
+        if(c == d){
+            v[a]++;
+            v[b]++;
+        }
+        else v[b]+=3;
     }
-    if(2 * a[N-1] <= SUM(a) && SUM(a) % 2 == 0){
-        cout << "HL" << endl;
-    }else{
-        cout << "T" << endl;
+    vector<i_i> vp;
+    rep(i,N)vp.emplace_back(v[i], i);
+    sort(all(vp), greater<>());
+    vector<ll> ans(N);
+    int cnt = 1;
+    rep(i,N){
+        if(i == 0){
+            ans[vp[i].second] = 1;
+            continue;
+        }
+        if(i && vp[i-1].first > vp[i].first)cnt = i+1;
+        ans[vp[i].second] = cnt;
     }
-}
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+    rep(i,N)cout << ans[i] << endl;
 }

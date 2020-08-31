@@ -6,6 +6,7 @@ typedef long long ll;
 #define all(a) (a).begin(),(a).end()
 #define bit(k) (1LL<<(k))
 #define SUM(v) accumulate(all(v), 0LL)
+
 typedef pair<int, int> i_i;
 typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
@@ -45,25 +46,30 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
-    int N;
+
+
+int main() {
+    ll N;
     cin >> N;
-    vector<ll> a(N);
-    rep(i,N)cin >> a[i];
-    sort(all(a));
-    if(N == 2){
-        if(a[0] == a[1])cout << "HL" << endl;
-        else cout << "T" << endl;
-        return;
+    ll A, B, C; // A, B: 生地, トッピングの値段, C: 生地のカロリー
+    cin >> A >> B >> C;
+    vector<ll> D(N);
+    rep(i,N)cin >> D[i];
+    sort(all(D));
+    auto check = [&](ll X) -> bool {
+        ll sita = X * A - C;
+        ll sum = 0;
+        rep(i,N){
+            if(D[i] > X * B)sum += D[i] - X * B;
+        }
+        return sum >= sita;
+    };
+    ll ok = 0;
+    ll ng = INF;
+    while(ng - ok > 1){
+        ll mid = (ok + ng) >> 1;
+        if(check(mid))ok = mid;
+        else ng = mid;
     }
-    if(2 * a[N-1] <= SUM(a) && SUM(a) % 2 == 0){
-        cout << "HL" << endl;
-    }else{
-        cout << "T" << endl;
-    }
-}
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+    cout << ok << endl;
 }

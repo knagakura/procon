@@ -5,7 +5,7 @@ typedef long long ll;
 #define rep1(i,N) for(int i=1;i<int(N);++i)
 #define all(a) (a).begin(),(a).end()
 #define bit(k) (1LL<<(k))
-#define SUM(v) accumulate(all(v), 0LL)
+
 typedef pair<int, int> i_i;
 typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
@@ -34,36 +34,38 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #define dump(...)
 #endif
 
-const int INF = (ll)1e9;
-const ll INFLL = (ll)1e18+1;
-const ll MOD = 1000000007;
-// const ll MOD = 998244353;
-const long double PI = acos(-1.0);
-
-/*
-const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
-const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
-const string dir = "DRUL";
-*/
-void solve(){
-    int N;
-    cin >> N;
-    vector<ll> a(N);
-    rep(i,N)cin >> a[i];
-    sort(all(a));
-    if(N == 2){
-        if(a[0] == a[1])cout << "HL" << endl;
-        else cout << "T" << endl;
-        return;
-    }
-    if(2 * a[N-1] <= SUM(a) && SUM(a) % 2 == 0){
-        cout << "HL" << endl;
-    }else{
-        cout << "T" << endl;
-    }
+ll chmod(ll x, ll mod){
+    if(x < 0)(x %= mod)+=mod;
+    return x%mod;
 }
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+int main() {
+    ll N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i,N)cin >> A[i];
+    if(N == 1){
+        cout << 1 << " " << 1  << endl;
+        cout << 1 << endl;
+        cout << 1 << " " << 1  << endl;
+        cout << 1 << endl;
+        cout << 1 << " " << 1  << endl;
+        cout << - A[0] - 2 << endl;
+        return 0;
+    }
+    // 1
+    ll ans1 = N - chmod(A[0], N);
+    A[0] += ans1;
+    // 2
+    vector<ll> ans2(N);
+    rep1(i,N){
+        ans2[i] = A[i] * (N-1);
+        A[i] += ans2[i];
+    }
+    // 3回目で全部やる
+    cout << 1 << " " << 1 << endl;
+    cout << ans1 << endl;
+    cout << 2 << " " << N << endl;
+    rep1(i,N){cout << ans2[i] << " ";}cout << endl;
+    cout << 1 << " " << N << endl;
+    rep(i,N){cout << -A[i] << " ";}cout << endl;
 }

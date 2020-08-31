@@ -6,6 +6,7 @@ typedef long long ll;
 #define all(a) (a).begin(),(a).end()
 #define bit(k) (1LL<<(k))
 #define SUM(v) accumulate(all(v), 0LL)
+
 typedef pair<int, int> i_i;
 typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
@@ -45,25 +46,25 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
-    int N;
+
+
+int main() {
+    ll N;
     cin >> N;
-    vector<ll> a(N);
-    rep(i,N)cin >> a[i];
-    sort(all(a));
-    if(N == 2){
-        if(a[0] == a[1])cout << "HL" << endl;
-        else cout << "T" << endl;
-        return;
+    ll ngs[3];
+    vector<ll> dp(N+1, INFLL);
+    rep(i,3){
+        cin >> ngs[i];
+        dp[ngs[i]] = -1;
     }
-    if(2 * a[N-1] <= SUM(a) && SUM(a) % 2 == 0){
-        cout << "HL" << endl;
-    }else{
-        cout << "T" << endl;
+    if(dp[N] > 0)dp[N] = 0;
+    for(int i = N; i >= 1; i--){
+        for(int j = 1; j <= 3; j++){
+            if(i - j < 0)continue;
+            if(dp[i] < 0)continue;
+            if(dp[i-j] < 0)continue;
+            chmin(dp[i-j], dp[i] + 1);
+        }
     }
-}
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+    cout << ((dp[0] <= 100) ? "YES" : "NO") << endl;
 }

@@ -6,6 +6,7 @@ typedef long long ll;
 #define all(a) (a).begin(),(a).end()
 #define bit(k) (1LL<<(k))
 #define SUM(v) accumulate(all(v), 0LL)
+
 typedef pair<int, int> i_i;
 typedef pair<ll, ll> l_l;
 template <class T> using vec = vector<T>;
@@ -17,7 +18,7 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 
 #define TOSTRING(x) string(#x)
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
-template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]" << endl; return os; };
+template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]"; return os; };
 template <typename T> ostream &operator<<(ostream &os, set<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
 template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
 template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
@@ -45,25 +46,41 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
-    int N;
-    cin >> N;
-    vector<ll> a(N);
-    rep(i,N)cin >> a[i];
-    sort(all(a));
-    if(N == 2){
-        if(a[0] == a[1])cout << "HL" << endl;
-        else cout << "T" << endl;
-        return;
+
+vector<int> v[100010];
+int main() {
+    ll N, K;
+    vector<ll> p(3);
+    string T;
+    cin >> N >> K;
+    rep(i,3)cin >> p[i];
+    cin >> T;
+    vector<int> vt(N,-1);
+    rep(i,N){
+        if(T[i] == 'r')vt[i] = 0;
+        if(T[i] == 's')vt[i] = 1;
+        if(T[i] == 'p')vt[i] = 2;
     }
-    if(2 * a[N-1] <= SUM(a) && SUM(a) % 2 == 0){
-        cout << "HL" << endl;
-    }else{
-        cout << "T" << endl;
+    rep(i,N)v[i%K].emplace_back(vt[i]);
+    ll ans = 0;
+    rep(i,N){
+        auto t = v[i];
+        int M = t.size();
+        if(M == 0)break;
+        // この配列についてdp
+        vvec<ll> dp(M+1, vec<ll>(3,0));
+        rep(j,M)rep(a,3)rep(b,3){
+            // j => k
+            if(a == b)continue;
+            int kati = (b + 1) % 3;
+            if(t[j] == kati){
+                chmax(dp[j+1][b], dp[j][a] + p[b]);
+            }
+            else{
+                chmax(dp[j+1][b], dp[j][a]);
+            }
+        }
+        ans += *max_element(all(dp[M]));
     }
-}
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+    cout << ans << endl;
 }

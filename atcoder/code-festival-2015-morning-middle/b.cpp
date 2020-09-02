@@ -49,26 +49,32 @@ const string dir = "DRUL";
 
 
 int main() {
-    ll N, P;
-    cin >> N >> P;
-    const int MAX_P = P + 110;
-    vector<l_l> ab;
-    rep(i,N){
-        ll a, b;
-        cin >> a >> b;
-        ab.emplace_back(a, b);
+    int N;
+    string S;
+    cin >> N >> S;
+    vector<int> cnt(26,0);
+    rep(i,N)cnt[S[i]-'a']++;
+    if(*max_element(all(cnt)) < 2){
+        cout << N << endl;
+        return 0;
     }
-    sort(all(ab), greater<>());
-    vector<ll> dp(MAX_P, -1);
-    vector<ll> dp2(MAX_P, -1);
-    dp[0] = 0;
-    rep(i, N){
-        ll a = ab[i].first;
-        ll b = ab[i].second;
-        dp2.assign(MAX_P, -1);
-        rep(j,MAX_P)chmax(dp2[j], dp[j]);
-        rep(j,P+1)if(dp[j] >= 0)chmax(dp2[j+a], dp[j] + b);
-        swap(dp, dp2);
+    ll ans = N;
+    vector<i_i> vp;
+    rep(m,N){
+        vp.clear();
+        rep(i,m)for(int j = m; j < N; j++)if(S[i] == S[j])vp.emplace_back(i,j);
+        sort(all(vp));
+        int sz = vp.size();
+        vector<ll> dp(sz+1, 0);
+        ll maxx = 0;
+        rep(j,sz)rep(i,j){
+            if(vp[i].first < vp[j].first && vp[i].second < vp[j].second){
+                chmax(dp[j], dp[i] + 1);
+                chmax(maxx, dp[j]);
+            }
+        }
+        ll tmp = N - (maxx+1) * 2;
+        chmin(ans, tmp);
     }
-    cout << *max_element(all(dp)) << endl;
+    cout << ans << endl;
 }

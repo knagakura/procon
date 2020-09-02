@@ -49,26 +49,19 @@ const string dir = "DRUL";
 
 
 int main() {
-    ll N, P;
-    cin >> N >> P;
-    const int MAX_P = P + 110;
-    vector<l_l> ab;
-    rep(i,N){
-        ll a, b;
-        cin >> a >> b;
-        ab.emplace_back(a, b);
+    ll N;
+    string S;
+    cin >> N >> S;
+    int sz = S.size();
+    vector<string> T(N);
+    rep(i,N)cin >> T[i];
+    vector<ll> dp(sz+1, 0);
+    dp[0] = 1;
+    rep(i,sz){
+        rep(j,N){
+            int M = T[j].size();
+            if(S.substr(i, M) == T[j])(dp[i+M] += dp[i]) %= MOD;
+        }
     }
-    sort(all(ab), greater<>());
-    vector<ll> dp(MAX_P, -1);
-    vector<ll> dp2(MAX_P, -1);
-    dp[0] = 0;
-    rep(i, N){
-        ll a = ab[i].first;
-        ll b = ab[i].second;
-        dp2.assign(MAX_P, -1);
-        rep(j,MAX_P)chmax(dp2[j], dp[j]);
-        rep(j,P+1)if(dp[j] >= 0)chmax(dp2[j+a], dp[j] + b);
-        swap(dp, dp2);
-    }
-    cout << *max_element(all(dp)) << endl;
+    cout << dp[sz] << endl;
 }

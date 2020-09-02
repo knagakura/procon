@@ -18,7 +18,7 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 
 #define TOSTRING(x) string(#x)
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
-template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]"; return os; };
+template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]" << endl; return os; };
 template <typename T> ostream &operator<<(ostream &os, set<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
 template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
 template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
@@ -49,26 +49,32 @@ const string dir = "DRUL";
 
 
 int main() {
-    ll N, P;
-    cin >> N >> P;
-    const int MAX_P = P + 110;
-    vector<l_l> ab;
-    rep(i,N){
-        ll a, b;
-        cin >> a >> b;
-        ab.emplace_back(a, b);
+    ll N, K, M, R;
+    cin >> N >> K >> M >> R;
+    vector<ll> A(N-1);
+    rep(i,N-1)cin >> A[i];
+    sort(all(A), greater<>());
+    if(K == N){
+        ll sum = SUM(A);
+        ll ans = max(0LL, K * R - sum);
+        if(ans > M){
+            cout << -1 << endl;
+            return 0;
+        }
+        cout << max(0LL, K * R - sum) << endl;
+        return 0;
     }
-    sort(all(ab), greater<>());
-    vector<ll> dp(MAX_P, -1);
-    vector<ll> dp2(MAX_P, -1);
-    dp[0] = 0;
-    rep(i, N){
-        ll a = ab[i].first;
-        ll b = ab[i].second;
-        dp2.assign(MAX_P, -1);
-        rep(j,MAX_P)chmax(dp2[j], dp[j]);
-        rep(j,P+1)if(dp[j] >= 0)chmax(dp2[j+a], dp[j] + b);
-        swap(dp, dp2);
+    ll sum = 0;
+    rep(i,K)sum += A[i];
+    if(sum >= K * R){
+        cout << 0 << endl;
+        return 0;
     }
-    cout << *max_element(all(dp)) << endl;
+    sum -= A[K-1];
+    ll ans = K * R - sum;
+    if(ans > M){
+        cout << -1 << endl;
+        return 0;
+    }
+    cout << K * R - sum << endl;
 }

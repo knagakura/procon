@@ -48,27 +48,33 @@ const string dir = "DRUL";
 */
 
 
+// ll dp[301][601][301];
+ll dp[601][301];
 int main() {
-    ll N, P;
-    cin >> N >> P;
-    const int MAX_P = P + 110;
-    vector<l_l> ab;
-    rep(i,N){
-        ll a, b;
-        cin >> a >> b;
-        ab.emplace_back(a, b);
+    ll X, Y, N;
+    cin >> X >> Y;
+    cin >> N;
+    vector<ll> t(N), h(N);
+    rep(i,N)cin >> t[i] >> h[i];
+    rep(j,601)rep(k,N+1)dp[j][k] = -1;
+    dp[X+Y][0] = 0;
+    rep(i,N)rep(j,X+Y+1)rep(k,N){
+        if(dp[j][k] == -1)continue;
+        if(j - t[i] < 0)continue;
+        chmax(dp[j-t[i]][k+1], dp[j][k] + h[i]);
     }
-    sort(all(ab), greater<>());
-    vector<ll> dp(MAX_P, -1);
-    vector<ll> dp2(MAX_P, -1);
-    dp[0] = 0;
-    rep(i, N){
-        ll a = ab[i].first;
-        ll b = ab[i].second;
-        dp2.assign(MAX_P, -1);
-        rep(j,MAX_P)chmax(dp2[j], dp[j]);
-        rep(j,P+1)if(dp[j] >= 0)chmax(dp2[j+a], dp[j] + b);
-        swap(dp, dp2);
+    auto check = [&](int x, int y) -> bool{
+        ll shohi = X+Y-x;
+        // スペシャルチケットは下限がy枚、上限がsyohi
+        // スペシャルチケットをi枚使うと、通常チケットはshohi - i
+        for(int i = y; i <= shohi; i++){
+            if(i <= X && shohi-i <= Y)return true;
+        }
+        return false;
+    };
+    ll ans = 0;
+    rep(j,X+Y+1)rep(k,N+1){
+        if(dp[j][k] >= 0 && check(j, k))chmax(ans, dp[j][k]);
     }
-    cout << *max_element(all(dp)) << endl;
+    cout << ans << endl;
 }

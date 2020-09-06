@@ -47,21 +47,26 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
 int main() {
-    ll N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
-        }
+    ll N, T;
+    cin >> N >> T;
+    vector<l_l> AB;
+    rep(i,N){
+        ll a, b;
+        cin >> a >> b;
+        AB.emplace_back(a, b);
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    sort(all(AB));
+    vector<ll> dp(T+1, -1);
+    dp[0] = 0;
+    rep(i,N){
+        auto [a, b] = AB[i];
+        vector<ll> dp2(T+1, -1);
+        rep(j,T+1)chmax(dp2[j], dp[j]);
+        rep(j,T){
+            if(dp[j] >= 0)chmax(dp2[min(T,j+a)], dp[j]+b);
+        }
+        swap(dp, dp2);
+    }
+    cout << *max_element(all(dp)) << endl;
 }

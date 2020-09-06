@@ -37,8 +37,8 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 
 const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
-const ll MOD = 1000000007;
-// const ll MOD = 998244353;
+// const ll MOD = 1000000007;
+const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
 /*
@@ -48,20 +48,71 @@ const string dir = "DRUL";
 */
 
 
+struct mint {
+    long long x;
+    mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
+    mint operator-() const { return mint(-x);}
+    mint& operator+=(const mint a) {
+        if ((x += a.x) >= MOD) x -= MOD;
+        return *this;
+    }
+    mint& operator-=(const mint a) {
+        if ((x += MOD-a.x) >= MOD) x -= MOD;
+        return *this;
+    }
+    mint& operator*=(const mint a) {
+        (x *= a.x) %= MOD;
+        return *this;
+    }
+    mint operator+(const mint a) const {
+        mint res(*this);
+        return res+=a;
+    }
+    mint operator-(const mint a) const {
+        mint res(*this);
+        return res-=a;
+    }
+    mint operator*(const mint a) const {
+        mint res(*this);
+        return res*=a;
+    }
+    mint modpow(long long t) const {
+        if (!t) return 1;
+        mint a = modpow(t>>1);
+        a *= a;
+        if (t&1) a *= *this;
+        return a;
+    }
+    // for prime MOD
+    mint inv() const {
+        return modpow(MOD-2);
+    }
+    mint& operator/=(const mint a) {
+        return (*this) *= a.inv();
+    }
+    mint operator/(const mint a) const {
+        mint res(*this);
+        return res/=a;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const mint& a){
+        os << a.x;
+        return os;
+    }
+};
 int main() {
-    ll N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
+    int A, B, C, D;
+    cin >> A >> B >> C >> D;
+    vvec<mint> dp(C+1, vec<mint>(D+1, 0));
+    dp[A][B] = 1;
+    for(int i = A; i <= C; i++){
+        for(int j = B; j <= D; j++){
+            dp[i][j] += dp[i-1][j] * j;
+            dp[i][j] += dp[i][j-1] * i;
+            dp[i][j] -= dp[i-1][j-1] * (i-1) * (j-1);
         }
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    if(C < 10)rep(i,C+1){
+        dump(dp[i]);
+    }
+    cout << dp[C][D] << endl;
 }

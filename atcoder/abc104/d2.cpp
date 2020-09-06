@@ -48,20 +48,79 @@ const string dir = "DRUL";
 */
 
 
+struct mint {
+    long long x;
+    mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
+    mint operator-() const { return mint(-x);}
+    mint& operator+=(const mint a) {
+        if ((x += a.x) >= MOD) x -= MOD;
+        return *this;
+    }
+    mint& operator-=(const mint a) {
+        if ((x += MOD-a.x) >= MOD) x -= MOD;
+        return *this;
+    }
+    mint& operator*=(const mint a) {
+        (x *= a.x) %= MOD;
+        return *this;
+    }
+    mint operator+(const mint a) const {
+        mint res(*this);
+        return res+=a;
+    }
+    mint operator-(const mint a) const {
+        mint res(*this);
+        return res-=a;
+    }
+    mint operator*(const mint a) const {
+        mint res(*this);
+        return res*=a;
+    }
+    mint modpow(long long t) const {
+        if (!t) return 1;
+        mint a = modpow(t>>1);
+        a *= a;
+        if (t&1) a *= *this;
+        return a;
+    }
+    // for prime MOD
+    mint inv() const {
+        return modpow(MOD-2);
+    }
+    mint& operator/=(const mint a) {
+        return (*this) *= a.inv();
+    }
+    mint operator/(const mint a) const {
+        mint res(*this);
+        return res/=a;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const mint& a){
+        os << a.x;
+        return os;
+    }
+};
+// i文字目まで見たときに、i文字目がjで、状態がk番目
+mint dp[200010][4][4];
 int main() {
-    ll N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
+    string S;
+    cin >> S;
+    int N = S.size();
+    rep(i,N+1)rep(j,4)rep(k,4)dp[i][j][k] = 0;
+    dp[0][0][0] = 1;
+    rep(i,N){
+        rep(j,4)rep(k,4)dp[i+1][j][k] += dp[i][j][k];
+        rep(j,4){
+            if(S)
         }
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    rep(i,N){
+    }
+    mint ans = 0;
+    cout << ans << endl;
 }
+/* 
+Cが来たときに、今までの(A,B)の個数を求められれば、(A, B, C)の個数がわかる
+同様に, Bが来たときに、それまでにあったAの個数がわかれば、(A, B)の個数がわかる
+
+耳DPだ！
+*/

@@ -9,8 +9,10 @@ typedef long long ll;
 
 typedef pair<int, int> i_i;
 typedef pair<ll, ll> l_l;
-template <class T> using vec = vector<T>;
-template <class T> using vvec = vector<vec<T>>;
+// template <class T> using vec = vector<T>;
+// template <class T> using vvec = vector<vec<T>>;
+template<class T>vector<T> vec(size_t a){return vector<T>(a);}
+template<class T, class... Ts>auto vec(size_t a, Ts... ts){return vector<decltype(vec<T>(ts...))>(a, vec<T>(ts...));}
 struct fast_ios{ fast_ios(){ cin.tie(0); ios::sync_with_stdio(false); cout << fixed << setprecision(20); }; }fast_ios_;
 
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
@@ -49,19 +51,33 @@ const string dir = "DRUL";
 
 
 int main() {
-    ll N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
+    int H, W;
+    cin >> H >> W;
+    // vvec<int> A(H, vec<int>(W));
+    // vvec<int> B(H, vec<int>(W));
+    auto A = vec<int>(H, W);
+    auto B = vec<int>(H, W);
+    cin >> A >> B;
+    const int M = 10000 * 2;
+    auto dp = vec<int>(H,W,M);
+    dp[0][0][abs(A[0][0] - B[0][0])] = 1;
+    rep(i,H)rep(j,W)rep(k,M){
+        if(dp[i][j][k]){
+            if(i + 1 < H){
+                dp[i+1][j][k + abs(A[i+1][j] - B[i+1][j])] = 1;
+                dp[i+1][j][abs(k - abs(A[i+1][j] - B[i+1][j]))] = 1;
+            }
+            if(j + 1 < W){
+                dp[i][j+1][k + abs(A[i][j+1] - B[i][j+1])] = 1;
+                dp[i][j+1][abs(k - abs(A[i][j+1] - B[i][j+1]))] = 1;
+            }
         }
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    int ans = INF;
+    rep(k,M)if(dp[H-1][W-1][k])chmin(ans,k);
+    cout << ans << endl;
 }
+/*
+dp[x座標][y座標][そのマスをどっちにぬったか][達成される差]
+
+*/

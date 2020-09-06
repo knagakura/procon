@@ -49,19 +49,31 @@ const string dir = "DRUL";
 
 
 int main() {
-    ll N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
+    ll N, Z, W;
+    cin >> N >> Z >> W;
+    vector<ll> a(N);
+    rep(i,N)cin >> a[i];
+    vvec<ll> dp(N+1, vec<ll>(2));
+    for(int i = N-1; i >= 0; i--){
+        // 先手番
+        dp[i][0] = -INFLL;
+        ll Y = (i ? a[i-1]: W);
+        chmax(dp[i][0], abs(Y-a[N-1])); // 全部とる
+        for(int j = i+1; j < N; j++){
+            chmax(dp[i][0], dp[j][1]); // 途中まで取ったら、相手の最適値になる
+        }
+        // 後手番
+        dp[i][1] = INFLL;
+        ll X = (i ? a[i-1]: Z);
+        chmin(dp[i][1], abs(X - a[N-1])); // 全部取る
+        for(int j = i+1; j < N; j++){
+            chmin(dp[i][1], dp[j][0]); // 途中まで取ったら、相手の最適値になる
         }
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    cout << dp[0][0] << endl;
 }
+/*
+どちらかが最後のカードを持つ
+dp[山札から取った枚数][後手かどうか] 
+:= その状態からスタートした時の、最終的なカードの差の最適値(先手なら最大値、後手なら最小値)
+*/

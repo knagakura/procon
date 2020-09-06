@@ -49,19 +49,31 @@ const string dir = "DRUL";
 
 
 int main() {
-    ll N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
+    int N, M;
+    cin >> N >> M;
+    vector<int> A(2*N);
+    rep(i,2*N)A[i] = i+1;
+    rep(i,M){
+        int K;
+        cin >> K;
+        vector<int> B;
+        if(K == 0){
+            rep(i,N){
+                B.emplace_back(A[i]);
+                B.emplace_back(A[N+i]);
+            }
         }
+        else{
+            for(int i = K; i < 2*N; i++){
+                B.emplace_back(A[i]);
+            }
+            rep(i,K){
+                B.emplace_back(A[i]);
+            }
+        }
+        swap(A, B);
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    rep(i,2*N){
+        cout << A[i] << endl;
+    }
 }

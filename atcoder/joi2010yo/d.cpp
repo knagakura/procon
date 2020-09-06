@@ -49,19 +49,36 @@ const string dir = "DRUL";
 
 
 int main() {
-    ll N, K;
+    int N, K;
     cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
-        }
+    vector<int> a(N);
+    rep(i,N)cin >> a[i];
+    map<ll, int> mp;
+    auto calc = [&](int mask) -> void{
+        vector<int> tmp; rep(i,N)if(bit(i) & mask)tmp.emplace_back(a[i]);
+        vector<int> v; rep(i,K)v.emplace_back(i);
+        do{
+            ll val = 0;
+            rep(i,K){
+                if(tmp[v[i]] < 10){
+                    val *= 10;
+                    val += tmp[v[i]];
+                }
+                else{
+                    val *= 100;
+                    val += tmp[v[i]];
+                }
+            }
+            mp[val]++;
+        }while(next_permutation(all(v)));
+    };
+    for(int i = 0; i < bit(N); i++){
+        int cnt = __builtin_popcount(i);
+        if(cnt == K)calc(i);
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    cout << mp.size() << endl;
 }
+
+/*
+\sibma nCk
+*/

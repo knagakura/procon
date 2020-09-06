@@ -18,7 +18,7 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 
 #define TOSTRING(x) string(#x)
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
-template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]"; return os; };
+template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]" << endl; return os; };
 template <typename T> ostream &operator<<(ostream &os, set<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
 template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
 template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
@@ -49,19 +49,27 @@ const string dir = "DRUL";
 
 
 int main() {
-    ll N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
-        }
+    ll N;
+    string S;
+    cin >> N >> S;
+    vvec<int> dp(N+1, vec<int>(N+1, 0));
+    rep(i,N)rep(j,N){
+        if(i >= j)continue;
+        if(S[i] == S[j])dp[i+1][j+1] = dp[i][j] + 1;
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    auto calc = [&](int x, int y) -> ll{
+        int sx = x;
+        int sy = y;
+        while(x < N && y < N && dp[x][y] + 1 == dp[x+1][y+1]){x++, y++;};
+        int gx = x;
+        int gy = y;
+        if(gx < sy)return gx - sx + 1;
+        else return sy - 1 - sx + 1;
+    };
+    ll ans = 0;
+    rep(i,N+1)rep(j,N+1){
+        if(i >= j)continue;
+        if(dp[i][j] == 1)chmax(ans, calc(i,j));
+    }
+    cout << ans << endl;
 }

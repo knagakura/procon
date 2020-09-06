@@ -46,22 +46,35 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
 int main() {
-    ll N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
-        }
+    int N, M;
+    cin >> N >> M;
+    vvec<int> G(N);
+    rep(i,M){
+        int a, b;
+        cin >> a >> b;
+        a--;b--;
+        G[a].emplace_back(b);
+        G[b].emplace_back(a);
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    auto bfs = [&](int start) -> int{
+        vec<int> d(N,INF);
+        queue<int> q;
+        q.push(start);
+        d[start] = 0;
+        while(not q.empty()){
+            int v = q.front();
+            q.pop();
+            for(auto nxt: G[v]){
+                if(d[nxt] < INF)continue;
+                d[nxt] = d[v] + 1;
+                q.push(nxt);
+            }
+        }
+        int res = 0;
+        rep1(i,N)res += d[i] <= 2;
+        return res;
+    };
+    ll ans = bfs(0);
+    cout << ans << endl;
 }

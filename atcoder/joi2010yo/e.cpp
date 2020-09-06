@@ -46,22 +46,54 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+const int dx[2] = {1, 0};
+const int dy[2] = {0, 1};
 
-
+ll dp[111][111][2][2];
 int main() {
-    ll N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> dp(K+1, 0);
-    // dp[i]: 自分にi個の状態で回ってきて、勝てるかどうか
-    dp[0] = 0;
-    rep(i,K+1)rep(j,N){
-        if(i - A[j] < 0)continue;
-        if(dp[i-A[j]] == 0)dp[i] = 1;
-        if(K < 10){
-            dump(dp);
+    int W, H;
+    cin >> W >> H;
+    dp[0][0][0][0] = 1;
+    const int M = 100000;
+    rep(i,H)rep(j,W){
+        if(i == 0 && j == 0){
+            dp[i+1][j][0][0] = 1;
+            dp[i][j+1][1][0] = 1;
+            continue;
+        }
+        rep(k,2)rep(l,2){
+            if(l){
+                if(k == 0){
+                    (dp[i+1][j][0][0] += dp[i][j][k][l]) %= M;
+                }
+                else{
+                    (dp[i][j+1][1][0] += dp[i][j][k][l]) %= M;
+                }
+            }
+            else{
+                (dp[i+1][j][0][k == 1] += dp[i][j][k][l]) %= M; // 右への移動
+                (dp[i][j+1][1][k == 0] += dp[i][j][k][l]) %= M; // 下への移動
+            }
         }
     }
-    cout << (dp[K] ? "First" : "Second") << endl;
+    #ifdef DEBUG
+    rep(i,H){
+        rep(j,W){
+            ll sum = 0;
+            rep(k,2)rep(l,2)sum += dp[i][j][k][l];
+            cerr << sum << " ";
+        }
+        cerr << endl;
+    }
+    #endif
+    ll ans = 0;
+    rep(k,2)rep(l,2){
+        ans += dp[H-1][W-1][k][l];
+        ans %= 100000;
+    }
+    cout << ans << endl;
 }
+
+/*
+dp[行][列][上からきたかどうか][曲がって入ってきたかどうか]
+*/

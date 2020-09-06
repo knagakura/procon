@@ -50,12 +50,24 @@ const string dir = "DRUL";
 
 int main() {
     int N;
-    string S;
-    cin >> N >> S;
-    string t = "aiueo";
-    int ans = 0;
+    cin >> N;
+    vector<i_i> A;
+    A.emplace_back(-1, -1);
     rep(i,N){
-        rep(j,5)ans += S[i] == t[j];
+        int a;
+        cin >> a;
+        A.emplace_back(a,i);
     }
-    cout << ans << endl;
+    sort(all(A),greater<>());
+    vector<int> ans(N);
+    int now = 1;
+    rep(i,N){
+        ans[A[i].second] = now;
+        if(A[i].first != A[i+1].first){
+            now = i + 2;
+        }
+    }
+    rep(i,N){
+        cout << ans[i] << endl;
+    }
 }

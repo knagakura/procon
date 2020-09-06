@@ -49,13 +49,15 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    string S;
-    cin >> N >> S;
-    string t = "aiueo";
-    int ans = 0;
-    rep(i,N){
-        rep(j,5)ans += S[i] == t[j];
+    ll X, L, R;
+    ll ans;
+    cin >> X >> L >> R;
+    if(X >= R)ans = R;
+    else if(X <= L)ans = L;
+    else{
+        ans = X;
     }
     cout << ans << endl;
+
+
 }

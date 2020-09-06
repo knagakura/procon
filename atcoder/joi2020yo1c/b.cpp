@@ -52,10 +52,12 @@ int main() {
     int N;
     string S;
     cin >> N >> S;
-    string t = "aiueo";
-    int ans = 0;
     rep(i,N){
-        rep(j,5)ans += S[i] == t[j];
+        if(S.substr(i,3) == "joi"){
+            S[i] = 'J';
+            S[i+1] = 'O';
+            S[i+2] = 'I';
+        }
     }
-    cout << ans << endl;
+    cout << S << endl;
 }

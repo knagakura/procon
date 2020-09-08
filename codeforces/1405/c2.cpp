@@ -46,25 +46,50 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-int main() {
-    int W, H, N;
-    cin >> W >> H >> N;
-    int prea, preb;
-    int ans = 0;
-    rep(i,N){
-        int a, b;
-        cin >> a >> b;
-        if(i){
-            if((a-prea) * (b-preb) >= 0){
-                ans += max(abs(a-prea), abs(b - preb));
-            }
-            else{
-                ans += abs(a-prea) + abs(b-preb);
-            }
-        }
-        prea = a, preb = b;
+void solve(){
+    int N, K;
+    string S;
+    cin >> N >> K >> S;
+    int M = N-K+1;
+    dump(S);
+    rep(i,M){
+        char pre = S[i];
+        char nxt = S[i+K];
+        if(pre == nxt)continue;
+        if(pre != '?' && nxt != '?')continue;
+        dump(pre, nxt);
+        if(pre == '?')S[i] = S[i+K];
+        else if(nxt == '?')S[i+K] = S[i];
     }
-    cout << ans << endl;
+    dump(S);
+    vector<int> a(M,0), b(M,0), c(M,0);
+    rep(i,M){
+        string tmp = S.substr(i,K);
+        rep(j,K){
+            a[i] += tmp[j] == '1';
+            b[i] += tmp[j] == '0';
+            c[i] += tmp[j] == '?';
+        }
+    }
+    rep(i,M){
+        if(a[i] > K/2 || b[i] > K/2){
+            cout << "NO" << endl;
+            return;
+        }
+    }
+    // cout << (ok ? "YES" : "NO" ) << endl;
+    cout << "YES" << endl;
 }
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
+}
+
+/*
+
+
+
+7 4
+1?0??1?
+*/

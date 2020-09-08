@@ -46,25 +46,79 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+template<typename T>
+class BIT{
+  public:
+    int N;
+    vector<T> data;
+    BIT(T _N):N(_N){
+        data.assign(N+1, 0);
+    };
+    
+    // a is 1-indexed
+    void add(int a, T w){
+        for(int x = a; x <= N; x += x & -x)data[x] += w;
+    }
+    // 1-indexed sum of prefix [0, a]
+    T sum(int a){
+        T res = 0;
+        for(int x = a; x > 0; x -= x & -x)res += data[x];
+        return res;
+    }
+    // 1-indexed sum of range [l, r]
+    T sum(int l, int r){return sum(r) - sum(l-1);}
 
-
-int main() {
-    int W, H, N;
-    cin >> W >> H >> N;
-    int prea, preb;
-    int ans = 0;
-    rep(i,N){
-        int a, b;
-        cin >> a >> b;
-        if(i){
-            if((a-prea) * (b-preb) >= 0){
-                ans += max(abs(a-prea), abs(b - preb));
-            }
-            else{
-                ans += abs(a-prea) + abs(b-preb);
+    // 0-indexed add
+    void add0(int a, T w){add(a + 1, w);}
+    // 0-indexed sum
+    T sum0(int a){return sum(a + 1);}
+    // 0-indexed sum of range
+    T sum0(int l, int r){return sum0(r) - sum0(l-1);}
+    // show the value
+    void debug(){print(data);}
+    // k-th number (k is 1 - indexed)
+    T get(int k){
+        T res = 0;
+        int sz = 1;
+        while(sz < (int)data.size()) sz <<= 1;
+        for(int i = sz / 2; i > 0; i >>= 1){
+            if(res + i <= N && data[res + i] < k){
+                k -= data[res + i];
+                res += i;
             }
         }
-        prea = a, preb = b;
+        return res + 1;
     }
-    cout << ans << endl;
+};
+
+void solve(){
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    vector<l_l> v;
+    rep(i,N){
+        cin >> A[i];
+    }
+    ll sum = 0;
+    cerr << endl;
+    rep(i,N){
+        if(A[i] >= 0)sum += A[i];
+        else{
+            if(sum + A[i] >= 0){
+                sum += A[i];
+                A[i] = 0;
+            }
+            else{
+                sum = 0;
+                A[i] += sum;
+            }
+        }
+        dump(sum);
+    }
+    cout << sum << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

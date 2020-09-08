@@ -49,22 +49,6 @@ const string dir = "DRUL";
 
 
 int main() {
-    int W, H, N;
-    cin >> W >> H >> N;
-    int prea, preb;
-    int ans = 0;
-    rep(i,N){
-        int a, b;
-        cin >> a >> b;
-        if(i){
-            if((a-prea) * (b-preb) >= 0){
-                ans += max(abs(a-prea), abs(b - preb));
-            }
-            else{
-                ans += abs(a-prea) + abs(b-preb);
-            }
-        }
-        prea = a, preb = b;
-    }
-    cout << ans << endl;
+    
+    
 }

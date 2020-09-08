@@ -46,25 +46,19 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-int main() {
-    int W, H, N;
-    cin >> W >> H >> N;
-    int prea, preb;
-    int ans = 0;
+void solve(){
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i,N)cin >> A[i];
+    reverse(all(A));
     rep(i,N){
-        int a, b;
-        cin >> a >> b;
-        if(i){
-            if((a-prea) * (b-preb) >= 0){
-                ans += max(abs(a-prea), abs(b - preb));
-            }
-            else{
-                ans += abs(a-prea) + abs(b-preb);
-            }
-        }
-        prea = a, preb = b;
+        cout << A[i] << " ";
     }
-    cout << ans << endl;
+    cout << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

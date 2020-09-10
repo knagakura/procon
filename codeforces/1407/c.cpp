@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -50,4 +49,32 @@ const string dir = "DRUL";
 
 
 int main() {
+    int N;
+    cin >> N;
+    vector<int> ans(N, -1);
+    for(int i = 0; i < N; i++){
+        if(ans[i] > 0)continue;
+        for(int j = 0; j < N; j++){
+            if(i == j)continue;
+            if(ans[i] > 0)break;
+            if(ans[j] > 0)continue;
+            int res1, res2;
+            cout << "?" << " " << i+1 << " " << j+1 << endl;
+            cin >> res1;
+            cout << "?" << " " << j+1 << " " << i+1 << endl;
+            cin >> res2;
+            if(res1 < res2) ans[j] = res2;
+            else ans[i] = res1;
+        }
+    }
+    vector<int> used(N+1, false);
+    rep(i,N)if(ans[i] > 0)used[ans[i]] = true;
+    int nokori = 0;
+    rep1(i,N+1)if(not used[i])nokori = i;
+    cout << "! ";
+    rep(i,N){
+        if(ans[i] == -1)cout << nokori << " ";
+        else cout << ans[i] << " ";
+    }
+    cout << endl;
 }

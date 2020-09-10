@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <atcoder/all>
+
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -48,6 +49,45 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
+struct UnionFind{
+    int n;
+    vector<int> Parent;
+    vector<int> sizes;
+    UnionFind(int _n):n(_n),Parent(_n),sizes(_n,1){ rep(i,n)Parent[i]=i; }
+    //find the root of x
+    int root(int x){
+        if(x!=Parent[x]){
+        Parent[x] = root(Parent[x]);
+        }
+        return Parent[x];
+    }
+    //merge x and y
+    void unite(int x,int y){
+        x = root(x);
+        y = root(y);
+        if(x == y) return;
+        if(sizes[x] < sizes[y]) swap(x, y);
+        Parent[y] = x;
+        sizes[x] += sizes[y];
+    }
+    bool same(int x,int y){ return root(x) == root(y); }
+    int size(int x){ return sizes[root(x)]; }
+    int group_num(){
+        set<int> s;
+        for(int i = 0; i < n; ++i){
+            s.insert(root(i));
+        }
+        return int(s.size());
+    }
+};
 int main() {
+    int N, Q;
+    cin >> N >> Q;
+    UnionFind T(N);
+    while(Q--){
+        int t, u, v;
+        cin >> t >> u >> v;
+        if(t == 0)T.unite(u, v);
+        else cout << T.same(u, v) << endl;
+    }
 }

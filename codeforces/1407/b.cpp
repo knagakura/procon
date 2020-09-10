@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -47,7 +46,41 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-int main() {
+void solve(){
+    int N;
+    cin >> N;
+    vector<ll> a(N);
+    rep(i,N)cin >> a[i];
+    sort(all(a), greater<>());
+    vector<ll> ans(N);
+    vector<ll> c(N);
+    vector<bool> used(N,false);
+    ll G = a[0];
+    ans[0] = a[0];
+    c[0] = G;
+    used[0] = true;
+    rep1(i,N){
+        ll maxx = 0;
+        int idx = -1;
+        rep(j,N){
+            if(used[j])continue;
+            ll tmp = gcd(G, a[j]);
+            if(chmax(maxx,tmp))idx = j;
+        }
+        ans[i] = a[idx];
+        used[idx] = true;
+        G = gcd(G, a[idx]);
+        c[i] = G;
+    }
+    dump(ans);
+    dump(c);
+    rep(i,N){
+        cout << ans[i] << " ";
+    }
+    cout << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

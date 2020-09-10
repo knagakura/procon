@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -50,4 +49,20 @@ const string dir = "DRUL";
 
 
 int main() {
+    int N;
+    cin >> N;
+    vector<int> v;
+    rep(i,N)v.emplace_back(i+1);
+    auto fst = v;
+    // do{
+        cerr << "    ";
+        rep(i,N)cerr << i + 1 << ", ";
+        DUMPOUT << endl;
+        vvec<int> d(N,vector<int>(N));
+        rep(i,N)rep(j,N)d[i][j] = v[j] % v[i];
+        rep(i,N){
+            cerr << i + 1 << ": ";dbg(d[i]);
+        }
+        DUMPOUT << endl;
+    // }while(next_permutation(all(v)));
 }

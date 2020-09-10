@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <atcoder/all>
+
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -50,4 +51,17 @@ const string dir = "DRUL";
 
 
 int main() {
+    int N, M;
+    cin >> N >> M;
+    int ans = 0;
+    rep(i,N){
+        int cnt = 0;
+        rep(j,M){
+            int a;
+            cin >> a;
+            cnt += a;
+        }
+        chmax(ans, cnt);
+    }
+    cout << ans << endl;
 }

@@ -49,5 +49,13 @@ const string dir = "DRUL";
 */
 
 
+void solve(){
+    ll n, m, a, b;
+    cin >> n >> m >> a >> b;
+    cout << atcoder::floor_sum(n,m,a,b) << endl;
+}
 int main() {
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

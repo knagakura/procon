@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
 using namespace std;
+#include <atcoder/all>
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
 #define rep1(i,N) for(int i=1;i<int(N);++i)
@@ -50,4 +50,27 @@ const string dir = "DRUL";
 
 
 int main() {
+    int N, Q;
+    cin >> N >> Q;
+    atcoder::fenwick_tree<ll> Tree(N);
+    rep(i,N){
+        ll a;
+        cin >> a;
+        Tree.add(i, a);
+    }
+    while(Q--){
+        int type;
+        cin >> type;
+        if(type == 0){
+            int idx;
+            ll x;
+            cin >> idx >> x;
+            Tree.add(idx, x);
+        }
+        else{
+            int l, r;
+            cin >> l >> r;
+            cout << Tree.sum(l, r) << endl;
+        }
+    }
 }

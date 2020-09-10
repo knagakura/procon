@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -47,7 +46,91 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+template< typename T >
+struct Compress {
+  vector< T > xs;
+
+  Compress() = default;
+
+  Compress(const vector< T > &vs) {
+    add(vs);
+  }
+
+  Compress(const initializer_list< vector< T > > &vs) {
+    for(auto &p : vs) add(p);
+  }
+
+  void add(const vector< T > &vs) {
+    copy(begin(vs), end(vs), back_inserter(xs));
+  }
+
+  void add(const T &x) {
+    xs.emplace_back(x);
+  }
+
+  void build() {
+    sort(begin(xs), end(xs));
+    xs.erase(unique(begin(xs), end(xs)), end(xs));
+  }
+
+  vector< int > get(const vector< T > &vs) const {
+    vector< int > ret;
+    transform(begin(vs), end(vs), back_inserter(ret), [&](const T &x) {
+      return lower_bound(begin(xs), end(xs), x) - begin(xs);
+    });
+    return ret;
+  }
+
+  int get(const T &x) const {
+    return lower_bound(begin(xs), end(xs), x) - begin(xs);
+  }
+
+  const T &operator[](int k) const {
+    return xs[k];
+  }
+};
 
 
 int main() {
+    int N;
+    cin >> N;
+    vector<ll> h(N);
+    rep(i,N)cin >> h[i];
+    Compress<ll> tmp(h);
+    tmp.build();
+    auto v = tmp.get(h);
+    dump(v);
+    vector<ll> dp(N+1, INFLL);
+    dp[0] = 0;
+    rep(i,N)chmin(dp[i+1], dp[i]+1);
+    dump(dp);
+    vector<i_i> upv, dwv;
+    int r = 0;
+    for(int l = 0; l < N; ){
+        while(r+1 < N && v[r] < v[r+1]){
+            r++;
+        }
+        if(l == r){
+            l++, r++;
+        }
+        else{
+            upv.emplace_back(l, r);
+            l = r;
+        }
+    }
+    r = 0;
+    for(int l = 0; l < N; ){
+        while(r+1 < N && v[r] > v[r+1]){
+            r++;
+        }
+        if(l == r){
+            l++, r++;
+        }
+        else{
+            dwv.emplace_back(l, r);
+            l = r;
+        }
+    }
+    dump(upv);
+    dump(dwv);
 }

@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <atcoder/all>
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -47,7 +46,56 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-int main() {
+void solve(){
+    int N;
+    cin >> N;
+    vector<ll> a(N);
+    int cnt1 = 0;
+    int cnt0 = 0;
+    rep(i,N){
+        cin >> a[i];
+        cnt1 += a[i] == 1;
+        cnt0 += a[i] == 0;
+    }
+    if(cnt1 == cnt0){
+        cout << N / 2 << endl;
+        rep(i,N/2){
+            cout << 0 << " ";
+        }
+        cout << endl;
+        return;
+    }
+    if(N == 2){
+        if(a[0] == a[1]){
+            cout << 2 << endl;
+            cout << a[0] << " " << a[1] << endl;
+        }
+        else{
+            cout << 1 << endl;
+            cout << 0 << endl;
+        }
+        return;
+    }
+    int M = N/2;
+    if(M&1)M+=1;
+    dump(cnt1,cnt0,M);
+    if(cnt0 >= M){
+        cout << M << endl;
+        rep(i,M){
+            cout << 0 << " ";
+        }
+        cout << endl;
+    }
+    else{
+        cout << M << endl;
+        rep(i,M){
+            cout << 1 << " ";
+        }
+        cout << endl;
+    }
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

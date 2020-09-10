@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <atcoder/all>
+
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -50,4 +51,15 @@ const string dir = "DRUL";
 
 
 int main() {
+    int N, Q;
+    cin >> N >> Q;
+    atcoder::dsu T(N);
+    while(Q--){
+        int t, u, v;
+        cin >> t >> u >> v;
+        if(t == 0)T.merge(u, v);
+        else{
+            cout << T.same(u, v) << endl;
+        }
+    }
 }

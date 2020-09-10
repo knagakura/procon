@@ -21,6 +21,10 @@
         "iosfwd": "cpp",
         "*.snippet": "cpp",
         "cmath": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "all": "cpp",
+        "convolution": "cpp",
+        "dsu": "cpp",
+        "fenwicktree": "cpp"
     }
 }

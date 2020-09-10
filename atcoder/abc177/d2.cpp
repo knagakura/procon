@@ -50,4 +50,16 @@ const string dir = "DRUL";
 
 
 int main() {
+    int N, M;
+    cin >> N >> M;
+    atcoder::dsu T(N);
+    rep(i,M){
+        int a, b;
+        cin >> a >> b;
+        a--;b--;
+        T.merge(a, b);
+    }
+    int ans = 0;
+    rep(i,N)chmax(ans, T.size(i));
+    cout << ans << endl;
 }

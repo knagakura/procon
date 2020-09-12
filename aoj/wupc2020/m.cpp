@@ -47,41 +47,75 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+const int MAXN = 100010;
+vector<int> G[MAXN];
+vector<ll> ans;
+vector<ll> dpth;
+vector<ll> visited;
+vector<ll> val;
+vector<ll> valcum;
+vector<ll> l;
+ll dfs1(int cur, int pre, int d){
+    ll res = d * l[cur];
+    visited[cur] = true;
+    dpth[cur] = d;
+    for(auto nxt: G[cur]){
+        if(nxt == pre)continue;
+        if(visited[nxt])continue;
+        res += dfs1(nxt, cur, d+1);
+    }
+    return val[cur] = res;
+}
+ll dfs3(int cur, int pre){
+    dump(cur, pre, valcum);
+    ll res = l[cur];
+    visited[cur] = true;
+    for(auto nxt: G[cur]){
+        if(nxt == pre)continue;
+        if(visited[nxt])continue;
+        res += dfs3(nxt, cur);
+    }
+    return valcum[cur] = res;
+}
+ll dfs2(int cur, int pre){
 
+    ll tmp_cur = val[cur]; // 13
+    ll tmp_valcum = valcum[cur];
+    for(auto nxt: G[cur]){
+        tmp_cur -= val[nxt]; // 13 - 2 = 11
+        val[nxt] += tmp_cur + tmp_cur;
+    }
+}
 int main() {
     int N;
     cin >> N;
-    map<i_i, int> mp;
+    l.resize(N);
+    rep(i,N)cin >> l[i];
+    rep(i,N-1){
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        G[a].push_back(b);
+        G[b].push_back(a);
+    }
+    ans.resize(N);
+    dpth.resize(N);
+    val.resize(N);
+    valcum.resize(N,0);
+    /* calc */
+
+    // まず根付き木をdfs1してans[0]を求める
+    visited.assign(N, false);
+    dfs1(0, -1, 0);
+    visited.assign(N, false);
+    dfs3(0, -1);
+    dump(dpth);
+    dump(val);
+    dump(valcum);
+    /*      */
+    ans[0] = ans[0];
+    // dfs2(0, -1);
     rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
+        cout << ans[i] << endl;
     }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
-        }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
-    ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
-        }
-    }
-    cout << ans << endl;
 }

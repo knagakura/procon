@@ -47,40 +47,75 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+template<typename T>
+class TwoDimCumsum {
+public:
+    int H,W;
+    vector<vector<T>> d;
+    TwoDimCumsum(T _H, T _W):H(_H),W(_W),d(_H+1,vector<T>(_W+1,0)){}
+    // 1-indexed
+    void add(int x, int y, int a){
+        d[x][y] += a;
+    }
+    void build(){
+        for(int i = 1; i <= H; ++i){
+            for(int j = 1; j <= W; ++j){
+                d[i][j] += d[i-1][j];
+                d[i][j] += d[i][j-1];
+                d[i][j] -= d[i-1][j-1];
+            }
+        }
+    }
+    //[sx, gx] & [sy, gy]
+    //1-indexed
+    T query(int sx, int sy, int gx, int gy){
+        return d[gx][gy] - d[sx-1][gy] - d[gx][sy-1] + d[sx-1][sy-1];
+    }
+    //confirm the 2d vector
+    void debug(){
+        for(int i = 0;i <= H;++i){
+            for(int j = 0; j <= W; ++j){
+                cerr<<d[i][j]<<((j == W) ? "\n":" ");
+            }
+        }
+    }
+};
+
+/*
+使い方
+https://atcoder.jp/contests/abc106/submissions/9873594
+1. インスタンス生成 縦横決める
+TwoDimCumsum<int> Cumsum(H,W);
+2. 座標に埋める
+Cumsum.add(x, y, 1)
+3. 二次元累積和計算
+Cumsum.build()
+4. 区間のクエリを受ける
+Cumsumq.uery(p, q)
+*/
 
 int main() {
-    int N;
-    cin >> N;
-    map<i_i, int> mp;
-    rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
+    int H, W;
+    cin >> W >> H;
+    int a, b;
+    cin >> a >> b;
+    vvec<ll> A(H, vector<ll>(W));
+    rep(i,H)rep(j,W){
+        cin >> A[i][j];
+        if(A[i][j] == -1)A[i][j] = INF;
     }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
-        }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
-    ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
+    TwoDimCumsum<ll> C(H, W);
+    rep(i,H)rep(j,W)C.add(i+1, j+1, A[i][j]);
+    C.build();
+    ll ans = INFLL;
+    for(int i = b; i <= H; i++){
+        for(int j = a; j <= W; j++){
+            int sx = i-b+1;
+            int gx = i;
+            int sy = j-a+1;
+            int gy = j;
+            ll tmp = C.query(sx, sy, gx, gy);
+            chmin(ans, tmp);
         }
     }
     cout << ans << endl;

@@ -47,41 +47,27 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
+ll N, K;
+void dfs(ll sz, ll row, string &ans){
+    // 残り一文字
+    if(sz == 0){
+        ans.push_back('J');
+        return;
+    }
+    ll bit_sz = bit(sz);
+    if(row <= bit_sz/2){
+        rep(_, bit_sz/2)ans.push_back('J');
+        rep(_, bit_sz/2)ans.push_back('O');
+        return;
+    }
+    else{
+        rep(_, bit_sz/2)ans.push_back('I');
+        dfs(sz-1, row - bit_sz/2, ans);
+    }
+}
 int main() {
-    int N;
-    cin >> N;
-    map<i_i, int> mp;
-    rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
-    }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
-        }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
-    ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
-        }
-    }
+    cin >> N >> K;
+    string ans;
+    dfs(N, K, ans);
     cout << ans << endl;
 }

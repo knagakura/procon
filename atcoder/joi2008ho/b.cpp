@@ -49,39 +49,22 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    map<i_i, int> mp;
+    string S, T;
+    cin >> S >> T;
+    int N = S.size();
+    int M = T.size();
+    vec<int> dp(M+1, 0);
+    int ans = 0;
     rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
-    }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
+        vec<int> ndp(M+1, 0);
+        rep(j,M){
+            if(S[i] == T[j]){
+                ndp[j+1] = dp[j] + 1;
+            }
         }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
-    ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
-        }
+        rep(j,M+1)chmax(ans,ndp[j]);
+        swap(ndp, dp);
     }
+    rep(j,M+1)chmax(ans, dp[j]);
     cout << ans << endl;
 }

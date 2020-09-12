@@ -47,41 +47,66 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
+vec<int> G[10010];
+bool visited[10010];
+struct UnionFind{
+    int n;
+    vector<int> Parent;
+    vector<int> sizes;
+    UnionFind(int _n):n(_n),Parent(_n),sizes(_n,1){ rep(i,n)Parent[i]=i; }
+    //find the root of x
+    int root(int x){
+        if(x!=Parent[x]){
+        Parent[x] = root(Parent[x]);
+        }
+        return Parent[x];
+    }
+    //merge x and y
+    void unite(int x,int y){
+        x = root(x);
+        y = root(y);
+        if(x == y) return;
+        if(sizes[x] < sizes[y]) swap(x, y);
+        Parent[y] = x;
+        sizes[x] += sizes[y];
+    }
+    bool same(int x,int y){ return root(x) == root(y); }
+    int size(int x){ return sizes[root(x)]; }
+    int group_num(){
+        set<int> s;
+        for(int i = 0; i < n; ++i){
+            s.insert(root(i));
+        }
+        return int(s.size());
+    }
+};
+void dfs(int cur, int pre){
+    if(visited[cur])return;
+    visited[cur] = true;
+    for(auto nxt: G[cur]){
+        if(nxt == pre)continue;
+        dfs(nxt, cur);
+    }
+}
 int main() {
-    int N;
-    cin >> N;
-    map<i_i, int> mp;
+    int N, M;
+    cin >> N >> M;
+    rep(i,N)visited[i] = false;
+    UnionFind T(N);
+    rep(i,M){
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        G[a].push_back(b);
+        G[b].push_back(a);
+        T.unite(a, b);
+    }
+    int cnt = 0;
     rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
+        if(visited[i])continue;
+        cnt++;
+        dfs(i, -1);
     }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
-        }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
-    ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
-        }
-    }
-    cout << ans << endl;
+    // cout << cnt - 1 << endl;
+    cout << T.group_num() - 1 << endl;
 }

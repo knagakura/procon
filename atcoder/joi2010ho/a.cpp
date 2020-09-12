@@ -47,41 +47,26 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
+const int mod = 100000;
 int main() {
-    int N;
-    cin >> N;
-    map<i_i, int> mp;
-    rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
+    ll N, M;
+    cin >> N >> M;
+    vec<ll> s(N-1);
+    vector<ll> a(M);
+    vector<ll> x(N, 0);
+    rep(i,N-1){
+        cin >> s[i];
+        x[i+1] = x[i] + s[i];
     }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
-        }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
+    rep(i,M)cin >> a[i];
     ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
-        }
+    ll now = 0;
+    rep(i,M){
+        ll nxt = now + a[i];
+        dump(now, nxt);
+        ans += abs(x[nxt] - x[now]);
+        ans %= mod;
+        now = nxt;
     }
     cout << ans << endl;
 }

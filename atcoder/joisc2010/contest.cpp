@@ -49,39 +49,25 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    map<i_i, int> mp;
+    ll N, M, T, X, Y;
+    cin >> N >> M >> T >> X >> Y;
+    vector<ll> p(M);
+    rep(i,M)cin >> p[i];
+    vec<ll> ans(N, 0);
+    vvec<ll> cnt(N, vec<ll>(M, 0));
+    vvec<ll> opened_time(N, vec<ll>(M, 0));
+    rep(j,Y){
+        ll t, n, m;
+        string type;
+        cin >> t >> n >> m >> type;
+        n--, m--;
+        if(type == "open")opened_time[n][m] = t;
+        if(type == "incorrect")cnt[n][m]++;
+        if(type == "correct"){
+            ans[n] += max(X, p[m] - (t - opened_time[n][m]) - 120 * cnt[n][m]);
+        }
+    }
     rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
+        cout << ans[i] << endl;
     }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
-        }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
-    ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
-        }
-    }
-    cout << ans << endl;
 }

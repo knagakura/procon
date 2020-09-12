@@ -51,37 +51,19 @@ const string dir = "DRUL";
 int main() {
     int N;
     cin >> N;
-    map<i_i, int> mp;
+    vector<ll> A(N);
+    rep(i,N)cin >> A[i];
+    // 0以外A[0]の倍数にして、最後辻褄を合わせる
+    vector<ll> B(N);
+    ll sum = 0;
+    rep1(i,N)B[i] = A[0];
+    rep1(i,N){
+        sum += A[i] * B[i];
+    }
+    B[0] = - sum / A[0];
     rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
+        cout << B[i];
+        if(i == N - 1)cout << endl;
+        else cout << " ";
     }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
-        }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
-    ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
-        }
-    }
-    cout << ans << endl;
 }

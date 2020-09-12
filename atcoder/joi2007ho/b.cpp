@@ -46,9 +46,71 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+template<typename T>
+vector<pair<T,long long>> RunLengthEncoder(vector<T> &v){
+    vector<pair<T,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
+    }
+    return RLE;
+}
 
+vector<pair<char,long long>> RunLengthEncoder_ForString(string v){
+    vector<pair<char,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
+    }
+    return RLE;
+}
 
 int main() {
-    
+    int N, K;
+    cin >> N >> K;
+    vector<int> v(N+2, 0);
+    rep(i,K){
+        int a;
+        cin >> a;
+        v[a] = 1;
+    }
+    // 白紙のカードが入っている場合
+    ll ans = 0;
+    if(v[0]){
+        v[0] = 0;
+        auto w = RunLengthEncoder(v);
+        int M = w.size();
+        rep(i,M){
+            if(w[i].first == 1)chmax(ans, w[i].second+1); // 伸ばせない場合はないと考えてよい
+            if(0 <= i - 1 && i + 1 < M && w[i].first == 0 && w[i].second == 1){
+                chmax(ans, w[i-1].second + 1 + w[i+1].second);
+            }
+        }
+    }
+    // 入っていない場合
+    else{
+        auto w = RunLengthEncoder(v);
+        int M = w.size();
+        rep(i,M){
+            if(w[i].first == 1)chmax(ans, w[i].second);
+        }
+    }
+    cout << ans << endl;
     
 }

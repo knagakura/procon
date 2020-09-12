@@ -47,41 +47,52 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+template<typename T> 
+map<T,int> factorize(T x){
+    map<T,int> mp;
+    for (T i = 2; i*i <= x; i++){
+        while (x%i == 0) {
+            x /= i;
+            mp[i]++;
+        }
+        if (x == 1) break;
+    }
+    if (x != 1) mp[x]++;
+    return mp;
+}
 
 int main() {
-    int N;
-    cin >> N;
-    map<i_i, int> mp;
-    rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
-    }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
+    ll N;
+    cin >> N; // <= 10^8
+    auto v = factorize(N); // O(√N)
+    auto check = [&](ll X) -> bool{
+        map<ll, ll> mp; // X以下に素数の素因数がいくつずつあるか
+        for(auto p: v){
+            auto [a, cnt] = p;
+            ll rui = a;
+            while(rui <= X){
+                mp[a] += X / rui;
+                rui *= a;
+            }
         }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
-    ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
+        for(auto p: v){
+            auto [a, cnt] = p;
+            if(cnt > mp[a])return false;
         }
+        return true;
+    };
+    ll ng = 0;
+    ll ok = N;
+    // log(N)
+    while(ok - ng > 1){
+        ll mid = (ok + ng) >> 1;
+        if(check(mid))ok = mid;
+        else ng = mid;
     }
-    cout << ans << endl;
+    cout << ok << endl;
 }
+/* 
+M!がNで割り切れる
+M!のなかにNの素因数分解の結果が全て含まれる
+
+*/

@@ -47,41 +47,31 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
-int main() {
-    int N;
-    cin >> N;
-    map<i_i, int> mp;
-    rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
+ll dfs(ll pre, ll nxt){
+    if((pre + nxt)%2 == 1){
+        return pre + nxt;
     }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
-        }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
+    ll res = pre;
+    res += dfs(nxt, (pre + nxt) >> 1);
+    return res;
+}
+int main() {
+    ll N;
+    cin >> N;
+    if(N == 1){
+        cout << 1 << endl;
+        return 0;
+    }
+    ll rui = 1;
+    int cnt = 0;
+    while(rui * 2 <= N){
+        rui *= 2;
+        cnt++;
+    }
     ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
-        }
+    for(int i = 0; i <= cnt; i++){
+        ll x = N / bit(i) * bit(i);
+        chmax(ans, dfs(0, x));
     }
     cout << ans << endl;
 }

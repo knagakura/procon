@@ -51,37 +51,15 @@ const string dir = "DRUL";
 int main() {
     int N;
     cin >> N;
-    map<i_i, int> mp;
-    rep(i,N){
-        int x, y;
-        cin >> x >> y;
-        mp[{x, y}] = 1;
-    }
-    auto check = [&](int sx, int sy, int gx, int gy) -> bool{
-        rep(_,2){
-            int dx = gx - sx;
-            int dy = gy - sy;
-            int x1 = sx + dy;
-            int y1 = sy - dx;
-            int x2 = sx + dx + dy;
-            int y2 = sy + dy - dx;
-            if(mp.count({x1, y1}) && mp.count({x2, y2}))return true;
-            swap(gx, sx);
-            swap(gy, sy);
-        }
-        return false;
-    };
-    auto dist = [&](int sx, int sy, int gx, int gy) -> ll{
-        return (sx - gx) * (sx - gx) + (sy - gy) * (sy - gy);
-    };
-    ll ans = 0;
-    for(auto p: mp){
-        for(auto q: mp){
-            if(p == q)continue;
-            auto [sx, sy] = p.first;
-            auto [gx, gy] = q.first;
-            if(check(sx, sy, gx, gy))chmax(ans, dist(sx, sy, gx, gy));
+    vec<int> a(N);
+    cin >> a;
+    vec<int> dp(N, 0);
+    for(int i = 0; i < N; i++){
+        chmax(dp[i], 1);
+        for(int j = 0; j < i; j++){
+            if(a[j] < a[i])chmax(dp[i], dp[j]+1);
         }
     }
-    cout << ans << endl;
+    dump(dp);
+    cout << *max_element(all(dp)) << endl;
 }

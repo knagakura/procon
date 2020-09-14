@@ -98,32 +98,33 @@ struct mint {
         return os;
     }
 };
-
-vvec<int> G;
-
-pair<mint, mint> dfs(int cur, int pre){
-    mint res0 = 1;
-    mint res1 = 1;
-    for(auto nxt: G[cur]){
-        if(nxt == pre)continue;
-        auto [nxt0, nxt1] = dfs(nxt, cur);
-        res0 *= (nxt0 + nxt1);
-        res1 *= nxt0;
+struct combination {
+    vector<mint> fact, ifact;
+    //constructor(initiation)
+    combination(int n):fact(n+1),ifact(n+1) {
+        assert(n < MOD);
+        fact[0] = 1;
+        for (int i = 1; i <= n; ++i) fact[i] = fact[i-1]*i;
+        ifact[n] = fact[n].inv();
+        for (int i = n; i >= 1; --i) ifact[i-1] = ifact[i]*i;
     }
-    return make_pair(res0, res1);
-}
+    mint Comb(int n, int k) {
+        if (k < 0 || k > n) return 0;
+        return fact[n]*ifact[k]*ifact[n-k];
+    }
+    mint H(int n, int m){
+        return Comb(n + m - 1, m);
+    }
+}C(20100);
 int main() {
-    int N;
-    cin >> N;
-    G.resize(N);
-    rep(i,N-1){
-        int a,b;
-        cin >> a >> b;
-        a--;b--;
-        G[a].push_back(b);
-        G[b].push_back(a);
+    int S;
+    cin >> S;
+    mint ans = 0;
+    // 長さを固定する
+    for(int i = 1; i <= S; i++){
+        int rem = S - 3 * i;
+        if(rem < 0)continue;
+        ans += C.H(i, rem);
     }
-    auto [a, b] = dfs(0, -1);
-    mint ans = a + b;
     cout << ans << endl;
 }

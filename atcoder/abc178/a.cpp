@@ -47,83 +47,10 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-struct mint {
-    long long x;
-    mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
-    mint operator-() const { return mint(-x);}
-    mint& operator+=(const mint a) {
-        if ((x += a.x) >= MOD) x -= MOD;
-        return *this;
-    }
-    mint& operator-=(const mint a) {
-        if ((x += MOD-a.x) >= MOD) x -= MOD;
-        return *this;
-    }
-    mint& operator*=(const mint a) {
-        (x *= a.x) %= MOD;
-        return *this;
-    }
-    mint operator+(const mint a) const {
-        mint res(*this);
-        return res+=a;
-    }
-    mint operator-(const mint a) const {
-        mint res(*this);
-        return res-=a;
-    }
-    mint operator*(const mint a) const {
-        mint res(*this);
-        return res*=a;
-    }
-    mint modpow(long long t) const {
-        if (!t) return 1;
-        mint a = modpow(t>>1);
-        a *= a;
-        if (t&1) a *= *this;
-        return a;
-    }
-    // for prime MOD
-    mint inv() const {
-        return modpow(MOD-2);
-    }
-    mint& operator/=(const mint a) {
-        return (*this) *= a.inv();
-    }
-    mint operator/(const mint a) const {
-        mint res(*this);
-        return res/=a;
-    }
-    friend std::ostream& operator<<(std::ostream& os, const mint& a){
-        os << a.x;
-        return os;
-    }
-};
 
-vvec<int> G;
-
-pair<mint, mint> dfs(int cur, int pre){
-    mint res0 = 1;
-    mint res1 = 1;
-    for(auto nxt: G[cur]){
-        if(nxt == pre)continue;
-        auto [nxt0, nxt1] = dfs(nxt, cur);
-        res0 *= (nxt0 + nxt1);
-        res1 *= nxt0;
-    }
-    return make_pair(res0, res1);
-}
 int main() {
-    int N;
-    cin >> N;
-    G.resize(N);
-    rep(i,N-1){
-        int a,b;
-        cin >> a >> b;
-        a--;b--;
-        G[a].push_back(b);
-        G[b].push_back(a);
-    }
-    auto [a, b] = dfs(0, -1);
-    mint ans = a + b;
-    cout << ans << endl;
+    int x;
+    cin >> x;
+    if(x)cout << 0 << endl;
+    else cout << 1 << endl;
 }

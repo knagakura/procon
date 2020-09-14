@@ -47,6 +47,7 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+
 struct mint {
     long long x;
     mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
@@ -98,32 +99,19 @@ struct mint {
         return os;
     }
 };
-
-vvec<int> G;
-
-pair<mint, mint> dfs(int cur, int pre){
-    mint res0 = 1;
-    mint res1 = 1;
-    for(auto nxt: G[cur]){
-        if(nxt == pre)continue;
-        auto [nxt0, nxt1] = dfs(nxt, cur);
-        res0 *= (nxt0 + nxt1);
-        res1 *= nxt0;
-    }
-    return make_pair(res0, res1);
-}
+mint dp[2500][2500];
 int main() {
-    int N;
-    cin >> N;
-    G.resize(N);
-    rep(i,N-1){
-        int a,b;
-        cin >> a >> b;
-        a--;b--;
-        G[a].push_back(b);
-        G[b].push_back(a);
+    ll S;
+    cin >> S;
+    rep(i,2222)rep(j,2222)dp[i][j] = 0;
+    dp[0][0] = 1;
+    rep(i,2221)rep(j,S){
+        if(dp[i][j].x == 0)continue;
+        for(int add = 3; add + j <= S; add++){
+            dp[i+1][add + j] += dp[i][j];
+        }
     }
-    auto [a, b] = dfs(0, -1);
-    mint ans = a + b;
+    mint ans = 0;
+    rep(i,2222)ans += dp[i][S];
     cout << ans << endl;
 }

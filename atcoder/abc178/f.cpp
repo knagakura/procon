@@ -46,84 +46,77 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-struct mint {
-    long long x;
-    mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
-    mint operator-() const { return mint(-x);}
-    mint& operator+=(const mint a) {
-        if ((x += a.x) >= MOD) x -= MOD;
-        return *this;
+uint32_t XorShift(void) {
+	static uint32_t x = 123456789;
+	static uint32_t y = 362436069;
+	static uint32_t z = 521288629;
+	static uint32_t w = 88675123;
+	uint32_t t;
+ 
+	t = x ^ (x << 11);
+	x = y; y = z; z = w;
+	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+}
+ 
+bool solve(vector<int> &A, vector<int>&B ){
+    int N = A.size();
+    vector<int> ans;
+    multiset<int> st;
+    rep(i,N)st.insert(B[i]);
+    rep(i,N){
+        auto it = st.upper_bound(A[i]);
+        if(it == st.end())it = st.begin();
+        ans.emplace_back(*it);
+        st.erase(it);
     }
-    mint& operator-=(const mint a) {
-        if ((x += MOD-a.x) >= MOD) x -= MOD;
-        return *this;
+    // dump(ans);
+    rep(i,N){
+        if(ans[i] == A[i]){
+            return false;
+            // cout << "No" << endl;
+            // return 0;
+        }
     }
-    mint& operator*=(const mint a) {
-        (x *= a.x) %= MOD;
-        return *this;
-    }
-    mint operator+(const mint a) const {
-        mint res(*this);
-        return res+=a;
-    }
-    mint operator-(const mint a) const {
-        mint res(*this);
-        return res-=a;
-    }
-    mint operator*(const mint a) const {
-        mint res(*this);
-        return res*=a;
-    }
-    mint modpow(long long t) const {
-        if (!t) return 1;
-        mint a = modpow(t>>1);
-        a *= a;
-        if (t&1) a *= *this;
-        return a;
-    }
-    // for prime MOD
-    mint inv() const {
-        return modpow(MOD-2);
-    }
-    mint& operator/=(const mint a) {
-        return (*this) *= a.inv();
-    }
-    mint operator/(const mint a) const {
-        mint res(*this);
-        return res/=a;
-    }
-    friend std::ostream& operator<<(std::ostream& os, const mint& a){
-        os << a.x;
-        return os;
-    }
-};
-
-vvec<int> G;
-
-pair<mint, mint> dfs(int cur, int pre){
-    mint res0 = 1;
-    mint res1 = 1;
-    for(auto nxt: G[cur]){
-        if(nxt == pre)continue;
-        auto [nxt0, nxt1] = dfs(nxt, cur);
-        res0 *= (nxt0 + nxt1);
-        res1 *= nxt0;
-    }
-    return make_pair(res0, res1);
+    return true;
+    // cout << "Yes" << endl;
+    // rep(i,N){
+    //     cout << ans[i] << " ";
+    // }
+    // cout << endl;
 }
 int main() {
-    int N;
-    cin >> N;
-    G.resize(N);
-    rep(i,N-1){
-        int a,b;
-        cin >> a >> b;
-        a--;b--;
-        G[a].push_back(b);
-        G[b].push_back(a);
+    int N = 10;
+    ll cnt = 0;
+    while(1){
+        cnt++;
+        vector<int> A(N), B(N);
+        rep(i,N){
+            A[i] = XorShift() % N + 1;
+            B[i] = XorShift() % N + 1;
+        }
+        sort(all(A));
+        sort(all(B));
+        map<int, int> mpa, mpb;
+        rep(i,N){
+            mpa[A[i]]++;
+            mpb[B[i]]++;
+        }
+        bool ok = true;
+        for(int i = 1; i <= N; i++){
+            ll cnta = mpa[i];
+            ll cntb = mpb[i];
+            if(cnta + cntb > N){
+                ok = false;
+            }
+        }
+        if(solve(A, B) != ok){
+            dump(A);
+            dump(B);
+            break;
+        }
+        if(cnt % 100 == 0){
+            dump(cnt);
+        }
     }
-    auto [a, b] = dfs(0, -1);
-    mint ans = a + b;
-    cout << ans << endl;
+    
 }

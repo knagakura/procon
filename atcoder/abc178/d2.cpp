@@ -98,32 +98,18 @@ struct mint {
         return os;
     }
 };
-
-vvec<int> G;
-
-pair<mint, mint> dfs(int cur, int pre){
-    mint res0 = 1;
-    mint res1 = 1;
-    for(auto nxt: G[cur]){
-        if(nxt == pre)continue;
-        auto [nxt0, nxt1] = dfs(nxt, cur);
-        res0 *= (nxt0 + nxt1);
-        res1 *= nxt0;
-    }
-    return make_pair(res0, res1);
-}
 int main() {
-    int N;
-    cin >> N;
-    G.resize(N);
-    rep(i,N-1){
-        int a,b;
-        cin >> a >> b;
-        a--;b--;
-        G[a].push_back(b);
-        G[b].push_back(a);
+    int S;
+    cin >> S;
+    vector<mint> dp(S+1, 0);
+    dp[0] = 1;
+    rep(i,S){
+        auto nxt = dp;
+        for(int j = 3; j <= S; j++){
+            if(i + j > S)continue;
+            nxt[i+j] += dp[i];
+        }
+        swap(dp, nxt);
     }
-    auto [a, b] = dfs(0, -1);
-    mint ans = a + b;
-    cout << ans << endl;
+    cout << dp[S] << endl;
 }

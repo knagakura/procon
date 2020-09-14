@@ -41,43 +41,51 @@ const ll MOD = 1000000007;
 // const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
-/*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
-const string dir = "DRUL";
-*/
 
 
+ll v[3010][3010];
+ll dp[3010][3010][10];
 int main() {
-    int N, M, P, Q, R;
-    cin >> N >> M >> P >> Q >> R;
-    vvec<l_l> G(N);
-    rep(i,R){
-        int x, y, z;
-        cin >> x >> y >> z;
+    int H, W, K;
+    cin >> H >> W >> K;
+    rep(i,H)rep(j,W)v[i][j] = 0;
+    while(K--){
+        int x, y;
+        ll val;
+        cin >> x >> y >> val;
         x--, y--;
-        G[x].emplace_back(y, z);
+        v[x][y] = val;
     }
-    auto calc = [&](int maski, int maskj) -> ll{
-        ll res = 0;
-        rep(x,N){
-            if(bit(x)&maski){
-                for(auto p: G[x]){
-                    auto [y, z] = p;
-                    if(bit(y)&maskj)res += z;
-                }
+    auto isin = [&](int a, int b) -> bool{
+        return 0 <= a && a < H && 0 <= b && b < W;
+    };
+    rep(i,H)rep(j,W)rep(k,10)dp[i][j][k] = 0;
+    dp[0][0][0] = 0;
+    dp[0][0][1] = v[0][0];
+    rep(i,H)rep(j,W)rep(k,4){
+        rep(d,2){
+            int ni = i + dx[d];
+            int nj = j + dy[d];
+            if(not isin(ni, nj))continue;
+            // 行変え
+            if(d == 0){
+                // 取る
+                chmax(dp[ni][nj][1], dp[i][j][k] + v[ni][nj]);
+                // 取らない
+                chmax(dp[ni][nj][0], dp[i][j][k]);
+            }
+            // 同じ行
+            else{
+                // 取る
+                chmax(dp[ni][nj][k+1], dp[i][j][k] + v[ni][nj]);
+                // 取らない
+                chmax(dp[ni][nj][k], dp[i][j][k]);
             }
         }
-        return res;
-    };
-    ll ans = 0;
-    for(int i = 0; i < bit(N); i++){
-        for(int j = 0; j < bit(M); j++){
-            int cnti = __builtin_popcount(i);
-            int cntj = __builtin_popcount(j);
-            if(cnti != P || cntj != Q)continue;
-            chmax(ans, calc(i, j));
-        }
     }
+    ll ans = 0;
+    rep(k,4)chmax(ans, dp[H-1][W-1][k]);
     cout << ans << endl;
 }

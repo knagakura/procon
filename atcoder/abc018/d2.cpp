@@ -58,26 +58,22 @@ int main() {
         x--, y--;
         G[x].emplace_back(y, z);
     }
-    auto calc = [&](int maski, int maskj) -> ll{
-        ll res = 0;
-        rep(x,N){
-            if(bit(x)&maski){
-                for(auto p: G[x]){
-                    auto [y, z] = p;
-                    if(bit(y)&maskj)res += z;
-                }
+    auto calc = [&](int maski) -> ll{
+        vector<ll> val(M, 0);
+        rep(x, N)if(bit(x)&maski){
+            for(auto p: G[x]){
+                auto [y, z] = p;
+                val[y] += z;
             }
         }
+        sort(all(val),greater<>());
+        ll res = accumulate(val.begin(), val.begin() + Q, 0LL);
         return res;
     };
     ll ans = 0;
     for(int i = 0; i < bit(N); i++){
-        for(int j = 0; j < bit(M); j++){
-            int cnti = __builtin_popcount(i);
-            int cntj = __builtin_popcount(j);
-            if(cnti != P || cntj != Q)continue;
-            chmax(ans, calc(i, j));
-        }
+        int cnti = __builtin_popcount(i);
+        if(cnti == P)chmax(ans, calc(i));
     }
     cout << ans << endl;
 }

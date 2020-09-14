@@ -49,35 +49,21 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N, M, P, Q, R;
-    cin >> N >> M >> P >> Q >> R;
-    vvec<l_l> G(N);
-    rep(i,R){
-        int x, y, z;
-        cin >> x >> y >> z;
-        x--, y--;
-        G[x].emplace_back(y, z);
-    }
-    auto calc = [&](int maski, int maskj) -> ll{
-        ll res = 0;
-        rep(x,N){
-            if(bit(x)&maski){
-                for(auto p: G[x]){
-                    auto [y, z] = p;
-                    if(bit(y)&maskj)res += z;
-                }
-            }
+    string S;
+    cin >> S;
+    int N = S.size();
+    vector<string> v;
+    string tmp;
+    rep(i,N){
+        if(S[i] == '_'){
+            if(not tmp.empty())v.emplace_back(tmp);
+            v.push_back("_");
+            tmp = "";
         }
-        return res;
-    };
-    ll ans = 0;
-    for(int i = 0; i < bit(N); i++){
-        for(int j = 0; j < bit(M); j++){
-            int cnti = __builtin_popcount(i);
-            int cntj = __builtin_popcount(j);
-            if(cnti != P || cntj != Q)continue;
-            chmax(ans, calc(i, j));
+        else{
+            tmp.push_back(S[i]);
         }
     }
-    cout << ans << endl;
+    if(not tmp.empty())v.emplace_back(tmp);
+    dump(v);
 }

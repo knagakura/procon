@@ -26,5 +26,6 @@
         "convolution": "cpp",
         "dsu": "cpp",
         "fenwicktree": "cpp"
-    }
+    },
+    "python.pythonPath": "/usr/local/bin/python3"
 }

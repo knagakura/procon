@@ -31,20 +31,29 @@ const string dir = "DRUL";
 */
 int sx, sy, gx, gy;
 int N;
-
-bool is_cross(int x)
+bool intersect(double p1x, double p1y, double p2x, double p2y, double p3x, double p3y, double p4x, double p4y) {
+    if (((p1x - p2x) * (p3y - p1y) + (p1y - p2y) * (p1x - p3x)) *
+        ((p1x - p2x) * (p4y - p1y) + (p1y - p2y) * (p1x - p4x)) < 0) {
+ 
+        if (((p3x - p4x) * (p1y - p3y) + (p3y - p4y) * (p3x - p1x)) *
+            ((p3x - p4x) * (p2y - p3y) + (p3y - p4y) * (p3x - p2x)) < 0) {
+            return true;
+        }
+ 
+    }
+    return false;
+}
 int main() {
-    cin.tie(0);
-    ios::sync_with_stdio(false);
-    cout << fixed << setprecision(20);
 
     cin >> sx >> sy >> gx >> gy >> N;
     vector<int> x(N), y(N);
-    rep(i,N){
-        cin >> x[i] >> y[i];
-    }
+    rep(i,N)cin >> x[i] >> y[i];
     int cnt = 0;
-    rep(i,N-1){
-        if(is_cross())
+    rep(i,N){
+        int j = (i + 1) % N;
+        if(intersect(x[i], y[i], x[j], y[j], sx, sy, gx, gy)){
+            cnt++;
+        }
     }
+    cout << cnt / 2 + 1 << endl;
 }

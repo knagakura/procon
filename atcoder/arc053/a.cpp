@@ -46,19 +46,10 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-ll ceil(ll a, ll b){
-    return (a + b - 1) / b;
-}
-void solve(){
-    ll x, y, k;
-    cin >> x >> y >> k;
-    ll need = y * k + k - 1;
-    dump(need, x-1);
-    ll cnt = ceil(need, x-1);
-    cout << cnt+k << endl;
-}
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+
+
+int main() {
+    int H, W;
+    cin >> H >> W;
+    cout << H * (W-1) + (H-1) * W << endl;
 }

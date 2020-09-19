@@ -49,7 +49,31 @@ const string dir = "DRUL";
 
 
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    int H, W;
+    cin >> H >> W;
+    vvec<int> A(H,vec<int>(W, 0));
+    rep(i,H)cin >> A[i];
+    auto calc = [&](int mask) -> ll{
+        auto tmp = A;
+        rep(i,H)rep(j,W){
+            if(bit(i) & mask){
+                tmp[i][j] ^= 1;
+            }
+        }
+        ll res = 0;
+        rep(j,W){
+            ll cnt = 0;
+            rep(i,H){
+                cnt += tmp[i][j];
+            }
+            chmax(cnt, H-cnt);
+            res += cnt;
+        }
+        return res;
+    };
+    ll ans = 0;
+    for(int i = 0; i < bit(H); i++){
+        chmax(ans, calc(i));
+    }
+    cout << ans << endl;
 }

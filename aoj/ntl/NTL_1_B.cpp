@@ -47,9 +47,18 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
+template<typename T, typename U> 
+T modpow(T a, U n) {
+    ll res = 1;
+    while (n > 0) {
+        if (n & 1) res = res * a % MOD;
+        a = a * a % MOD;
+        n >>= 1;
+    }
+    return res;
+}
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    ll m, n;
+    cin >> m >> n;
+    cout << modpow(m, n) << endl;
 }

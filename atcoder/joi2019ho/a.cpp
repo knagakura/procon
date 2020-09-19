@@ -49,7 +49,26 @@ const string dir = "DRUL";
 
 
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    int H, W;
+    cin >> H >> W;
+    vector<string> S(H);
+    cin >> S;
+    vector<ll> cntI(W, 0);
+    vector<ll> cntO(H, 0);
+    rep(j,W)rep(i,H){
+        cntI[j] += S[i][j] == 'I';
+    }
+    rep(i,H)rep(j,W){
+        cntO[i] += S[i][j] == 'O';
+    }
+    ll ans = 0;
+    rep(i,H){
+        rep(j,W){
+            cntO[i] -= S[i][j] == 'O';
+            cntI[j] -= S[i][j] == 'I';
+            if(S[i][j] != 'J')continue;
+            ans += cntO[i] * cntI[j];
+        }
+    }
+    cout << ans << endl;
 }

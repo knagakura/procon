@@ -49,7 +49,13 @@ const string dir = "DRUL";
 
 
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    int N;
+    cin >> N;
+    vector<ll> a(N);
+    rep(i,N)cin >> a[i];
+    ll ans = 1;
+    rep(i,N){
+        ans = lcm(ans, a[i]);
+    }
+    cout << ans << endl;
 }

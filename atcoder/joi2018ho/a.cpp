@@ -49,7 +49,19 @@ const string dir = "DRUL";
 
 
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    int N, K;
+    cin >> N >> K;
+    vector<ll> T(N);
+    rep(i,N)cin >> T[i];
+    vector<ll> range;
+    rep(i,N-1){
+        range.emplace_back(T[i+1] - (T[i]+1));
+    }
+    ll ans = 0;
+    ans += T.back() + 1 - T[0];
+    sort(all(range));
+    rep(i,K-1){
+        ans -= range[N-1-1-i];
+    }
+    cout << ans << endl;
 }

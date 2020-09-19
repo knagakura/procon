@@ -48,23 +48,58 @@ const string dir = "DRUL";
 */
 
 
-int main() {
-    ll N, T, S;
-    cin >> N >> T >> S;
-    vector<ll> A(N), B(N);
-    rep(i,N)cin >> A[i] >> B[i];
-    vvec<ll> dp(N+1, vector<ll>(T+1, 0));
-    dp[0][0] = 0;
-    rep(i,N){
-        rep(j,T+1){
-            chmax(dp[i+1][j], dp[i][j]);
-            if(j + B[i] > T)continue;
-            if(j < S && S < j + B[i])continue;
-            chmax(dp[i+1][j+B[i]], dp[i][j] + A[i]);
+template<typename T>
+vector<pair<T,long long>> RunLengthEncoder(vector<T> &v){
+    vector<pair<T,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
         }
     }
-    rep(i,N+1){
-        dbg(dp[i]);
+    return RLE;
+}
+
+vector<pair<char,long long>> RunLengthEncoder_ForString(string v){
+    vector<pair<char,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
     }
-    cout << *max_element(all(dp[N])) << endl;
+    return RLE;
+}
+int main() {
+    string S;
+    cin >> S;
+    auto v = RunLengthEncoder_ForString(S);
+    int M = v.size();
+    ll ans = 0;
+    for(int i = 1; i < M - 1; i++){
+        int l = i - 1;
+        int r = i + 1;
+        if(v[l].first == 'J'){
+            if(v[i].first == 'O'){
+                if(v[r].first == 'I'){
+                    if(v[l].second >= v[i].second && v[i].second <= v[r].second){
+                        chmax(ans, v[i].second);
+                    }
+                }
+            }
+        }
+    }
+    cout << ans << endl;
 }

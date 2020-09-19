@@ -47,9 +47,71 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+string S, T;
+int N;
+vector<int> used;
+vector<ll> fact;
+map<char,int> mp;
+map<string, int> mp_st;
+ll ans;
+int check(string &tmp){
+    int M = tmp.size();
+    if(S[M-1] > tmp[M-1])return 0;
+    else if(S[M-1] == tmp[M-1])return 1;
+    else return 2;
+}
 
+ll calc(string &tmp){
+    ll res = 1;
+    auto mptmp = mp;
+    for(auto c: tmp)mptmp[c]--;
+    ll cnt = 0;
+    for(auto p: mptmp)cnt += p.second;
+    res *= fact[cnt];
+    for(auto p: mptmp){
+        res /= fact[p.second];
+    }
+    return res;
+}
+void dfs(string &tmp){
+    if(mp_st[tmp] > 0)return;
+    mp_st[tmp]++;
+    int type = check(tmp);
+    if(type == 0){ // 小さいことが確定したら、その後どう並べても小さいので、そこの場合の数を足す
+        ans += calc(tmp);
+        return;
+    }
+    if(type == 2)return; // 大きくなったら探索を終える（数える意味がないので）
+    if((int)tmp.size() == N){
+        dump(tmp);
+        return;
+    }
+    rep(i,N){
+        if(used[i])continue;
+        tmp.push_back(T[i]);
+        used[i] = true;
+        dfs(tmp);
+        tmp.pop_back();
+        used[i] = false;
+    }
+}
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    cin >> S;
+    T = S;
+    N = S.size();
+    used.assign(N, false);
+    fact.resize(N+1);
+    fact[0] = 1;
+    rep(i,N){
+        fact[i+1] = fact[i] * (i+1);
+    }
+    dump(fact);
+    sort(all(T));
+    rep(i,N)mp[S[i]]++;
+    dump(T);
+    dump(S);
+    ans = 0;
+    string tmp;
+    dfs(tmp);
+    cout << ans+1 << endl;
 }

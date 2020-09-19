@@ -49,7 +49,18 @@ const string dir = "DRUL";
 
 
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    int N;
+    cin >> N;
+    string ans;
+    rep(i,N){
+        string S;
+        cin >> S;
+        for(auto c: S){
+            if(0 <= c - 'A' && c - 'A' < 26){
+                ans.push_back(c);
+            }
+        }
+    }
+    ans += "UPC";
+    cout << ans << endl;
 }

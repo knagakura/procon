@@ -47,9 +47,31 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
+template<typename T> 
+map<T,int> factorize(T x){
+    map<T,int> mp;
+    for (T i = 2; i*i <= x; i++){
+        while (x%i == 0) {
+            x /= i;
+            mp[i]++;
+        }
+        if (x == 1) break;
+    }
+    if (x != 1) mp[x]++;
+    return mp;
+}
+template<typename T>
+T eulerPhi(T n){
+    auto map = factorize(n);
+    T res = n;
+    for(auto& p: map){
+        res /= p.first;
+        res *= p.first - 1;
+    }
+    return res;
+}
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    ll N;
+    cin >> N;
+    cout << eulerPhi(N) << endl;
 }

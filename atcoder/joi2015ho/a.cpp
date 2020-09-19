@@ -49,7 +49,30 @@ const string dir = "DRUL";
 
 
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    int N, M;
+    cin >> N >> M;
+    vector<ll> P(M), A(N-1), B(N-1), C(N-1);
+    cin >> P;
+    rep(i,M)P[i]--;
+    rep(i,N-1){
+        cin >> A[i] >> B[i] >> C[i];
+    }
+    vector<ll> cnt(N-1, 0);
+    rep(i,M-1){
+        int s = P[i];
+        int t = P[i+1];
+        if(s > t)swap(s, t);
+        cnt[s]++;
+        cnt[t]--;
+    }
+    dump(cnt);
+    rep(i,N-2){
+        cnt[i+1] += cnt[i];
+    }
+    dump(cnt);
+    ll ans = 0;
+    rep(i,N-1){
+        ans += min(A[i]*cnt[i], C[i] + B[i] * cnt[i]);
+    }
+    cout << ans << endl;
 }

@@ -48,8 +48,51 @@ const string dir = "DRUL";
 */
 
 
+// dp[i][区間の状態]
+
+/*
+0: まだ反転してない
+1: 反転している
+2: 反転を終えている
+0 => 0
+
+0 => 1
+
+1 => 1
+
+1 => 2
+
+2 => 2
+*/
+
+ll dp[200010][10];
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    int N;
+    cin >> N;
+    vector<int> a(N);
+    rep(i,N)cin >> a[i];
+    rep(i,N+1)rep(j,3)dp[i][j] = -INFLL;
+    dp[0][0] = 1;
+    dp[0][1] = 1;
+    rep(i,N-1){
+        for(int j = 0; j <= 2; j++){
+            if(dp[i][j] == -INFLL)continue;
+            for(int k = 0; k <= 2; k++){
+                if(k < j)continue;
+                int pre = a[i] ^ (j == 1 ? 1: 0);
+                int nxt = a[i+1] ^ (k == 1 ? 1: 0);
+                if(pre != nxt){
+                    chmax(dp[i+1][k], dp[i][j] + 1);
+                }
+                else{
+                    chmax(dp[i+1][k], 1LL);
+                }
+            }
+        }
+    }
+    ll ans = 0;
+    rep(i,N)for(int j = 0; j <= 2; j++){
+        chmax(ans, dp[i][j]);
+    }
+    cout << ans << endl;
 }

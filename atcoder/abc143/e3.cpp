@@ -49,7 +49,59 @@ const string dir = "DRUL";
 
 
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << b - a + 1 << endl;
+    int N,M;
+    ll L;
+    cin >> N >> M >> L;
+    
+    // dist
+    vector dist(N, vector<ll>(N, INFLL));
+    rep(i,N)dist[i][i] = 0;
+    rep(i,M){
+        int a, b;
+        ll c;
+        cin >> a >> b >> c;
+        a--, b--;
+        dist[a][b] = dist[b][a] = c;
+    }
+    rep(k,N)rep(i,N)rep(j,N)chmin(dist[i][j], dist[i][k]+dist[k][j]);
+
+    // dist2
+    vector dist2(N, vector<ll>(N, INFLL));
+    rep(i,N)dist2[i][i] = 0;
+    rep(i,N)rep(j,N){
+        if(i == j)dist2[i][j] = 0;
+        else if(dist[i][j] <= L)dist2[i][j] = 1;
+    }
+    rep(k,N)rep(i,N)rep(j,N)chmin(dist2[i][j], dist2[i][k]+dist2[k][j]);
+
+    auto solve = [&](int s, int t) -> ll{
+        ll res = dist2[s][t] - 1;
+        return (res == INFLL-1 ? -1: res);
+    };
+    int Q;
+    cin >> Q;
+    while(Q--){
+        int s, t;
+        cin >> s >> t;
+        s--, t--;
+        cout << solve(s, t) << endl;
+    }
+    rep(i,N){
+        dump(dist[i]);
+    }
+    rep(i,N){
+        dump(dist2[i]);
+    }
 }
+
+/*
+O(N^3)が通る =>
+
+Q = N^2
+クエリあたりO(N)ならOK.
+
+まず全点間距離を出して（ワーシャルフロイド）
+その距離を使ってもう一回ワーシャルフロイドしたらいいのでは？
+L未満なら0、L以上なら1回
+
+*/

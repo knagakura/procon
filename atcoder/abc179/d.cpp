@@ -165,29 +165,9 @@ int main() {
     rep(i,K){
         cin >> l[i] >> r[i];
     }
-    // vector<mint> dp(N, 0);
-    // dp[0] = 1;
-    // LazySegTree<mint> T(dp);
-    // auto dbug = [&](){
-    //     rep(i,N+1){
-    //         cerr << T[i] << " ";
-    //     }
-    //     cout << endl;
-    //     return;
-    // };
-    // rep(i,N){
-    //     rep(j,K){
-    //         int L = min(N, i+l[j]);
-    //         int R = min(N, i+r[j]);
-    //         dump(L, R);
-    //         T.add(L, R+1, T[i]);
-    //     }
-    //     dbug();
-    //     cerr << endl;
-    // }
-    // cout << T[N-1] << endl;
     vector<mint> dp(N+10, 0);
     dp[0] = 1;
+    dp[1] = -1;
     for(int i = 0; i < N; i++){
         for(int j = 0; j < K; j++){
             int L = min(N, i + l[j]);
@@ -196,7 +176,7 @@ int main() {
             dp[L] += dp[i];
             dp[R] -= dp[i];
         }
-        if(i)dp[i+1] += dp[i];
+        dp[i+1] += dp[i];
     }
     cout << dp[N-1] << endl;
 }

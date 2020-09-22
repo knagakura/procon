@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
+// #include <atcoder/all>
 using namespace std;
+// using namespace atcoder;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
 #define rep1(i,N) for(int i=1;i<int(N);++i)
@@ -41,78 +43,79 @@ const ll MOD = 1000000007;
 // const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
+/*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
+const string dir = "DRUL";
+*/
 
 
-int main() {
-    int H, W;
-    cin >> H >> W;
-    vector<string> S(H), T;
-    cin >> S;
-    T = S;
-    auto IsIn = [&](int x, int y){
-        return 0 <= x && x < H && 0 <= y && y < W;
-    };
-    auto bfs = [&](int si, int sj){
-        vvec<int> dist(H,vector<int>(W, -1));
-        vvec<int> visited(H,vector<int>(W, 0));
-        // 準備
-        rep(i,H)visited[i][sj] = 1;
-        rep(j,W)visited[si][j] = 1;
-        rep(x, H)rep(y,W)rep(j,2){
-            int nx = x + dx[j+2];
-            int ny = y + dy[j+2];
-            if(T[nx][ny] == '#')visited[x][y]++;
+struct UnionFind{
+    int n;
+    vector<int> Parent;
+    vector<int> sizes;
+    UnionFind(int _n):n(_n),Parent(_n),sizes(_n,1){ rep(i,n)Parent[i]=i; }
+    //find the root of x
+    int root(int x){
+        if(x!=Parent[x]){
+        Parent[x] = root(Parent[x]);
         }
-        dist[si][sj] = 0;
-        visited[si][sj] = 2;
-        queue<pair<int,int>> q;
-        q.push({si, sj});
-        while(not q.empty()){
-            auto [x, y] = q.front();
-            q.pop();
-            // if(visited[x][y] < 2)continue;
-            rep(j,2){
-                int nx = x + dx[j];
-                int ny = y + dy[j];
-                if(not IsIn(nx, ny))continue;
-                if(T[nx][ny] == '#')continue;
-                visited[nx][ny]++;
-                chmax(dist[nx][ny], dist[x][y]+1);
-                if(visited[nx][ny] == 2)q.push({nx, ny});
-            }
-        }
-        int maxx = 0, maxy = 0;
-        int maxxx = 0;
-        rep(i,H)rep(j,W){
-            if(chmax(maxxx, dist[i][j])){
-                maxx = i;
-                maxy = j;
-            }
-        }
-        T[si][sj] = '.';
-        T[maxx][maxy] = '#';
-        rep(i,H){
-            dump(dist[i]);
-        }        
-        rep(i,H){
-            dump(visited[i]);
-        }
-        rep(i,H){
-            dump(T[i]);
-        }
-        return maxxx;
-    };
-    ll ans = 0;
-    for(int i = H-1; i >= 0; i--){
-        for(int j = W-1; j >= 0; j--){
-            if(S[i][j] == 'o'){
-                ll add = bfs(i,j);
-                dump(i,j, add);
-                ans += add;
-            }
-        }
+        return Parent[x];
     }
-    cout << ans << endl;
+    //merge x and y
+    void unite(int x,int y){
+        x = root(x);
+        y = root(y);
+        if(x == y) return;
+        if(sizes[x] < sizes[y]) swap(x, y);
+        Parent[y] = x;
+        sizes[x] += sizes[y];
+    }
+    bool same(int x,int y){ return root(x) == root(y); }
+    int size(int x){ return sizes[root(x)]; }
+    int group_num(){
+        set<int> s;
+        for(int i = 0; i < n; ++i){
+            s.insert(root(i));
+        }
+        return int(s.size());
+    }
+};
+int main() {
+    int N;
+    cin >> N;
+    vector<int> x(N), y(N);
+    UnionFind Uni(N);
+    vector<pair<i_i, int>> xyi;
+    rep(i,N){
+        cin >> x[i] >> y[i];
+        x[i]--;
+        y[i]--;
+        xyi.push_back({{x[i], y[i]}, i});
+    }
+    sort(all(xyi));
+    set<pair<int, int>> st;
+    // 今入ってる座標は全てx座標が自分未満なので、y座標が自分未満のやつを探せば良い
+    rep(i,N){
+        auto pp = xyi[i];
+        auto [p, idx] = pp;
+        auto [a, b] = p;
+        // stの中の{b,INF}未満のやつを全てuniteする
+        int ue = b;
+        int minn = b;
+        while(1){
+            auto itr = st.lower_bound({ue, INF});
+            if(itr == st.begin())break;
+            itr--;
+            auto tmp = *itr;
+            auto [sita, idx2] = tmp;
+            Uni.unite(idx, idx2);
+            st.erase(itr);
+            chmin(minn, sita);
+        }
+        st.insert({minn, idx});
+    }
+    rep(i,N){
+        cout << Uni.size(i) << endl;
+    }
 }

@@ -41,28 +41,6 @@ const ll MOD = 1000000007;
 // const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
-/*
-const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
-const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
-const string dir = "DRUL";
-*/
-
-// ll dfs(int l, int r){
-//     ll res = 0;
-//     if(r - l == 2){
-//         ll rui = modpow(X, l+1);
-//         res = rui*(1+rui)%M;
-//     }
-//     else if(r - l == 1){
-//         res = modpow(X, l+1);
-//     }
-//     else{
-//         ll mid = (l+r)/2;
-//         res = dfs(l, mid) + dfs(mid, r);
-//     }
-//     // dump(l, r, res);
-//     return res;
-// }
 int main() {
     ll N, X, M;
     cin >> N >> X >> M;

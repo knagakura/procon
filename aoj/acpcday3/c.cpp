@@ -41,78 +41,28 @@ const ll MOD = 1000000007;
 // const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
+/*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
+const string dir = "DRUL";
+*/
 
-
+ll dp[50050][111];
 int main() {
-    int H, W;
-    cin >> H >> W;
-    vector<string> S(H), T;
-    cin >> S;
-    T = S;
-    auto IsIn = [&](int x, int y){
-        return 0 <= x && x < H && 0 <= y && y < W;
-    };
-    auto bfs = [&](int si, int sj){
-        vvec<int> dist(H,vector<int>(W, -1));
-        vvec<int> visited(H,vector<int>(W, 0));
-        // 準備
-        rep(i,H)visited[i][sj] = 1;
-        rep(j,W)visited[si][j] = 1;
-        rep(x, H)rep(y,W)rep(j,2){
-            int nx = x + dx[j+2];
-            int ny = y + dy[j+2];
-            if(T[nx][ny] == '#')visited[x][y]++;
-        }
-        dist[si][sj] = 0;
-        visited[si][sj] = 2;
-        queue<pair<int,int>> q;
-        q.push({si, sj});
-        while(not q.empty()){
-            auto [x, y] = q.front();
-            q.pop();
-            // if(visited[x][y] < 2)continue;
-            rep(j,2){
-                int nx = x + dx[j];
-                int ny = y + dy[j];
-                if(not IsIn(nx, ny))continue;
-                if(T[nx][ny] == '#')continue;
-                visited[nx][ny]++;
-                chmax(dist[nx][ny], dist[x][y]+1);
-                if(visited[nx][ny] == 2)q.push({nx, ny});
-            }
-        }
-        int maxx = 0, maxy = 0;
-        int maxxx = 0;
-        rep(i,H)rep(j,W){
-            if(chmax(maxxx, dist[i][j])){
-                maxx = i;
-                maxy = j;
-            }
-        }
-        T[si][sj] = '.';
-        T[maxx][maxy] = '#';
-        rep(i,H){
-            dump(dist[i]);
-        }        
-        rep(i,H){
-            dump(visited[i]);
-        }
-        rep(i,H){
-            dump(T[i]);
-        }
-        return maxxx;
-    };
-    ll ans = 0;
-    for(int i = H-1; i >= 0; i--){
-        for(int j = W-1; j >= 0; j--){
-            if(S[i][j] == 'o'){
-                ll add = bfs(i,j);
-                dump(i,j, add);
-                ans += add;
-            }
+    int N, K;
+    cin >> N >> K;
+    vector<ll> A(N);
+    rep(i,N)cin >> A[i];
+    rep(i,N+1)rep(j,K+1)dp[i][j] = -INFLL;
+    dp[0][0] = 0;
+    rep(i,N){
+        rep(j,K+1){
+            if(dp[i][j] == -INFLL)continue;
+            chmax(dp[i+1][j], dp[i][j]);
+            chmax(dp[i+1][(j+A[i]%K)%K], dp[i][j] + (j+A[i])/K);
         }
     }
+    ll ans = 0;
+    rep(j,K+1)chmax(ans, dp[N][j] - j);
     cout << ans << endl;
 }

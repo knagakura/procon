@@ -35,84 +35,92 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #define dump(...)
 #endif
 
-const int INF = (ll)1e9;
+const int INF = (ll)1e9+5;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = 1000000007;
 // const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
+/*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
+const string dir = "DRUL";
+*/
 
-
-int main() {
-    int H, W;
-    cin >> H >> W;
-    vector<string> S(H), T;
-    cin >> S;
-    T = S;
-    auto IsIn = [&](int x, int y){
-        return 0 <= x && x < H && 0 <= y && y < W;
-    };
-    auto bfs = [&](int si, int sj){
-        vvec<int> dist(H,vector<int>(W, -1));
-        vvec<int> visited(H,vector<int>(W, 0));
-        // 準備
-        rep(i,H)visited[i][sj] = 1;
-        rep(j,W)visited[si][j] = 1;
-        rep(x, H)rep(y,W)rep(j,2){
-            int nx = x + dx[j+2];
-            int ny = y + dy[j+2];
-            if(T[nx][ny] == '#')visited[x][y]++;
-        }
-        dist[si][sj] = 0;
-        visited[si][sj] = 2;
-        queue<pair<int,int>> q;
-        q.push({si, sj});
-        while(not q.empty()){
-            auto [x, y] = q.front();
-            q.pop();
-            // if(visited[x][y] < 2)continue;
-            rep(j,2){
-                int nx = x + dx[j];
-                int ny = y + dy[j];
-                if(not IsIn(nx, ny))continue;
-                if(T[nx][ny] == '#')continue;
-                visited[nx][ny]++;
-                chmax(dist[nx][ny], dist[x][y]+1);
-                if(visited[nx][ny] == 2)q.push({nx, ny});
+template<typename T>
+struct edge{
+    int to;
+    T cap;
+    int rev;
+};
+template<typename T>
+struct FordFulkerson{
+    int V;
+    vector<vector<edge<T>>> G;
+    vector<bool> used;
+    T inf;
+    FordFulkerson(int V_, T inf_):V(V_), inf(inf_){
+        G.resize(V);
+        used.assign(V, false);
+    }
+    void add_edge(int from, int to, T cap){
+        G[from].push_back((edge<T>){to, cap, (int)G[to].size()});
+        G[to].push_back((edge<T>){from, 0, (int)G[from].size()-1});
+    }
+    T dfs(int v, int t, T f){
+        if(v == t)return f;
+        used[v] = true;
+        for(auto &&e: G[v]){
+            if(used[e.to])continue;
+            if(e.cap <= 0)continue;
+            int d = dfs(e.to, t, min(f, e.cap));
+            if(d > 0){
+                e.cap -= d;
+                G[e.to][e.rev].cap += d;
+                return d;
             }
         }
-        int maxx = 0, maxy = 0;
-        int maxxx = 0;
-        rep(i,H)rep(j,W){
-            if(chmax(maxxx, dist[i][j])){
-                maxx = i;
-                maxy = j;
-            }
-        }
-        T[si][sj] = '.';
-        T[maxx][maxy] = '#';
-        rep(i,H){
-            dump(dist[i]);
-        }        
-        rep(i,H){
-            dump(visited[i]);
-        }
-        rep(i,H){
-            dump(T[i]);
-        }
-        return maxxx;
-    };
-    ll ans = 0;
-    for(int i = H-1; i >= 0; i--){
-        for(int j = W-1; j >= 0; j--){
-            if(S[i][j] == 'o'){
-                ll add = bfs(i,j);
-                dump(i,j, add);
-                ans += add;
-            }
+        return 0;
+    }
+    T max_flow(int s, int t){
+        T flow = 0;
+        for( ; ; ){
+            used.assign(V, false);
+            int f = dfs(s, t, INF);
+            if(f == 0)return flow;
+            flow += f;
         }
     }
+};
+
+int main() {
+    int N, M;
+    ll d;
+    cin >> N >> M >> d;
+    vector<int> u(M), v(M), p(M), q(M), w(M);
+    vvec<int> Town(N);
+    vector<int> ps(N+1, 0);
+    FordFulkerson<ll> G(10*M, INFLL);
+    rep(i,M){
+        cin >> u[i] >> v[i] >> p[i] >> q[i] >> w[i];
+        u[i]--, v[i]--;
+        Town[u[i]].push_back(p[i]);
+        Town[v[i]].push_back(q[i]+d);
+    }
+    rep(i,N){
+        sort(all(Town[i]));
+        Town[i].erase(unique(all(Town[i])), Town[i].end());
+        ps[i+1] += ps[i] + Town[i].size();
+        for(int j = ps[i]; j < ps[i+1] - 1; j++){
+            G.add_edge(j, j+1, INFLL);
+        }
+    }
+    for(int i = 0; i < M; i++){
+        int pa = lower_bound(all(Town[u[i]]), p[i]) - Town[u[i]].begin() + ps[u[i]];
+        int pb = lower_bound(all(Town[v[i]]), q[i]+d) - Town[v[i]].begin() + ps[v[i]];
+        G.add_edge(pa, pb, w[i]);
+    }
+    ll V = ps[N];
+    ll ans = G.max_flow(0, V-1);
     cout << ans << endl;
 }

@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <atcoder/maxflow>
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -42,61 +41,16 @@ const ll MOD = 1000000007;
 // const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
+/*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
+*/
+
 
 int main() {
-    int H, W;
-    cin >> H >> W;
-    vector<string> S(H);
-    rep(i,H)cin >> S[i];
-    atcoder::mf_graph<ll> G(H*W+2);
-    int s = H * W;
-    int t = s + 1;
-    auto IsIn = [&](int i,int j) -> bool{
-        return 0 <= i && i < H && 0 <= j && j < W;
-    };
-    auto f = [&](int i, int j) -> int{
-        return i * W + j;
-    };
-    rep(i,H)rep(j,W){
-        if(S[i][j] == '#')continue;
-        if((i+j)&1)G.add_edge(f(i,j), t, 1);
-        else G.add_edge(s, f(i,j), 1);
-        rep(k,2){
-            int ni = i + dx[k];
-            int nj = j + dy[k];
-            if(not IsIn(ni, nj))continue;
-            if(S[ni][nj] == '#')continue;
-            int from = f(i, j);
-            int to = f(ni, nj);
-            if((i+j)&1)swap(from, to);
-            // fromが偶数
-            // toが奇数
-            G.add_edge(from, to, 1);
-        }
-    }
-    ll ans = G.flow(s, t);
-    for(auto e: G.edges()){
-        if(e.flow > 0 && e.from < H*W && e.to < H*W){
-            int sx = e.from / W;
-            int sy = e.from % W;
-            int gx = e.to / W;
-            int gy = e.to % W;
-            dump(sx, sy, gx, gy);
-            if(sx == gx){
-                S[sx][sy] = '<';
-                S[gx][gy] = '>';
-                if(sy < gy)swap(S[sx][sy], S[gx][gy]);
-            }
-            if(sy == gy){
-                S[sx][sy] = '^';
-                S[gx][gy] = 'v';
-                if(sx < gx)swap(S[sx][sy], S[gx][gy]);
-            }
-        }
-    }
-    cout << ans << endl;
-    rep(i,H)cout << S[i] << endl;
+    vector<int> A(3);
+    cin >> A;
+    sort(all(A));
+    cout << A[1] << endl;
 }

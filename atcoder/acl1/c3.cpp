@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
-#include <atcoder/maxflow>
 using namespace std;
+#include <atcoder/mincostflow>
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
 #define rep1(i,N) for(int i=1;i<int(N);++i)
@@ -46,57 +46,56 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 
+
+const ll inf = 1LL << 40;
 int main() {
     int H, W;
     cin >> H >> W;
     vector<string> S(H);
-    rep(i,H)cin >> S[i];
-    atcoder::mf_graph<ll> G(H*W+2);
-    int s = H * W;
-    int t = s + 1;
+    rep(i,H)cin >> S;
+    int sz = 2*H*W+2;
+    atcoder::mcf_graph<ll, ll> G(sz);
+    int s = sz-2;
+    int t = sz-1;
     auto IsIn = [&](int i,int j) -> bool{
         return 0 <= i && i < H && 0 <= j && j < W;
     };
     auto f = [&](int i, int j) -> int{
         return i * W + j;
     };
+    auto bfs = [&](int sx, int sy){
+        vvec<int> dist(H, vector<int>(W, INF));
+        dist[sx][sy] = 0;
+        queue<pair<int, int>> q;
+        q.push({sx,sy});
+        while(not q.empty()){
+            auto [x, y] = q.front();
+            q.pop();
+            rep(k,2){
+                int nx = x + dx[k];
+                int ny = y + dy[k];
+                if(not IsIn(nx, ny))continue;
+                if(S[nx][ny] == '#')continue;
+                if(chmin(dist[nx][ny], dist[x][y] + 1)){
+                    q.push({nx, ny});
+                }
+            }
+        }
+        rep(i,H)rep(j,W){
+            if(dist[i][j] == INF)continue;
+            ll cost = dist[i][j];
+            G.add_edge(f(sx,sy), f(i, j)+H*W, 1, inf - cost);
+        }
+    };
+    int cnt = 0;
     rep(i,H)rep(j,W){
-        if(S[i][j] == '#')continue;
-        if((i+j)&1)G.add_edge(f(i,j), t, 1);
-        else G.add_edge(s, f(i,j), 1);
-        rep(k,2){
-            int ni = i + dx[k];
-            int nj = j + dy[k];
-            if(not IsIn(ni, nj))continue;
-            if(S[ni][nj] == '#')continue;
-            int from = f(i, j);
-            int to = f(ni, nj);
-            if((i+j)&1)swap(from, to);
-            // fromが偶数
-            // toが奇数
-            G.add_edge(from, to, 1);
+        if(S[i][j] == 'o'){
+            cnt++;
+            G.add_edge(s, f(i, j), 1, 0); // s => 'o'
+            bfs(i, j); // 辺を張る
         }
+        G.add_edge(f(i,j)+H*W, t, 1, 0);
     }
-    ll ans = G.flow(s, t);
-    for(auto e: G.edges()){
-        if(e.flow > 0 && e.from < H*W && e.to < H*W){
-            int sx = e.from / W;
-            int sy = e.from % W;
-            int gx = e.to / W;
-            int gy = e.to % W;
-            dump(sx, sy, gx, gy);
-            if(sx == gx){
-                S[sx][sy] = '<';
-                S[gx][gy] = '>';
-                if(sy < gy)swap(S[sx][sy], S[gx][gy]);
-            }
-            if(sy == gy){
-                S[sx][sy] = '^';
-                S[gx][gy] = 'v';
-                if(sx < gx)swap(S[sx][sy], S[gx][gy]);
-            }
-        }
-    }
-    cout << ans << endl;
-    rep(i,H)cout << S[i] << endl;
+    auto [cap, cost] = G.flow(s, t);
+    cout << cnt * inf - cost << endl;
 }

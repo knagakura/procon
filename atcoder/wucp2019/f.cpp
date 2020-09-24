@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <atcoder/maxflow>
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -42,61 +41,94 @@ const ll MOD = 1000000007;
 // const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
+/*
 const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
+*/
+
+template<typename T>
+struct edge{
+    int to;
+    T cap;
+    int rev;
+};
+template<typename T>
+struct FordFulkerson{
+    int V;
+    vector<vector<edge<T>>> G;
+    vector<bool> used;
+    T inf;
+    FordFulkerson(int V_, T inf_):V(V_), inf(inf_){
+        G.resize(V);
+        used.assign(V, false);
+    }
+    void add_edge(int from, int to, T cap){
+        G[from].push_back((edge<T>){to, cap, (int)G[to].size()});
+        G[to].push_back((edge<T>){from, 0, (int)G[from].size()-1});
+    }
+    T dfs(int v, int t, T f){
+        if(v == t)return f;
+        used[v] = true;
+        for(auto &&e: G[v]){
+            if(used[e.to])continue;
+            if(e.cap <= 0)continue;
+            int d = dfs(e.to, t, min(f, e.cap));
+            if(d > 0){
+                e.cap -= d;
+                G[e.to][e.rev].cap += d;
+                return d;
+            }
+        }
+        return 0;
+    }
+    T max_flow(int s, int t){
+        T flow = 0;
+        for( ; ; ){
+            used.assign(V, false);
+            int f = dfs(s, t, inf);
+            if(f == 0)return flow;
+            flow += f;
+        }
+    }
+};
 
 int main() {
-    int H, W;
-    cin >> H >> W;
-    vector<string> S(H);
-    rep(i,H)cin >> S[i];
-    atcoder::mf_graph<ll> G(H*W+2);
-    int s = H * W;
-    int t = s + 1;
-    auto IsIn = [&](int i,int j) -> bool{
-        return 0 <= i && i < H && 0 <= j && j < W;
-    };
-    auto f = [&](int i, int j) -> int{
-        return i * W + j;
-    };
-    rep(i,H)rep(j,W){
-        if(S[i][j] == '#')continue;
-        if((i+j)&1)G.add_edge(f(i,j), t, 1);
-        else G.add_edge(s, f(i,j), 1);
-        rep(k,2){
-            int ni = i + dx[k];
-            int nj = j + dy[k];
-            if(not IsIn(ni, nj))continue;
-            if(S[ni][nj] == '#')continue;
-            int from = f(i, j);
-            int to = f(ni, nj);
-            if((i+j)&1)swap(from, to);
-            // fromが偶数
-            // toが奇数
-            G.add_edge(from, to, 1);
+    int N, M;
+    cin >> N >> M;
+    vector<int> c(N, 0);
+    FordFulkerson<ll> G(2*N, INFLL);
+    for(int i = 1; i <= N-2; i++){
+        cin >> c[i];
+        // 戦闘上: 出口を前において、入り口を後ろに置く
+        if(c[i] == -1){
+            G.add_edge(N, i+N, INFLL);
+            G.add_edge(i, 2*N-1, INFLL);
+        }
+        // 休憩所: 真ん中に置く、頂点に容量のあるフローなので、頂点倍加して間に辺を生やす
+        else{
+            G.add_edge(i, i+N, c[i]);
         }
     }
-    ll ans = G.flow(s, t);
-    for(auto e: G.edges()){
-        if(e.flow > 0 && e.from < H*W && e.to < H*W){
-            int sx = e.from / W;
-            int sy = e.from % W;
-            int gx = e.to / W;
-            int gy = e.to % W;
-            dump(sx, sy, gx, gy);
-            if(sx == gx){
-                S[sx][sy] = '<';
-                S[gx][gy] = '>';
-                if(sy < gy)swap(S[sx][sy], S[gx][gy]);
-            }
-            if(sy == gy){
-                S[sx][sy] = '^';
-                S[gx][gy] = 'v';
-                if(sx < gx)swap(S[sx][sy], S[gx][gy]);
-            }
+    rep(i,M){
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        if(a == 0){
+            if(c[b] != -1)if(b == N-1)b += N;
+        }
+        else a += N;
+        G.add_edge(a, b, INFLL);
+    }
+    rep(i,2*N){
+        for(auto e: G.G[i]){
+            if(e.to)cerr << i << " " << e.to << " " << endl;
         }
     }
-    cout << ans << endl;
-    rep(i,H)cout << S[i] << endl;
+    ll ans = G.max_flow(N, 2*N-1);
+    cout << (ans == INFLL ? -1: ans) << endl;
 }
+/*
+頂点にc_iによって状態が定義されたDAGがある。
+1 => Nへのpathが必ず存在する
+*/

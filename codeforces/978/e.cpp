@@ -46,29 +46,23 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
-    int N;
-    cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> B = A;
-    vector<ll> C = A;
-    set<ll> st;
-    rep(i,N)st.insert(A[i]);
-    sort(all(C));
-    sort(all(B), greater<>());
-    if(st.size() < N){
-        cout << "YES" << endl;
+
+
+int main() {
+    ll N, W;
+    cin >> N >> W;
+    vector<ll> a(N);
+    rep(i,N)cin >> a[i];
+    for(int i = 1; i < N; i++){
+        a[i] += a[i-1];
     }
-    else if(B == A){
-        cout << "NO" << endl;
-    }
-    else{
-        cout << "YES" << endl;
-    }
-}
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+    dump(a);
+    ll minn = *min_element(all(a));
+    ll maxx = *max_element(all(a));
+    ll ok = 0;
+    if(minn < 0)ok = abs(minn);
+    ll ng = W - maxx + 1;
+    ll ans = ng - ok;
+    if(ok > ng)ans = 0;
+    cout << ans << endl;
 }

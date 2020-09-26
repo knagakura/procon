@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <atcoder/segtree>
 using namespace std;
 typedef long long ll;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -46,29 +47,53 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
-    int N;
-    cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> B = A;
-    vector<ll> C = A;
-    set<ll> st;
-    rep(i,N)st.insert(A[i]);
-    sort(all(C));
-    sort(all(B), greater<>());
-    if(st.size() < N){
-        cout << "YES" << endl;
-    }
-    else if(B == A){
-        cout << "NO" << endl;
-    }
-    else{
-        cout << "YES" << endl;
-    }
+
+template<typename T>
+T op(T a, T b){
+    return max(a, b);
 }
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+template<typename T>
+T e(){
+    return 0;
+}
+int main() {
+    int N, Q;
+    cin >> N >> Q;
+    atcoder::segtree<ll, op, e> S(N);
+    vector<ll> A(N);
+    rep(i,N){
+        cin >> A[i];
+        S.set(i, A[i]);
+    }
+    while(Q--){
+        int t;
+        cin >> t;
+        if(t == 1){
+            int idx;
+            ll v;
+            cin >> idx >> v;
+            idx--;
+            S.set(idx, v);
+        }
+        if(t == 2){
+            int l, r;
+            cin >> l >> r;
+            l--, r--;
+            cout << S.prod(l, r+1) << endl;
+        }
+        if(t == 3){
+            int idx;
+            ll v;
+            cin >> idx >> v;
+            idx--;
+            int ng = idx-1;
+            int ok = N;
+            while(ok - ng > 1){
+                int mid = (ok+ng) >> 1;
+                if(S.prod(idx, mid+1) >= v)ok = mid;
+                else ng = mid;
+            }
+            cout << ok + 1 << endl;
+        }
+    }
 }

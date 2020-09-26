@@ -46,29 +46,40 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
+
+
+int main() {
     int N;
     cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> B = A;
-    vector<ll> C = A;
-    set<ll> st;
-    rep(i,N)st.insert(A[i]);
-    sort(all(C));
-    sort(all(B), greater<>());
-    if(st.size() < N){
-        cout << "YES" << endl;
+    vector<ll> b(N);
+    rep(i,N)cin >> b[i];
+    ll ans = INFLL;
+    auto calc = [&](int c, int d) -> ll{
+        ll res = 0;
+        auto a = b;
+        a[0] += c;
+        a[1] += d;
+        res += abs(c) + abs(d);
+        ll diff = a[1] - a[0];
+        for(int i = 2; i < N; i++){
+            ll dd = a[i] - a[i-1];
+            if(diff == dd)continue;
+            else if(diff - dd == 1){
+                a[i]++;
+                res++;
+            }
+            else if(dd - diff == 1){
+                a[i]--;
+                res++;
+            }
+            else return INFLL;
+        }
+        return res;
+    };
+    for(int c = -1; c <= 1; c++){
+        for(int d = -1; d <= 1; d++){
+            chmin(ans, calc(c, d));
+        }
     }
-    else if(B == A){
-        cout << "NO" << endl;
-    }
-    else{
-        cout << "YES" << endl;
-    }
-}
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+    cout << ((ans == INFLL ? -1: ans)) << endl;
 }

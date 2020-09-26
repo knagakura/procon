@@ -47,25 +47,20 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 void solve(){
-    int N;
-    cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> B = A;
-    vector<ll> C = A;
-    set<ll> st;
-    rep(i,N)st.insert(A[i]);
-    sort(all(C));
-    sort(all(B), greater<>());
-    if(st.size() < N){
-        cout << "YES" << endl;
+    int N, Q;
+    cin >> N >> Q;
+    vector<ll> a(N);
+    rep(i,N)cin >> a[i];
+    ll dp[2] = {0, -INFLL};
+    rep(i,N){
+        ll nxt[2] = {-INFLL, -INFLL};
+        rep(j,2){
+            chmax(nxt[j], dp[j]);
+            chmax(nxt[j^1], dp[j] + (j ? -a[i]: a[i]));
+        }
+        rep(j,2)swap(dp[j], nxt[j]);
     }
-    else if(B == A){
-        cout << "NO" << endl;
-    }
-    else{
-        cout << "YES" << endl;
-    }
+    cout << max(dp[0], dp[1]) << endl;
 }
 int main(){
     int t;

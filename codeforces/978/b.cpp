@@ -46,29 +46,50 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
+
+template<typename T>
+vector<pair<T,long long>> RunLengthEncoder(vector<T> &v){
+    vector<pair<T,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
+    }
+    return RLE;
+}
+
+vector<pair<char,long long>> RunLengthEncoder_ForString(string v){
+    vector<pair<char,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
+    }
+    return RLE;
+}
+int main() {
     int N;
     cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> B = A;
-    vector<ll> C = A;
-    set<ll> st;
-    rep(i,N)st.insert(A[i]);
-    sort(all(C));
-    sort(all(B), greater<>());
-    if(st.size() < N){
-        cout << "YES" << endl;
+    string S;
+    cin >> S;
+    auto v = RunLengthEncoder_ForString(S);
+    int ans = 0;
+    for(auto [c, cnt]: v){
+        if(c == 'x')ans += max(0LL, cnt - 2);
     }
-    else if(B == A){
-        cout << "NO" << endl;
-    }
-    else{
-        cout << "YES" << endl;
-    }
-}
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+    cout << ans << endl;
 }

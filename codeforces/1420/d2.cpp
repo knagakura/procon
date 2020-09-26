@@ -114,59 +114,43 @@ struct combination {
     mint H(int n, int m){
         return Comb(n + m - 1, m);
     }
-}C(3000010);
+}C(300010);
 void solve(){
-    int N, K;
+    ll N, K;
     cin >> N >> K;
-    vector<l_l> v;
+    vector<ll> l(N), r(N);
+    map<ll,int> mp;
     rep(i,N){
-        int l, r;
-        cin >> l >> r;
-        v.emplace_back(l, 2*i);
-        v.emplace_back(r, 2*i+1);
+        cin >> l[i] >> r[i];
+        mp[l[i]-1]++;
+        mp[l[i]]++;
+        mp[l[i]+1]++;
+        mp[r[i]-1]++;
+        mp[r[i]]++;
+        mp[r[i]+1]++;
     }
-    sort(all(v));
-    map<int, l_l> mp;
-    int M = v.size();
-    set<ll> st;
-    vector<ll> xs;
-    rep(i,M){
-        auto [x, idx] = v[i];
-        xs.emplace_back(x-1);
-        xs.emplace_back(x);
-        xs.emplace_back(x+1);
+    int idx = 1;
+    for(auto &p: mp)p.second = idx++;
+    rep(i,N){
+        l[i] = mp[l[i]];
+        r[i] = mp[r[i]];
     }
-    sort(all(xs));
-    auto result = unique(all(xs));
-    xs.erase(result, xs.end());
-    rep(i,M){
-        auto [x, idx] = v[i];
-        int ban = lower_bound(all(xs), x) - xs.begin();
-        if(idx&1){
-            mp[idx/2].second = ban;
-        }
-        else mp[idx/2].first = ban;
+    ll M = idx + 5;
+    vector<ll> imos(M);
+    vector<ll> outs(M);
+    rep(i,N){
+        imos[l[i]]++;
+        imos[r[i]+1]--;
+        outs[r[i]]++;
     }
-    int sz = xs.size() + 5;
-    vector<ll> cnt(sz, 0);
-    vector<ll> in(sz, 0);
-    vector<ll> out(sz, 0);
-    for(auto [idx, p]: mp){
-        auto [l, r] = p;
-        in[l] += 1;
-        out[r+1] -= 1;
-    }
-    cnt[0] += in[0] + out[0];
-    rep(i,sz-1)cnt[i+1] += cnt[i] + in[i] + out[i];
+    rep(i,M-1)imos[i+1] += imos[i];
     mint ans = 0;
-    rep1(i,sz){
-        int old = cnt[i] + out[i];
-        mint add = C.Comb(cnt[i], K);
+    rep(i,M){
+        ll old = imos[i] - outs[i];
+        mint add = C.Comb(imos[i], K);
         add -= C.Comb(old, K); // 少なくとも一つがnewであるもの　=> 余事象で全部がoldのものを引けばよい
         ans += add;
     }
-    dump(cnt);
-    dump(out);
     cout << ans << endl;
 }
 int main(){

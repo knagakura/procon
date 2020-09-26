@@ -49,23 +49,15 @@ const string dir = "DRUL";
 void solve(){
     int N;
     cin >> N;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    vector<ll> B = A;
-    vector<ll> C = A;
-    set<ll> st;
-    rep(i,N)st.insert(A[i]);
-    sort(all(C));
-    sort(all(B), greater<>());
-    if(st.size() < N){
-        cout << "YES" << endl;
+    vector<ll> a(N);
+    rep(i,N)cin >> a[i];
+    rep(i,N-1){
+        if(a[i] <= a[i+1]){
+            cout << "YES" << endl;
+            return;
+        }
     }
-    else if(B == A){
-        cout << "NO" << endl;
-    }
-    else{
-        cout << "YES" << endl;
-    }
+    cout << "NO" << endl;
 }
 int main(){
     int t;

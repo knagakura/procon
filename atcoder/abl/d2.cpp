@@ -47,7 +47,17 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-// #include <atcoder/all>
 
+ll dp[300010];
 int main() {
+    int N, K;
+    cin >> N >> K;
+    vector<int> A(N);
+    rep(i,N)cin >> A[i];
+    ll ans = 0;
+    set<pair<int,int>> st;
+    rep(i,N)st.insert({i, A[i]});
+    rep(i,N){
+        st.upper_bound({})
+    }
 }

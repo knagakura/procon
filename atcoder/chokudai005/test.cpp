@@ -46,8 +46,12 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-// #include <atcoder/all>
-
+int a;
+bool changed(int x){
+    return a != (a = x);
+}
 int main() {
+    a = 100;
+    dump(changed(10));
+    dump(changed(10));
 }

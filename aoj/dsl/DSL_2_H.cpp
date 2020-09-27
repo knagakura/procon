@@ -46,8 +46,72 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+#include <atcoder/lazysegtree>
 
-// #include <atcoder/all>
+// struct S{
+//     ll x;
+//     ll size;
+//     S(ll x_ = 0, ll size_ = 0): x(x_), size(size_){};
+// };
+// struct F{
+//     ll x;
+//     F(ll x_ = 0): x(x_){};
+// };
+
+// S op(S a, S b){
+//     return S(min(a.x, b.x), a.size + b.size);
+// }
+// S e(){
+//     return S(INF, 0);
+// }
+// S mapping(F a, S b){
+//     return S(b.x + a.x /** b.size*/, b.size);
+// }
+// F composition(F a, F b){
+//     return F(a.x + b.x);
+// }
+// F id(){
+//     return F();
+// }
+using S = ll;
+using F = ll;
+S op(S a, S b){ return std::min(a, b); }
+S e(){ return INFLL; }
+S mapping(F f, S x){ return f+x; }
+F composition(F f, F g){ return f+g; }
+F id(){ return 0; }
 
 int main() {
+    int N, Q;
+    cin >> N >> Q;
+    // atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(N);
+    // rep(i,N)T.set(i, S(0, 1));
+
+    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(N);
+    rep(i,N)T.set(i, 0);
+    // auto outs = [&](){
+    //     rep(i,N){
+    //         cerr << "{" << T.get(i).x << " " << T.get(i).size << "}, ";
+    //     }
+    //     cerr << endl;
+    // };
+    while(Q--){
+        int type;
+        cin >> type;
+        if(type == 0){
+            int l, r;
+            ll x;
+            cin >> l >> r >> x;
+            T.apply(l, r+1, F(x));
+            // for(int i = l; i <= r; i++){
+            //     dump(i, T.get(i).x);
+            // }
+        }
+        else{
+            int l, r;
+            cin >> l >> r;
+            // cout << T.prod(l, r+1).x << endl;
+            cout << T.prod(l, r+1) << endl;
+        }
+    }
 }

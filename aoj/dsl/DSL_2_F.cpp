@@ -47,7 +47,46 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-// #include <atcoder/all>
+#include <atcoder/lazysegtree>
+using S = ll;
+using F = ll;
+const S inf = (1LL << 31) - 1;
+// モノイドの演算
+S op(S a, S b){
+    return min(a, b);
+}
+// モノイドの単位元
+S e(){
+    return inf;
+}
 
+S mapping(F f, S x){
+    if(f == -1)return x;
+    return f;
+}
+F composition(F f, F g){
+    if(f == -1)return g;
+    return f;
+}
+// 恒等写像f(x) = x;
+F id(){
+    return -1;
+}
 int main() {
+    int N, Q;
+    cin >> N >> Q;
+    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(N);
+    rep(i,N)T.set(i, inf);
+    while(Q--){
+        int type, l, r;
+        cin >> type >> l >> r;
+        if(type == 0){
+            ll x;
+            cin >> x;
+            T.apply(l, r+1, F(x));
+        }
+        else{
+            cout << T.prod(l, r+1) << endl;
+        }
+    }
 }

@@ -47,7 +47,11 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-// #include <atcoder/all>
+#include<atcoder/lazysegtree>
+
 
 int main() {
+    int N, Q;
+    cin >> N >> Q;
+
 }

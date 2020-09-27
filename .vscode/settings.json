@@ -25,7 +25,9 @@
         "all": "cpp",
         "convolution": "cpp",
         "dsu": "cpp",
-        "fenwicktree": "cpp"
+        "fenwicktree": "cpp",
+        "modint": "cpp",
+        "lazysegtree": "cpp"
     },
     "python.pythonPath": "/usr/local/bin/python3"
 }

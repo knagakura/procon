@@ -47,7 +47,16 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-// #include <atcoder/all>
 
 int main() {
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i,N)cin >> A[i];
+    rep(i,N){
+        if(A[i] == 1){
+            cout << i + 1 << endl;
+            return 0;
+        }
+    }
 }

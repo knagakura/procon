@@ -47,7 +47,50 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-// #include <atcoder/all>
+#include <atcoder/lazysegtree>
+struct S{
+    ll x;
+    ll size;
+    S(ll x_, ll size_): x(x_), size(size_){}
+};
+using F = long long;
 
+S op(S a, S b){
+    return S(a.x + b.x, a.size + b.size);
+}
+S e(){
+    return S(0, 0);
+}
+S mapping(F f, S a){
+    return S(a.x + f * a.size, a.size);
+}
+F composition(F f, F g){
+    return F(f+g);
+}
+F id(){
+    return F(0);
+}
 int main() {
+    int N, Q;
+    cin >> N >> Q;
+
+    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(N);
+    rep(i,N)T.set(i, S(0, 1));
+    while(Q--){
+        int type;
+        cin >> type;
+        if(type == 0){
+            int l, r;
+            ll x;
+            cin >> l >> r >> x;
+            l--, r--;
+            T.apply(l, r+1, F(x));
+        }
+        else{
+            int l, r;
+            cin >> l >> r;
+            l--, r--;
+            cout << T.prod(l, r+1).x << endl;
+        }
+    }
 }

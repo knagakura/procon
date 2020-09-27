@@ -47,7 +47,28 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-// #include <atcoder/all>
+#include<atcoder/segtree>
 
+ll op(ll a, ll b){
+    return max(a, b);
+}
+ll e(){
+    return 0;
+}
+const int A_MAX = 300010;
 int main() {
+    int N, K;
+    cin >> N >> K;
+    atcoder::segtree<int, op, e> S(A_MAX);
+    vector<int> A(N);
+    rep(i,N)cin >> A[i];
+    ll ans = 0;
+    for(int i = 0; i < N; i++){
+        int l = max(0, A[i] - K);
+        int r = min(A_MAX-1, A[i]+K+1);
+        ll prod = S.prod(l, r);
+        S.set(A[i], prod+1);
+        chmax(ans, prod+1);
+    }
+    cout << ans << endl;
 }

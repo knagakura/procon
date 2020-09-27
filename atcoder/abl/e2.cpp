@@ -47,7 +47,67 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-// #include <atcoder/all>
 
+#include <atcoder/lazysegtree>
+#include <atcoder/modint>
+using mint = atcoder::modint998244353;
+
+vector<mint> pow10;
+const mint inv9 = mint(9).inv();
+
+// モノイド
+struct S{
+    mint x;
+    int size;
+    S(mint x_ = 0, int size_ = 0): x(x_), size(size_){}
+};
+
+// 関数に必要係数等
+struct F{
+    int x;
+    F(int x_ = 0): x(x_){}
+};
+
+// モノイドの演算(結合律を満たす)
+S op(S a, S b){
+    mint nxt_x = a.x * pow10[b.size] + b.x; // 
+    return S(nxt_x, a.size + b.size);
+}
+
+// モノイドの単位元
+S e(){
+    return S(0, 0);
+}
+
+// S -> Sの写像 f
+S mapping(F f, S g){
+    if(f.x == 0)return g;
+    return S(f.x * (pow10[g.size] - 1) * inv9, g.size); // 数字 * 1111...1
+}
+
+// 写像の合成
+F composition(F f, F g){
+    if(f.x == 0)return g;
+    return f;
+}
+
+// 恒等写像(f(id) = id)
+F id(){
+    return F(0);
+}
 int main() {
+    int N, Q;
+    cin >> N >> Q;
+    pow10.resize(N+5);
+    pow10[0] = 1;
+    rep(i,N+3)pow10[i+1] = pow10[i] * 10;
+    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(N);
+    rep(i,N)T.set(i, S(1, 1));
+    while(Q--){
+        int l, r, d;
+        cin >> l >> r >> d;
+        l--, r--;
+        T.apply(l, r+1, F(d));
+        printf("%d\n", T.all_prod().x.val());
+    }
 }

@@ -46,16 +46,28 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-void solve(){
-    int N;
-    cin >> N;
-    vector<ll> a(N);
-    rep(i,N)cin >> a[i];
+uint32_t XorShift(void) {
+	static uint32_t x = 123456789;
+	static uint32_t y = 362436069;
+	static uint32_t z = 521288629;
+	static uint32_t w = 88675123;
+	uint32_t t;
+ 
+	t = x ^ (x << 11);
+	x = y; y = z; z = w;
+	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+}
+
+bool solve(int N, vector<int>&a){
+    // int N;
+    // cin >> N;
+    // vector<ll> a(N);
+    // rep(i,N)cin >> a[i];
     ll sum = SUM(a);
-    dump(sum, a);
+    // dump(sum, a);
     if(sum % N != 0){
-        cout << -1 << endl;
-        return;
+        // cout << -1 << endl;
+        return true;
     }
     ll ave = sum / N;
     ll cnt = 0;
@@ -67,10 +79,11 @@ void solve(){
         q.push_back(1);
         r.push_back(x);
         a[i] -= (i+1) * x;
+        if(a[i] < 0)return false;
         a[0] += (i+1) * x;
-        dump(a);
+        // dump(a);
     }
-    for(int i = N-1; i >= 1; i--){
+    rep1(i,N){
         if(a[i] > ave){
             // ll x = a[i] - ave;
             ll mod = a[i] % (i+1); // > 0
@@ -81,14 +94,16 @@ void solve(){
             r.push_back(x);
             a[i] += x;
             a[0] -= x;
-            ll y = a[i];
+            if(a[0] < 0)return false;
+            ll y = a[i] - ave;
             // cout << i + 1 <<  " " << 1 << " " << y / (i+1) << endl;
             p.push_back(i+1);
             q.push_back(1);
             r.push_back(y/(i+1));
             a[i] -= y;
+            if(a[i] < 0)return false;
             a[0] += y;
-            dump(a);
+            // dump(a);
         }
     }
     rep1(i,N){
@@ -99,15 +114,36 @@ void solve(){
         r.push_back(y);
         a[i] += y;
         a[0] -= y;
+        if(a[0] < 0)return false;
     }
+
+    set<int> st;
+    rep(i,N)st.insert(a[i]);
+    if(st.size() == 1)return true;
     int M = p.size();
     cout << M << endl;
     rep(i,M){
         cout << p[i] << " " << q[i] << " " << r[i] << endl;
     }
+    return false;
 }
-int main(){
-    int t;
-    cin >> t;
-    while(t--)solve();
+
+
+int main() {
+    int N = 10000;
+    ll cnt = 0;
+    while(true){
+        vector<int> a;
+        rep(i,N)a.push_back(XorShift()%100+1);
+        auto b = a;
+        cnt++;
+        if(not solve(N, a)){
+            cnt++;
+            dump("dame", b);
+            break;
+        }
+        if(cnt % 1000 == 0){
+                dump(cnt, SUM(a), a);
+        }
+    }
 }

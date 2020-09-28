@@ -1,20 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
-#define rep(i,N) for(int i=0;i<int(N);++i)
-#define rep1(i,N) for(int i=1;i<int(N);++i)
-#define all(a) (a).begin(),(a).end()
-#define bit(k) (1LL<<(k))
-#define SUM(v) accumulate(all(v), 0LL)
-
-typedef pair<int, int> i_i;
-typedef pair<ll, ll> l_l;
-template <class T> using vec = vector<T>;
-template <class T> using vvec = vector<vec<T>>;
-struct fast_ios{ fast_ios(){ cin.tie(0); ios::sync_with_stdio(false); cout << fixed << setprecision(20); }; }fast_ios_;
-
-template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
-template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 
 #define TOSTRING(x) string(#x)
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
@@ -35,29 +21,42 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #define dump(...)
 #endif
 
-const int INF = (ll)1e9;
-const ll INFLL = (ll)1e18+1;
-const ll MOD = 1000000007;
-// const ll MOD = 998244353;
-const long double PI = acos(-1.0);
-
-/*
-const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
-const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
-const string dir = "DRUL";
-*/
 void solve(){
-    int N, K;
-    cin >> N >> K;
-    vector<ll> A(N);
-    rep(i,N)cin >> A[i];
-    sort(all(A));
-    ll minn = *min_element(all(A));
-    ll ans = 0;
-    rep1(i,N){
-        ans += (K - A[i]) / minn;
+    int N;
+    scanf("%d", &N);
+    vector<int> A(N+1);
+    for(int i=1; i<=N; i++) scanf("%d", &A[i]);
+    int S = accumulate(A.begin(), A.end(), 0);
+    if(S%N){
+        printf("-1\n");
+        return;
     }
-    cout << ans << endl;
+    int M = S/N;
+    vector<tuple<int, int, int>> ans;
+    vector<int> B(N+1);
+    B[0] = S;
+    for(int i=2; i<=N; i++){
+        ans.emplace_back(1, i, M);
+    }
+    for(int i=N; i>=2; i--){
+        int d = (A[i]-1)/i + 1;
+        ans.emplace_back(i, 1, d);
+        B[i] += d*i;
+        B[1] -= d*i;
+        int d2 = B[i]-A[i];
+        ans.emplace_back(1, i, d2);
+        B[i] -= d2;
+        B[1] += d2;
+    }
+    reverse(ans.begin(), ans.end());
+    printf("%d\n", int(ans.size()));
+    for(auto [i, j, x] : ans){
+        printf("%d %d %d\n", i, j, x);
+        A[i] -= i*x;
+        A[j] += i*x;
+        dump(A);
+    }
+    for(int i=1; i<=N; i++) assert(A[i] == A[1]);
 }
 int main(){
     int t;

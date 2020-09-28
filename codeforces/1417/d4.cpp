@@ -49,61 +49,38 @@ const string dir = "DRUL";
 void solve(){
     int N;
     cin >> N;
-    vector<ll> a(N);
-    rep(i,N)cin >> a[i];
-    ll sum = SUM(a);
-    dump(sum, a);
-    if(sum % N != 0){
+    vector<ll> A(N+1);
+    rep1(i,N+1){
+        cin >> A[i];
+    }
+    ll S = SUM(A);
+    if(S%N > 0){
         cout << -1 << endl;
         return;
     }
-    ll ave = sum / N;
-    ll cnt = 0;
-    vector<ll> p, q, r;
-    rep1(i,N){
-        ll x = a[i] / (i+1);
-        // cout << i+1 << " " << 1 << " " << x << endl;
-        p.push_back(i+1);
-        q.push_back(1);
-        r.push_back(x);
-        a[i] -= (i+1) * x;
-        a[0] += (i+1) * x;
-        dump(a);
+    vector<tuple<int, int, ll>> ans;
+    // iへ配って戻す
+    for(int i = 2; i <= N; i++){
+        ll x = 0;
+        if(A[i]%i > 0)x = i - (A[i]%i); // 注意
+        A[i] += x;
+        A[1] -= x;
+        assert(A[1] >= 0);
+        if(x)ans.emplace_back(1, i, x);
+        ll y = A[i] / i;
+        A[i] -= y * i;
+        A[1] += y * i;
+        ans.emplace_back(i, 1, y);
     }
-    for(int i = N-1; i >= 1; i--){
-        if(a[i] > ave){
-            // ll x = a[i] - ave;
-            ll mod = a[i] % (i+1); // > 0
-            ll x = (i+1) - mod;
-            // cout << 1 << " " << i+1 << " " << x << endl;
-            p.push_back(1);
-            q.push_back(i+1);
-            r.push_back(x);
-            a[i] += x;
-            a[0] -= x;
-            ll y = a[i];
-            // cout << i + 1 <<  " " << 1 << " " << y / (i+1) << endl;
-            p.push_back(i+1);
-            q.push_back(1);
-            r.push_back(y/(i+1));
-            a[i] -= y;
-            a[0] += y;
-            dump(a);
-        }
+    for(int i = 2; i <=N; i++){
+        ll x = S / N;
+        A[1] -= x;
+        A[i] += x;
+        ans.emplace_back(1, i, x);
     }
-    rep1(i,N){
-        ll y = ave - a[i];
-        // cout << 1 << " " << i+1 << " " << y << endl;
-        p.push_back(1);
-        q.push_back(i+1);
-        r.push_back(y);
-        a[i] += y;
-        a[0] -= y;
-    }
-    int M = p.size();
-    cout << M << endl;
-    rep(i,M){
-        cout << p[i] << " " << q[i] << " " << r[i] << endl;
+    cout << ans.size() << endl;
+    for(auto [i, j, x]: ans){
+        cout << i << " " << j << " " << x << endl;
     }
 }
 int main(){

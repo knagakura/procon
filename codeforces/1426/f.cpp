@@ -47,53 +47,76 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-#include <atcoder/lazysegtree> 
-
-struct S{
-    ll x;
-    ll l;
-    S(ll x_, ll l_):x(x_), l(l_){}
-};
-
-struct F{
-    ll x;
-    F(ll x_): x(x_){}
-};
-
-S op(S a, S b){
-    return S(min(a.x, b.x), min(a.l, b.l));
-}
-
-S e(){
-    return S(INFLL, INFLL);
-}
-
-S mapping(F f, S a){
-    if(f.x == INFLL)return a;
-    return S(f.x + a.l, a.l);
-}
- 
-F composition(F f, F g){
-    if(f.x == INFLL)return g;
-    return f;
-}
-
-F id(){
-    return F(INFLL);
-}
-int main() {
-    int H, W;
-    cin >> H >> W;
-    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(W);
-    rep(i,W)T.set(i, S(0, i));
-    rep(i,H){
-        int l, r;
-        cin >> l >> r;
-        l--; r--;
-        // [l, r]に更新をする
-        ll x = (l == 0 ? INF: T.get(l-1).x);
-        T.apply(l, r+1, F(x-l+1));
-        ll ans = T.all_prod().x;
-        cout << ((ans >= INF ? -1: ans+i+1)) << endl;
+struct mint {
+    long long x;
+    mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
+    mint operator-() const { return mint(-x);}
+    mint& operator+=(const mint a) {
+        if ((x += a.x) >= MOD) x -= MOD;
+        return *this;
     }
+    mint& operator-=(const mint a) {
+        if ((x += MOD-a.x) >= MOD) x -= MOD;
+        return *this;
+    }
+    mint& operator*=(const mint a) {
+        (x *= a.x) %= MOD;
+        return *this;
+    }
+    mint operator+(const mint a) const {
+        mint res(*this);
+        return res+=a;
+    }
+    mint operator-(const mint a) const {
+        mint res(*this);
+        return res-=a;
+    }
+    mint operator*(const mint a) const {
+        mint res(*this);
+        return res*=a;
+    }
+    mint modpow(long long t) const {
+        if (!t) return 1;
+        mint a = modpow(t>>1);
+        a *= a;
+        if (t&1) a *= *this;
+        return a;
+    }
+    // for prime MOD
+    mint inv() const {
+        return modpow(MOD-2);
+    }
+    mint& operator/=(const mint a) {
+        return (*this) *= a.inv();
+    }
+    mint operator/(const mint a) const {
+        mint res(*this);
+        return res/=a;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const mint& a){
+        os << a.x;
+        return os;
+    }
+};
+int main() {
+    int N;
+    cin >> N;
+    string S;
+    cin >> S;
+    vector<mint> dp(4, 0);
+    dp[0] = 1;
+    rep(i,N){
+        vector<mint> nxt(4, 0);
+        if(S[i] == '?'){
+            rep(_, 3)rep(j,4)nxt[j] += dp[j];
+            rep(j,3)nxt[j+1] += dp[j];
+        }
+        else{
+            rep(j,4)nxt[j] += dp[j];
+            int from = S[i] - 'a';
+            nxt[from+1] += dp[from];
+        }
+        swap(dp, nxt);
+    }
+    cout << dp[3] << endl;
 }

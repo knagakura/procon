@@ -46,54 +46,55 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+#include <atcoder/lazysegtree>
+struct S { int min, l; };
 
-#include <atcoder/lazysegtree> 
+using F = int;
 
-struct S{
-    ll x;
-    ll l;
-    S(ll x_, ll l_):x(x_), l(l_){}
-};
+S op(S sl, S sr) { return {min(sl.min, sr.min), min(sl.l, sr.l)}; }
 
-struct F{
-    ll x;
-    F(ll x_): x(x_){}
-};
+S e() { return {INF, INF}; }
 
-S op(S a, S b){
-    return S(min(a.x, b.x), min(a.l, b.l));
+S mapping(F f, S s) {
+  if (f == INF) return s;
+  return {s.l + f, s.l};
 }
 
-S e(){
-    return S(INFLL, INFLL);
+F composition(F f, F g) {
+  if (f == INF) return g;
+  return f;
 }
 
-S mapping(F f, S a){
-    if(f.x == INFLL)return a;
-    return S(f.x + a.l, a.l);
-}
- 
-F composition(F f, F g){
-    if(f.x == INFLL)return g;
-    return f;
-}
+F id() { return INF; }
 
-F id(){
-    return F(INFLL);
-}
+
 int main() {
-    int H, W;
-    cin >> H >> W;
-    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(W);
-    rep(i,W)T.set(i, S(0, i));
-    rep(i,H){
-        int l, r;
-        cin >> l >> r;
-        l--; r--;
-        // [l, r]に更新をする
-        ll x = (l == 0 ? INF: T.get(l-1).x);
-        T.apply(l, r+1, F(x-l+1));
-        ll ans = T.all_prod().x;
-        cout << ((ans >= INF ? -1: ans+i+1)) << endl;
-    }
+  int h, w; cin >> h >> w;
+
+  vector<S> v(w);
+  rep(i, w) v[i] = {0, i};
+  atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> seg(v);
+  auto outs = [&](int idx){
+      dump(idx);
+      rep(i,w){
+          int val = seg.get(i).min;
+          cerr << (val >= w ? "-": to_string(val)) << " ";
+      }
+      cerr << endl;
+  };
+  outs(0);
+  rep(i, h) {
+    int a, b; cin >> a >> b;
+    --a;
+    dump(a, b);
+    int x = 1e5;
+    if (a > 0) x = seg.prod(a-1, a).min;
+    dbg("apply: [", a, b, ")", x-a+1);
+    seg.apply(a, b, x-a+1);
+    int dist = seg.all_prod().min;
+    int ans = -1;
+    if (dist < w) ans = dist + i + 1;
+    outs(i+1);
+    cout << ans << '\n';
+  }
 }

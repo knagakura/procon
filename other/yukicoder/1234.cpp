@@ -46,54 +46,53 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-#include <atcoder/lazysegtree> 
-
-struct S{
-    ll x;
-    ll l;
-    S(ll x_, ll l_):x(x_), l(l_){}
-};
-
-struct F{
-    ll x;
-    F(ll x_): x(x_){}
-};
-
-S op(S a, S b){
-    return S(min(a.x, b.x), min(a.l, b.l));
-}
-
-S e(){
-    return S(INFLL, INFLL);
-}
-
-S mapping(F f, S a){
-    if(f.x == INFLL)return a;
-    return S(f.x + a.l, a.l);
-}
- 
-F composition(F f, F g){
-    if(f.x == INFLL)return g;
-    return f;
-}
-
-F id(){
-    return F(INFLL);
-}
-int main() {
-    int H, W;
-    cin >> H >> W;
-    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(W);
-    rep(i,W)T.set(i, S(0, i));
-    rep(i,H){
-        int l, r;
-        cin >> l >> r;
-        l--; r--;
-        // [l, r]に更新をする
-        ll x = (l == 0 ? INF: T.get(l-1).x);
-        T.apply(l, r+1, F(x-l+1));
-        ll ans = T.all_prod().x;
-        cout << ((ans >= INF ? -1: ans+i+1)) << endl;
+void solve(){
+    ll A, B;
+    cin >> A >> B;
+    if(B - A <= 120){
+        cout << B - A << endl;
+        rep(i,B-A){
+            cout << 1 << " ";
+        }
+        cout << endl;
+        return;
     }
+    int top = 0;
+    for(int i = 60; i >= 0; i--){
+        if((A & bit(i)) == 0 && ((B & bit(i)) > 0)){
+            top = i;
+            break;
+        }
+    }
+    dump(A, B, top);
+    vector<ll> ans;
+    while((A&bit(top)) == 0){
+        rep(i,top+1){
+            if(A&bit(i)){
+                A += bit(i);
+                ans.emplace_back(bit(i));
+                break;
+            }
+        }
+    }
+    
+    for(int i = top - 1; i >= 0; i--){
+        ll a = A & bit(i);
+        ll b = B & bit(i);
+        if(a == 0 && b > 0){
+            A += bit(i);
+            ans.emplace_back(bit(i));
+        }
+    }
+    dump(A, B);
+    cout << ans.size() << endl;
+    for(auto a: ans){
+        cout << a << " ";
+    }
+    cout << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

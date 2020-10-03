@@ -47,28 +47,48 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+#include <atcoder/lazysegtree>
 
+using namespace atcoder;
+
+/*
+- range minimum query
+- range chmin query
+のできる遅延セグ木
+*/
+using S = int;
+using F = int;
+S op(S a, S b){
+    return min(a, b);
+}
+S e(){
+    return INF;
+}
+S mapping(F f, F a){
+    return min(f, a);
+}
+F composition(F f, F g){
+    return min(f, g);
+}
+F id(){
+    return INF;
+}
 int main() {
-    int N, Q;
+    ll N, Q;
     cin >> N >> Q;
-    vector<set<int>> sets1(N), sets2(N);
-    rep(i,N){
-        sets1[i].insert(N-1);
-        sets1[i].insert(N-1);
-    }
-    ll cnt = 0;
+    vector<int> v(N+1, N);
+    lazy_segtree<S, op, e, F, mapping, composition, id> Tx(v), Ty(v);
+    ll ans = (N-2) * (N-2);
     while(Q--){
-        int type, x;
-        cin >> type >> x;
-        x--;
-        cnt++;
-        if(type == 1){
-            int r = *sets1[x].lower_bound(0);
-            cnt += r;
-        }
-        else{
+        int t, x;
+        cin >> t >> x;
+        if(t == 2)swap(Tx, Ty);
 
-        }
+        int y_min = Tx.prod(x, x+1);
+        ans -= y_min - 2;
+        Ty.apply(2, y_min, x);
+
+        if(t == 2)swap(Tx, Ty);
     }
-    cout << cnt << endl;
+    cout << ans << endl;
 }

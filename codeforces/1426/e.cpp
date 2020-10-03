@@ -36,7 +36,7 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #endif
 
 const int INF = (ll)1e9;
-const ll INFLL = (ll)1e18+1;
+const ll INFLL = (ll)1e12;
 const ll MOD = 1000000007;
 // const ll MOD = 998244353;
 const long double PI = acos(-1.0);
@@ -46,54 +46,40 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+#include <atcoder/mincostflow>
 
-#include <atcoder/lazysegtree> 
-
-struct S{
-    ll x;
-    ll l;
-    S(ll x_, ll l_):x(x_), l(l_){}
-};
-
-struct F{
-    ll x;
-    F(ll x_): x(x_){}
-};
-
-S op(S a, S b){
-    return S(min(a.x, b.x), min(a.l, b.l));
-}
-
-S e(){
-    return S(INFLL, INFLL);
-}
-
-S mapping(F f, S a){
-    if(f.x == INFLL)return a;
-    return S(f.x + a.l, a.l);
-}
- 
-F composition(F f, F g){
-    if(f.x == INFLL)return g;
-    return f;
-}
-
-F id(){
-    return F(INFLL);
-}
+ll a[3], b[3];
 int main() {
-    int H, W;
-    cin >> H >> W;
-    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(W);
-    rep(i,W)T.set(i, S(0, i));
-    rep(i,H){
-        int l, r;
-        cin >> l >> r;
-        l--; r--;
-        // [l, r]に更新をする
-        ll x = (l == 0 ? INF: T.get(l-1).x);
-        T.apply(l, r+1, F(x-l+1));
-        ll ans = T.all_prod().x;
-        cout << ((ans >= INF ? -1: ans+i+1)) << endl;
+    ll N;
+    cin >> N;
+    atcoder::mcf_graph<ll, ll> G_min(20); //価値の最小値
+    atcoder::mcf_graph<ll, ll> G_max(20);
+    rep(i,3)cin >> a[i];
+    rep(i,3)cin >> b[i];
+    int s = 6;
+    int t = s + 1;
+    rep(i,3){
+        G_min.add_edge(s, i, INF, 0);
+        G_min.add_edge(i+3, t, b[i], 0);
+        //
+        G_max.add_edge(s, i, INF, 0);
+        G_max.add_edge(i+3, t, b[i], 0);
     }
+    rep(i,3)rep(j,3){
+        int a_i = i;
+        int b_i = j + 3;
+        int cost = 0;
+        if(a_i == 0 && b_i == 4)cost++;
+        if(a_i == 1 && b_i == 5)cost++;
+        if(a_i == 2 && b_i == 3)cost++;
+        G_min.add_edge(a_i, b_i, a[i], cost);
+        //
+        G_max.add_edge(a_i, b_i, a[i], INFLL-cost);
+    }
+    auto ans_min = G_min.flow(s, t, N);
+    auto ans_max = G_max.flow(s, t, N);
+    dump(ans_min);
+    dump(ans_max);
+    cout << ans_min.second << " " << ans_max.first * INFLL - ans_max.second << endl;
+    // cout << ans_min << " " << ans_max << endl;
 }

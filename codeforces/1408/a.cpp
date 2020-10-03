@@ -46,54 +46,25 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-#include <atcoder/lazysegtree> 
-
-struct S{
-    ll x;
-    ll l;
-    S(ll x_, ll l_):x(x_), l(l_){}
-};
-
-struct F{
-    ll x;
-    F(ll x_): x(x_){}
-};
-
-S op(S a, S b){
-    return S(min(a.x, b.x), min(a.l, b.l));
-}
-
-S e(){
-    return S(INFLL, INFLL);
-}
-
-S mapping(F f, S a){
-    if(f.x == INFLL)return a;
-    return S(f.x + a.l, a.l);
-}
- 
-F composition(F f, F g){
-    if(f.x == INFLL)return g;
-    return f;
-}
-
-F id(){
-    return F(INFLL);
-}
-int main() {
-    int H, W;
-    cin >> H >> W;
-    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(W);
-    rep(i,W)T.set(i, S(0, i));
-    rep(i,H){
-        int l, r;
-        cin >> l >> r;
-        l--; r--;
-        // [l, r]に更新をする
-        ll x = (l == 0 ? INF: T.get(l-1).x);
-        T.apply(l, r+1, F(x-l+1));
-        ll ans = T.all_prod().x;
-        cout << ((ans >= INF ? -1: ans+i+1)) << endl;
+void solve(){
+    int N;
+    cin >> N;
+    vector<int> a(N), b(N), c(N);
+    cin >> a >> b >> c;
+    vector<int> p(N, INF);
+    p[0] = a[0];
+    rep1(i,N){
+        if(p[i-1] != a[i] && p[(i+1)%N] != a[i])p[i] = a[i];
+        else if(p[i-1] != b[i] && p[(i+1)%N] != b[i])p[i] = b[i];
+        else if(p[i-1] != c[i] && p[(i+1)%N] != c[i])p[i] = c[i];
     }
+    rep(i,N){
+        cout << p[i] << " ";
+    }
+    cout << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

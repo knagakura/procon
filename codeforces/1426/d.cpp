@@ -47,53 +47,28 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-#include <atcoder/lazysegtree> 
 
-struct S{
-    ll x;
-    ll l;
-    S(ll x_, ll l_):x(x_), l(l_){}
-};
-
-struct F{
-    ll x;
-    F(ll x_): x(x_){}
-};
-
-S op(S a, S b){
-    return S(min(a.x, b.x), min(a.l, b.l));
-}
-
-S e(){
-    return S(INFLL, INFLL);
-}
-
-S mapping(F f, S a){
-    if(f.x == INFLL)return a;
-    return S(f.x + a.l, a.l);
-}
- 
-F composition(F f, F g){
-    if(f.x == INFLL)return g;
-    return f;
-}
-
-F id(){
-    return F(INFLL);
-}
 int main() {
-    int H, W;
-    cin >> H >> W;
-    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> T(W);
-    rep(i,W)T.set(i, S(0, i));
-    rep(i,H){
-        int l, r;
-        cin >> l >> r;
-        l--; r--;
-        // [l, r]に更新をする
-        ll x = (l == 0 ? INF: T.get(l-1).x);
-        T.apply(l, r+1, F(x-l+1));
-        ll ans = T.all_prod().x;
-        cout << ((ans >= INF ? -1: ans+i+1)) << endl;
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i,N)cin >> A[i];
+    vector<ll> cum(N+1, 0);
+    map<ll,int> mp;
+    rep(i,N){
+        cum[i+1] += cum[i] + A[i];
     }
+    ll ans = 0;
+    for(int i = 0; i <= N; i++){
+        if(mp[cum[i]] > 0){
+            ans++;
+            dump(i, cum[i]);
+            mp.clear();
+        }
+        mp[cum[i]]++;;
+        if(i - 1 >= 0)mp[cum[i-1]]++;
+    }
+    cout << ans << endl;
+    dump(A);
+    dump(cum);
 }

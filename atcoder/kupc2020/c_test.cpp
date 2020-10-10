@@ -49,14 +49,31 @@ const string dir = "DRUL";
 
 
 int main() {
+    string alpha;
+    rep(i,26)alpha.push_back(char('a' + i));
+
     int N;
     cin >> N;
-    ll ans = 0;
-    vector<int> x(N), y(N);
-    rep(i,N)cin >> x[i] >> y[i];
-    rep(i,N-1){
-        ans += abs(x[i+1] - x[i]);
-        ans += abs(y[i+1] - y[i]);
+    vector<string> c(N);
+    cin >> c;
+    map<string, int> mp;
+    rep(i,N)rep(j,N){
+        for(int p = j+1; p < N; p++){
+            string tmp;
+            for(int k = j; k <= p; k++)tmp.push_back(c[i][k]);
+            mp[tmp]++;
+        } 
+        for(int q = i+1; q < N; q++){
+            string tmp;
+            for(int k = i; k <= q; k++)tmp.push_back(c[k][j]);
+            mp[tmp]++;
+        }
     }
-    cout << ans << endl;
+    dump(mp);
+    for(auto [st, cnt]: mp){
+        if(cnt == 2){
+            dump("dame");
+        }
+    }
+    dump(N*N*(N-1), mp.size());
 }

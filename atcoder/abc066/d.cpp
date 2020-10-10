@@ -98,48 +98,57 @@ struct mint {
         return os;
     }
 };
-int N;
-vvec<int> G;
-map<pair<int,int>, int> mp;
-vector<int> dp;
-int dfs(int cur = 0, int pre = -1){
-    int res = 1;
-    for(auto nxt: G[cur]){
-        if(nxt == pre)continue;
-        int add = dfs(nxt, cur);
-        mp[make_pair(cur, nxt)] = add;
-        mp[make_pair(nxt, cur)] = N - add;
-        res += add;
+
+struct combination {
+    vector<mint> fact, ifact;
+    //constructor(initiation)
+    combination(int n):fact(n+1),ifact(n+1) {
+        assert(n < MOD);
+        fact[0] = 1;
+        for (int i = 1; i <= n; ++i) fact[i] = fact[i-1]*i;
+        ifact[n] = fact[n].inv();
+        for (int i = n; i >= 1; --i) ifact[i-1] = ifact[i]*i;
     }
-    return dp[cur] = res;
-}
+    mint Comb(int n, int k) {
+        if (k < 0 || k > n) return 0;
+        return fact[n]*ifact[k]*ifact[n-k];
+    }
+    mint H(int n, int m){
+        return Comb(n + m - 1, m);
+    }
+}C(100010);
 int main() {
+    int N;
     cin >> N;
-    // vvec<int> G(N);
-    G.resize(N);
-    dp.resize(N, 0);
-    rep(i,N-1){
-        int a, b;
-        cin >> a >> b;
-        a--, b--;
-        G[a].emplace_back(b);
-        G[b].emplace_back(a);
+    vector<ll> a(N+1);
+    vector<int> cnt(N+1, 0);
+    rep(i,N+1){
+        cin >> a[i];
+        cnt[a[i]]++;
     }
-    // 部分木のサイズ求めるパート
-    dfs();
-    // 数え上げパート
-    mint cnt = 0;
-    mint beki = mint(2).modpow(N);
-    rep(i,N){
-        int sz = G[i].size();
-        mint add = mint(2).modpow(N-1) - 1;
-        if(sz == 1)continue;
-        for(auto nxt: G[i]){
-            int rem = mp[make_pair(i, nxt)];
-            add -= mint(2).modpow(rem) - 1;
+    int dd = 0; //二回ある数字
+    rep(i,N+1){
+        if(cnt[i] == 2)dd = i;
+    }
+    int l = 0, r = 0;
+    rep(i,N+1){
+        if(cnt[a[i]] == 2){
+            l = i;
+            cnt[a[i]]++;
         }
-        cnt += add;
+        else if(cnt[a[i]] == 3){
+            r = i;
+        }
     }
-    mint ans = beki.inv() * cnt;
-    cout << ans << endl;
+    int mid = r - l - 1;
+    for(int k = 1; k <= N+1; k++){
+        mint ans = 0;
+        ans += C.Comb(N-1, k-2); // dd: 2
+        ans += C.Comb(N-1, k); // dd: 0
+        // dd: 1
+        mint al = C.Comb(N-1, k-1);
+        mint yo = C.Comb(N-1-mid, k-1);
+        ans += yo + (al - yo) * 2;
+        cout << ans << endl;
+    }
 }

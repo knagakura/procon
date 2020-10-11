@@ -46,15 +46,71 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-int main() {
-    char s, t;
-    cin >> s >> t;
-    if(s == 'Y'){
-        cout << char(t - 'a' + 'A') << endl;
+template<typename T>
+vector<pair<T,long long>> RunLengthEncoder(vector<T> &v){
+    vector<pair<T,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
     }
-    else{
-        cout << t << endl;
+    return RLE;
+}
+
+vector<pair<char,long long>> RunLengthEncoder_ForString(string v){
+    vector<pair<char,long long>> RLE;
+    long long cnt = 1;
+    for(int i = 0; i < (int)v.size(); ++i){
+        if(i == (int)v.size()-1){
+            RLE.push_back(make_pair(v[i], cnt));
+            continue;
+        }
+        if(v[i] == v[i+1])cnt++;
+        else{
+            RLE.push_back(make_pair(v[i],cnt));
+            cnt = 1;
+        }
     }
+    return RLE;
+}
+void solve(){
+    int N;
+    string S;
+    cin >> N >> S;
+    auto v = RunLengthEncoder_ForString(S);
+    int M = v.size();
+    vector<int> cnt(M, 0);
+    int j = 0;
+    for(int i = 0; i < M; i++){
+        if(j < i)j = i;
+        while(j < M && v[j].second == 1){
+            j++;
+        }
+        if(j < M){
+            v[j].second--;
+            cnt[j]++;
+            cnt[i]++;
+        }
+        else{
+            cnt[i]++;
+            if(i+1 < M){
+                cnt[i+1]++;
+                i++;
+            }
+        }
+    }
+    ll sum = SUM(cnt);
+    cout << (sum + 2 - 1) / 2 << endl; // 切り上げ
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

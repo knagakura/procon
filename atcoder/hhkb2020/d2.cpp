@@ -46,15 +46,21 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-int main() {
-    char s, t;
-    cin >> s >> t;
-    if(s == 'Y'){
-        cout << char(t - 'a' + 'A') << endl;
-    }
-    else{
-        cout << t << endl;
-    }
+#include <atcoder/modint>
+using mint = atcoder::modint1000000007;
+void solve(){
+    ll N, A, B;
+    cin >> N >> A >> B;
+    mint X4 = (N-A-B < 0) ? 0: mint(N-A-B+1) * mint(N-A-B+2) / 2;
+    mint X3 = 2 * X4;
+    mint X2 = (N-A+1)*(N-B+1) - X3;
+    mint X1 = X2 * X2;
+    mint zen1 = mint(N-A+1)*mint(N-B+1)*mint(N-A+1)*mint(N-B+1);
+    mint ans = zen1 - X1;
+    cout << ans.val() << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

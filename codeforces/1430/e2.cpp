@@ -48,13 +48,26 @@ const string dir = "DRUL";
 */
 
 
+vector<int> manachar(string &S){
+    vector<int> R(S.size());
+    int c = 0;
+    for (int i = 0; i < S.size(); ++i) {
+        int l = c - (i-c);
+        if (i+R[l] < c+R[c]) {
+            R[i] = R[l];
+        } else {
+            int j = c+R[c] - i;
+            while (i-j >= 0 && i+j < S.size() && S[i-j] == S[i+j]) ++j;
+            R[i] = j;
+            c = i;
+        }
+    }
+    return R;
+}
 int main() {
-    char s, t;
-    cin >> s >> t;
-    if(s == 'Y'){
-        cout << char(t - 'a' + 'A') << endl;
-    }
-    else{
-        cout << t << endl;
-    }
+    int N;
+    string S;
+    cin >> N >> S;
+    auto v = manachar(S);
+    dump(v);
 }

@@ -49,12 +49,16 @@ const string dir = "DRUL";
 
 
 int main() {
-    char s, t;
-    cin >> s >> t;
-    if(s == 'Y'){
-        cout << char(t - 'a' + 'A') << endl;
+    int N;
+    string S;
+    cin >> N >> S;
+    vvec<int> v(26);
+    rep(i,N){
+        v[S[i]-'a'].emplace_back(i);
     }
-    else{
-        cout << t << endl;
+    rep(i,26){
+        if(not v[i].empty()){
+            dbg(char('a'+i), v[i]);
+        }
     }
 }

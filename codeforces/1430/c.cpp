@@ -46,15 +46,27 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-int main() {
-    char s, t;
-    cin >> s >> t;
-    if(s == 'Y'){
-        cout << char(t - 'a' + 'A') << endl;
+void solve(){
+    int N;
+    cin >> N;
+    vector<ll> a(N);
+    rep(i,N)a[i] = i + 1;
+    vector<pair<int,int>> ans;
+    while(a.size() > 1){
+        int x = a.back();
+        a.pop_back();
+        int y = a.back();
+        a.pop_back();
+        ans.emplace_back(x, y);
+        a.push_back((x+y+1)/2);
     }
-    else{
-        cout << t << endl;
+    cout << a[0] << endl;
+    for(auto &res: ans){
+        cout << res.first << " " << res.second << endl;
     }
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

@@ -46,15 +46,32 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-int main() {
-    char s, t;
-    cin >> s >> t;
-    if(s == 'Y'){
-        cout << char(t - 'a' + 'A') << endl;
+bool ok[1010];
+ll a[1010], b[1010], c[1010];
+void solve(){
+    ll N;
+    cin >> N;
+    if(ok[N]){
+        cout << a[N] << " " << b[N] << " " << c[N] << endl;
     }
-    else{
-        cout << t << endl;
+    else {
+        cout << -1 << endl;
     }
+}
+int main(){
+    int t;
+    cin >> t;
+    rep(i,1001)ok[i] = false;
+    for(ll x = 0; 3 * x <= 1000; x++){
+        for(ll y = 0; 3 * x + 5 * y <= 1000; y++){
+            for(ll z = 0; 3 * x + 5 * y + 7 * z <= 1000; z++){
+                ll wa = 3 * x + 5 * y + 7 * z;
+                ok[wa] = true;
+                a[wa] = x;
+                b[wa] = y;
+                c[wa] = z;
+            }
+        }
+    }
+    while(t--)solve();
 }

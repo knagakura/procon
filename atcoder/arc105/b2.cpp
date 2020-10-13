@@ -52,26 +52,8 @@ int main() {
     int N;
     cin >> N;
     vector<ll> a(N);
-    map<ll, int> mp;
-    set<pair<ll, int>> st;
-    rep(i,N){
-        cin >> a[i];
-        mp[a[i]]++;
-    }
-    for(auto &p: mp)st.insert(p);
-    while(st.size() > 1){
-        auto [maxx, cnt1] = *st.rbegin();
-        auto [minn, cnt2] = *st.begin();
-        st.erase({maxx, cnt1}); // 最大値のやつを削除
-        ll neww = maxx - minn;
-        auto [x, cnt3] = *st.lower_bound({neww, -1}); // X - xがあるかどうか探す
-        if(x == neww){
-            st.erase({x, cnt3});
-            st.insert({x, cnt1 + cnt3});
-        }
-        else{
-            st.insert({neww, cnt1});
-        }
-    }
-    cout << (*st.begin()).first << endl;
+    rep(i,N)cin >> a[i];
+    ll ans = 0;
+    rep(i,N)ans = gcd(ans, a[i]);
+    cout << ans << endl;
 }

@@ -48,35 +48,39 @@ const string dir = "DRUL";
 */
 
 
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
+vector<int> z_algorithm(const string &S){
+    int c = 0;
+    int N = S.size();
+    vector<int> Z(N, 0);
+    rep1(i,N){
+        dump(i);
+        // 全てわかっている状態
+        dump(i-c, c);
+        dump(i + Z[i-c], c + Z[c]);
+        if(i + Z[i-c] < c + Z[c]){
+            dump("OK");
+            Z[i] = Z[i-c];
         }
-        if (x == 1) break;
+        else{
+            int j = max(0, c + Z[c] - i);
+            int pre_j = j; // 
+            while(i + j < N && S[j] == S[i + j]){
+                j++;
+            }
+            int now_j = j;
+            dump(pre_j, now_j); //
+            Z[i] = j;
+            c = i;
+        }
+        dump(Z);
     }
-    if (x != 1) mp[x]++;
-    return mp;
+    Z[0] = N;
+    return Z;
 }
-
-
 int main() {
-    ll N;
-    cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
-        }
-    }
-    cout << ans << endl;
+    int N;
+    string S;
+    cin >> N >> S;
+    auto v = z_algorithm(S);
+    dump(v);
 }

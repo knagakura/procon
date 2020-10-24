@@ -61,22 +61,36 @@ map<T,int> factorize(T x){
     if (x != 1) mp[x]++;
     return mp;
 }
-
+template<typename T>
+vector<T> divisor(T N) {
+    vector<T> res;
+    for(T i = 1; i * i <= N; i++){
+        if(N % i == 0){
+            res.push_back(i);
+            if(i * i != N)res.push_back(N / i);
+        }
+    }
+    sort(res.begin(), res.end());
+    return res;
+}
 
 int main() {
     ll N;
     cin >> N;
+    auto check = [&](ll x) -> bool {
+        ll tN = N;
+        while(tN%x == 0)tN /= x;
+        if(tN%x == 1)return true;
+        return false;
+    };
     ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
-        }
+    for(auto x: divisor(N)){
+        if(x == 1)continue;
+        if(check(x))ans++;
+    }
+    for(auto x: divisor(N-1)){
+        if(x == 1)continue;
+        if(check(x))ans++;
     }
     cout << ans << endl;
 }

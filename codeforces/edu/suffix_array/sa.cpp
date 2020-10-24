@@ -48,35 +48,60 @@ const string dir = "DRUL";
 */
 
 
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) mp[x]++;
-    return mp;
-}
-
-
 int main() {
-    ll N;
-    cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
+    string S;
+    cin >> S;
+    S.push_back('$');
+    int N = S.size();
+    S += S;
+    int beki = 1;
+    while(beki < N)beki *= 2;
+    vector<int> res(N), sya(N);
+    rep(i,N)res[i] = i;
+    auto calc = [&](int k) -> void{
+        // 最初は単純にソートするだけ
+        // 同じものは同じと判定したい
+        if(k == 0){
+            sort(all(res), [&](int a, int b){
+                return S[a] < S[b];
+            });
+            sya[res[0]] = 0;
+            int num = 0;
+            rep1(i,N){
+                if(S[res[i-1]] == S[res[i]])sya[res[i]] = num;
+                else sya[res[i]] = ++num;
+            }
+            return;
         }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
+        auto r_idx = [&](int idx) -> int{
+            return (idx + bit(k-1)) % N;
+        };
+        // i回目(i >= 1)はi-1回目を活用する
+        // res2の構築
+        vector<int> res2(N), sya2(N);
+        rep(i,N)res2[i] = i;
+        sort(all(res2), [&](int a, int b){
+            if(sya[a] == sya[b])return sya[r_idx(a)] < sya[r_idx(b)];
+            return sya[a] < sya[b];
+        });
+        // sya2の構築
+        sya2[res2[0]] = 0;
+        int num = 0;
+        rep1(i,N){
+            if(sya[res2[i-1]] == sya[res2[i]] && 
+            sya[r_idx(res2[i-1])] == sya[r_idx(res2[i])]){
+                sya2[res2[i]] = num;
+            }
+            else sya2[res2[i]] = ++num;
         }
+        swap(res, res2);
+        swap(sya, sya2);
+    };
+    // O(logN)
+    for(int k = 0; bit(k) <= beki; k++){
+        calc(k); // O(NlogN)
     }
-    cout << ans << endl;
+    rep(i,N){
+        cout << res[i] << (i == N-1 ? "\n": " ");
+    }
 }

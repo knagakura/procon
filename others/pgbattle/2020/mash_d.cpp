@@ -48,35 +48,42 @@ const string dir = "DRUL";
 */
 
 
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) mp[x]++;
-    return mp;
-}
-
-
 int main() {
-    ll N;
-    cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
-        }
+    int N, M;
+    cin >> N >> M;
+    vvec<int> G(N);
+    rep(i,M){
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        G[a].push_back(b);
     }
-    cout << ans << endl;
+    vector<int> dist(N, INF);
+    auto bfs = [&](int start = 0) -> void{
+        queue<int> q;
+        q.push(start);
+        dist[start] = 0;
+        while(not q.empty()){
+            int cur = q.front();
+            q.pop();
+            for(auto nxt: G[cur]){
+                if(dist[nxt] < INF)continue;
+                if(chmin(dist[nxt], dist[cur] + 1)){
+                    q.push(nxt);
+                }
+            }
+        }
+    };
+    bfs();
+    dump(dist);
+    if(dist[N-1] == INF){
+        cout << -1 << endl;
+        return 0;
+    }
+    vector<int> ans;
+    auto solve = [&]() -> void{
+        int cur = 0;;
+        while(cur != N)
+    };
+
 }

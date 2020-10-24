@@ -47,36 +47,15 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) mp[x]++;
-    return mp;
-}
-
-
+lib-divi
 int main() {
-    ll N;
-    cin >> N;
+    ll x, y, a, b;
+    cin >> x >> y >> a >> b;
     ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
-        }
+    while(x * a - x < b){
+        x *= a;
+        ans++;
     }
+    ans += (y - x) / b;
     cout << ans << endl;
 }

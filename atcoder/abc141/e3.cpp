@@ -47,35 +47,21 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) mp[x]++;
-    return mp;
-}
-
-
+#include <atcoder/string>
 int main() {
-    ll N;
-    cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
+    int N;
+    string S;
+    cin >> N >> S;
+    auto sa = atcoder::suffix_array(S);
+    auto lcp = atcoder::lcp_array(S, sa); 
+    int ans = 0;
+    dump(sa);
+    dump(lcp);
+    for(int i = 0; i < N; i++){
+        int lcp_min = lcp[i];
+        for(int j = i+1; j < N; j++){
+            chmax(ans, min(abs(sa[i] - sa[j]), lcp_min));
+            if(j < N - 1)chmin(lcp_min, lcp[j]);
         }
     }
     cout << ans << endl;

@@ -47,13 +47,25 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+template<typename T>
+vector<T> divisor(T N) {
+    vector<T> res;
+    for(T i = 1; i * i <= N; i++){
+        if(N % i == 0){
+            res.push_back(i);
+            if(i * i != N)res.push_back(N / i);
+        }
+    }
+    sort(res.begin(), res.end());
+    return res;
+}
 
 template<typename T> 
 map<T,int> factorize(T x){
     map<T,int> mp;
     for (T i = 2; i*i <= x; i++){
         while (x%i == 0) {
-            x /= i;
+            x = x/i;
             mp[i]++;
         }
         if (x == 1) break;
@@ -66,17 +78,8 @@ map<T,int> factorize(T x){
 int main() {
     ll N;
     cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
-        }
+    auto a = divisor(N);
+    for(auto x: a){
+        cout << x << endl;
     }
-    cout << ans << endl;
 }

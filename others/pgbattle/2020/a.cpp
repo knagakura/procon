@@ -47,36 +47,33 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
+vvec<int> G;
+vector<bool> f;
+void dfs(int cur = 0, int pre = -1){
+    bool ok = false;
+    for(auto nxt: G[cur]){
+        if(nxt == pre)continue;
+        ok = true;
+        dfs(nxt, cur);
     }
-    if (x != 1) mp[x]++;
-    return mp;
+    if(not ok)f[cur] = true;
 }
-
-
 int main() {
-    ll N;
+    int N;
     cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
-        }
+    G.resize(N);
+    f.assign(N,false);
+    rep(i,N-1){
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        G[b].push_back(a);
+        G[a].push_back(b);
+    }
+    dfs(0, -1);
+    int ans = 0;
+    rep(i,N){
+        ans += f[i];
     }
     cout << ans << endl;
 }

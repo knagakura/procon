@@ -46,37 +46,26 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) mp[x]++;
-    return mp;
-}
-
-
-int main() {
-    ll N;
+void solve(){
+    int N;
     cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
+    vector<ll> A(N);
+    cin >> A;
+    dump(A);
+    rep(i,(N+1)/2){
+        ll l = i + A[i];
+        ll r = 0;
+        for(int j = i+1; j < N; j++)r += A[j];
+        dump(l, r);
+        if(l > r){
+            cout << "First" << endl;
+            return;
         }
     }
-    cout << ans << endl;
+    cout << "Second" << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

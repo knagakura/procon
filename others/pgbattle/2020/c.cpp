@@ -47,36 +47,52 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) mp[x]++;
-    return mp;
-}
-
-
+#include<atcoder/modint>
+using mint = atcoder::modint1000000007;
 int main() {
     ll N;
-    cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
+    int M;
+    ll D;
+    cin >> N >> M >> D;
+    vector<ll> A(M);
+    vector<pair<ll, ll>> v;
+    rep(i,M){
+        cin >> A[i];
+        pair<ll, ll> p = {A[i]%D, A[i]/D};
+        v.push_back(p);
+    }
+    sort(all(A));
+    sort(all(v));
+    dump(v);
+
+    mint ans = 0;
+    ll modd = N % D;
+    ll kake = N / D;
+    v.emplace_back(-1, -1);
+    vector<int> tmp;
+    rep(i,M){
+        tmp.push_back(v[i].second);
+        if(v[i].first != v[i+1].first){
+            int sz = tmp.size();
+            ll maxx = kake * D;
+            if(maxx + v[i].first <= N)maxx += v[i].first;
+            else {
+                maxx -= (D - v[i].first);
+            }
+            dump(maxx);
+            ll cnt = (maxx - v[i].first+D-1) / D;
+            dump(cnt);
+            tmp.push_back(maxx/D);
+            ans += mint(cnt) * mint(cnt+1) / 2;
+            dump(ans.val());
+            rep(j,sz){
+                mint sub = (tmp[j+1] - tmp[j] + (j == sz-1)) * tmp[j];
+                dump(sub.val());
+                ans -= sub;
+            }
+            dump(tmp);
+            tmp.clear();
         }
     }
-    cout << ans << endl;
+    cout << ans.val() << endl;
 }

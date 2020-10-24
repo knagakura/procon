@@ -46,37 +46,53 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+const int len = 8;
+const char ka[4] = {'(', ')', '[', ']'};
 
-
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
+bool isvalid(const string &x, int l, int r, const vector<bool> &ok){
+    if(ok[l] || ok[r])return false;
+    if((x[l] == '(' && x[r] == ')') || (x[l] == '[' && x[r] == ']')){
+        for(int i = l + 1; i < r; i++){
+            if(not ok[i])return false;
         }
-        if (x == 1) break;
+        return true;
     }
-    if (x != 1) mp[x]++;
-    return mp;
+    else{
+        return false;
+    }
 }
-
-
-int main() {
-    ll N;
-    cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
+bool isvalid(const string &x){
+    vector<bool> ok(len, false);
+    for(int d = 1; d < len; d+=2){
+        for(int i = 0; i < len; i++){
+            int j = i + d;
+            if(j >= len)continue;
+            if(isvalid(x, i, j, ok)){
+                ok[i] = ok[j] = true;
+            }
         }
     }
-    cout << ans << endl;
+    rep(i,len){
+        if(not ok[i])return false;
+    }
+    return true;
+}
+string kakko(int x){
+    string res;
+    rep(i,len){
+        res.push_back(ka[x%4]);
+        x /= 4;
+    }
+    return res;
+}
+int main() {
+    int N = bit(2*len);
+    vector<string> vs;
+    rep(i,N){
+        string tmp = kakko(i);
+        if(isvalid(tmp)){
+            vs.push_back(tmp);
+        }
+    }
+    dump(vs);
 }

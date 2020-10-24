@@ -48,35 +48,24 @@ const string dir = "DRUL";
 */
 
 
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) mp[x]++;
-    return mp;
-}
-
-
 int main() {
-    ll N;
+    int N;
     cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
-        }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
-        }
+    vector<ll> A(N), B(N);
+    cin >> A >> B;
+    ll sum = accumulate(all(A), 0LL);
+
+    vector<ll> x(N/2), y(N/2);
+    rep(i,N/2){
+        x[i] = B[i*2] - A[i*2];
+        y[i] = B[i*2+1] - A[i*2+1];
     }
-    cout << ans << endl;
+    sort(all(x), greater<>());
+    sort(all(y), greater<>());
+    ll res = sum;
+    rep(i,N/2){
+        sum += x[i] + y[i];
+        chmax(res, sum);
+    }
+    cout << res << endl;
 }

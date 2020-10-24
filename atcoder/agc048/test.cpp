@@ -46,37 +46,28 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-template<typename T> 
-map<T,int> factorize(T x){
-    map<T,int> mp;
-    for (T i = 2; i*i <= x; i++){
-        while (x%i == 0) {
-            x /= i;
-            mp[i]++;
-        }
-        if (x == 1) break;
-    }
-    if (x != 1) mp[x]++;
-    return mp;
+ 
+uint32_t XorShift(void) {
+	static uint32_t x = 123456789;
+	static uint32_t y = 362436069;
+	static uint32_t z = 521288629;
+	static uint32_t w = 88675123;
+	uint32_t t;
+ 
+	t = x ^ (x << 11);
+	x = y; y = z; z = w;
+	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
 }
 
-
 int main() {
-    ll N;
-    cin >> N;
-    ll ans = 0;
-    ans += 2; // x = N - 1, N
-    for(ll x = 2; x * x <= N; x++){
-        ll tmpN = N;
-        while(tmpN%x == 0){
-            tmpN /= x;
+    int t = 100;
+    cout << t << endl;
+    while(t--){
+        int N = 7 + XorShift()%2;
+        string S;
+        rep(i,N){
+            S.push_back(char('a' + XorShift()%26));
         }
-        if(tmpN%x == 1){
-            dump(x);
-            ans++;
-        }
+        cout << S << endl;
     }
-    cout << ans << endl;
 }

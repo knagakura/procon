@@ -49,6 +49,9 @@ const string dir = "DRUL";
 
 
 int main() {
-    int a;
-    cin >> a;
+    ll N;
+    cin >> N;
+    for(ll a = 3; a <= N; a *= 3){
+        ll rem = N - a;
+    }
 }

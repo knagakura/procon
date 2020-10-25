@@ -47,46 +47,10 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-vvec<int> G;
-vector<ll> a, b;
-vector<ll> used;
-void dfs(int cur, int pre, vector<int>&v){
-    used[cur] = true;
-    v.push_back(cur);
-    for(auto nxt: G[cur]){
-        if(used[nxt])continue;
-        dfs(nxt, cur, v);
-    }
-}
+ll solve()
 int main() {
-    int N, M;
-    cin >> N >> M;
-    G.resize(N);
-    a.resize(N);
-    b.resize(N);
-    used.resize(N, false);
-    cin >> a >> b;
-    rep(i,M){
-        int c, d;
-        cin >> c >> d;
-        c--, d--;
-        G[c].push_back(d);
-        G[d].push_back(c);
-    }
-    rep(i,N){
-        if(used[i])continue;
-        vector<int> v;
-        dfs(i, -1, v);
-        dump(v);
-        ll suma = 0;
-        ll sumb = 0;
-        for(auto x: v)suma += a[x];
-        for(auto x: v)sumb += b[x];
-        dump(suma, sumb);
-        if(suma != sumb){
-            cout << "No" << endl;
-            return 0;
-        }
-    }
-    cout << "Yes" << endl;
+    int N;
+    cin >> N;
+    vector<int> l(N), r(N);
+
 }

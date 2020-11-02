@@ -37,8 +37,8 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 
 const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
-const ll MOD = 1000000007;
-// const ll MOD = 998244353;
+// const ll MOD = 1000000007;
+const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
 /*
@@ -46,87 +46,88 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-template< typename T >
-struct Compress {
-  vector< T > xs;
-
-  Compress() = default;
-
-  Compress(const vector< T > &vs) {
-    add(vs);
-  }
-
-  Compress(const initializer_list< vector< T > > &vs) {
-    for(auto &p : vs) add(p);
-  }
-
-  void add(const vector< T > &vs) {
-    copy(begin(vs), end(vs), back_inserter(xs));
-  }
-
-  void add(const T &x) {
-    xs.emplace_back(x);
-  }
-
-  void build() {
-    sort(begin(xs), end(xs));
-    xs.erase(unique(begin(xs), end(xs)), end(xs));
-  }
-
-  vector< int > get(const vector< T > &vs) const {
-    vector< int > ret;
-    transform(begin(vs), end(vs), back_inserter(ret), [&](const T &x) {
-      return lower_bound(begin(xs), end(xs), x) - begin(xs);
-    });
-    return ret;
-  }
-
-  int get(const T &x) const {
-    return lower_bound(begin(xs), end(xs), x) - begin(xs);
-  }
-
-  const T &operator[](int k) const {
-    return xs[k];
-  }
+struct mint {
+    long long x;
+    mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
+    mint operator-() const { return mint(-x);}
+    mint& operator+=(const mint a) {
+        if ((x += a.x) >= MOD) x -= MOD;
+        return *this;
+    }
+    mint& operator-=(const mint a) {
+        if ((x += MOD-a.x) >= MOD) x -= MOD;
+        return *this;
+    }
+    mint& operator*=(const mint a) {
+        (x *= a.x) %= MOD;
+        return *this;
+    }
+    mint operator+(const mint a) const {
+        mint res(*this);
+        return res+=a;
+    }
+    mint operator-(const mint a) const {
+        mint res(*this);
+        return res-=a;
+    }
+    mint operator*(const mint a) const {
+        mint res(*this);
+        return res*=a;
+    }
+    mint modpow(long long t) const {
+        if (!t) return 1;
+        mint a = modpow(t>>1);
+        a *= a;
+        if (t&1) a *= *this;
+        return a;
+    }
+    // for prime MOD
+    mint inv() const {
+        return modpow(MOD-2);
+    }
+    mint& operator/=(const mint a) {
+        return (*this) *= a.inv();
+    }
+    mint operator/(const mint a) const {
+        mint res(*this);
+        return res/=a;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const mint& a){
+        os << a.x;
+        return os;
+    }
 };
+struct combination {
+    vector<mint> fact, ifact;
+    //constructor(initiation)
+    combination(int n):fact(n+1),ifact(n+1) {
+        assert(n < MOD);
+        fact[0] = 1;
+        for (int i = 1; i <= n; ++i) fact[i] = fact[i-1]*i;
+        ifact[n] = fact[n].inv();
+        for (int i = n; i >= 1; --i) ifact[i-1] = ifact[i]*i;
+    }
+    mint Comb(int n, int k) {
+        if (k < 0 || k > n) return 0;
+        return fact[n]*ifact[k]*ifact[n-k];
+    }
+    mint H(int n, int m){
+        return Comb(n + m - 1, m);
+    }
+}Comb(30000);
 
+mint dp[3030][3040];
 int main() {
-    vector<ll> a(6);
-    cin >> a;
-    int N;
-    cin >> N;
-    vector<ll> b(N);
-    cin >> b;
+    ll N, K;
+    cin >> N >> K;
+    ll l = K;
+    while(l % 2 == 0){
+        l /= 2;
+    }
+    dump(l);
+    dp[l][l] = 1;
+    for(int i = l; i < N; i++){
 
-
-    sort(all(a));
-    sort(all(b));
-    dump(a);
-    dump(b);
-    map<ll,int> mp;
-    vector<ll> v;
-    rep(i,N){
-        set<ll> tmp;
-        for(int j = 5; j >= 0; j--){
-            ll d = b[i] - a[j];
-            tmp.insert(d);
-        }
-        dbg(b[i], tmp);
-        for(auto x: tmp)v.push_back(x);
     }
-    Compress<ll> comp(v);
-    comp.build();
-    int sz = v.size();
-    rep(i,sz){
-        cerr << comp[i] << " ";
-    }
-    cerr << endl;
-    dump(v);
-    for(auto p: comp.get(v)){
-        cerr << p <<  " ";
-    }
-    cerr << endl;
-    vector<ll> dp(sz, INFLL);
+    cout << dp[N][l] << endl;
 }

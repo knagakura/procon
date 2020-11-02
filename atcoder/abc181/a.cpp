@@ -48,85 +48,13 @@ const string dir = "DRUL";
 */
 
 
-template< typename T >
-struct Compress {
-  vector< T > xs;
-
-  Compress() = default;
-
-  Compress(const vector< T > &vs) {
-    add(vs);
-  }
-
-  Compress(const initializer_list< vector< T > > &vs) {
-    for(auto &p : vs) add(p);
-  }
-
-  void add(const vector< T > &vs) {
-    copy(begin(vs), end(vs), back_inserter(xs));
-  }
-
-  void add(const T &x) {
-    xs.emplace_back(x);
-  }
-
-  void build() {
-    sort(begin(xs), end(xs));
-    xs.erase(unique(begin(xs), end(xs)), end(xs));
-  }
-
-  vector< int > get(const vector< T > &vs) const {
-    vector< int > ret;
-    transform(begin(vs), end(vs), back_inserter(ret), [&](const T &x) {
-      return lower_bound(begin(xs), end(xs), x) - begin(xs);
-    });
-    return ret;
-  }
-
-  int get(const T &x) const {
-    return lower_bound(begin(xs), end(xs), x) - begin(xs);
-  }
-
-  const T &operator[](int k) const {
-    return xs[k];
-  }
-};
-
 int main() {
-    vector<ll> a(6);
-    cin >> a;
     int N;
     cin >> N;
-    vector<ll> b(N);
-    cin >> b;
-
-
-    sort(all(a));
-    sort(all(b));
-    dump(a);
-    dump(b);
-    map<ll,int> mp;
-    vector<ll> v;
-    rep(i,N){
-        set<ll> tmp;
-        for(int j = 5; j >= 0; j--){
-            ll d = b[i] - a[j];
-            tmp.insert(d);
-        }
-        dbg(b[i], tmp);
-        for(auto x: tmp)v.push_back(x);
+    if(N%2 == 0){
+        cout << "White" << endl;
     }
-    Compress<ll> comp(v);
-    comp.build();
-    int sz = v.size();
-    rep(i,sz){
-        cerr << comp[i] << " ";
+    else{
+        cout << "Black" << endl;
     }
-    cerr << endl;
-    dump(v);
-    for(auto p: comp.get(v)){
-        cerr << p <<  " ";
-    }
-    cerr << endl;
-    vector<ll> dp(sz, INFLL);
 }

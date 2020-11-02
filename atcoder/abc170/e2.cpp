@@ -20,6 +20,7 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
 template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]"; return os; };
 template <typename T> ostream &operator<<(ostream &os, set<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
+template <typename T> ostream &operator<<(ostream &os, multiset<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
 template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
 template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
 
@@ -47,86 +48,54 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
-template< typename T >
-struct Compress {
-  vector< T > xs;
-
-  Compress() = default;
-
-  Compress(const vector< T > &vs) {
-    add(vs);
-  }
-
-  Compress(const initializer_list< vector< T > > &vs) {
-    for(auto &p : vs) add(p);
-  }
-
-  void add(const vector< T > &vs) {
-    copy(begin(vs), end(vs), back_inserter(xs));
-  }
-
-  void add(const T &x) {
-    xs.emplace_back(x);
-  }
-
-  void build() {
-    sort(begin(xs), end(xs));
-    xs.erase(unique(begin(xs), end(xs)), end(xs));
-  }
-
-  vector< int > get(const vector< T > &vs) const {
-    vector< int > ret;
-    transform(begin(vs), end(vs), back_inserter(ret), [&](const T &x) {
-      return lower_bound(begin(xs), end(xs), x) - begin(xs);
-    });
-    return ret;
-  }
-
-  int get(const T &x) const {
-    return lower_bound(begin(xs), end(xs), x) - begin(xs);
-  }
-
-  const T &operator[](int k) const {
-    return xs[k];
-  }
-};
-
+int MAXX = 200005;
 int main() {
-    vector<ll> a(6);
-    cin >> a;
-    int N;
-    cin >> N;
-    vector<ll> b(N);
-    cin >> b;
-
-
-    sort(all(a));
-    sort(all(b));
-    dump(a);
-    dump(b);
-    map<ll,int> mp;
-    vector<ll> v;
+    int N, Q;
+    cin >> N >> Q;
+    vector<int> A(N), B(N), C(Q), D(Q);
+    vector<set<pair<int, int>>> vm(MAXX);
     rep(i,N){
-        set<ll> tmp;
-        for(int j = 5; j >= 0; j--){
-            ll d = b[i] - a[j];
-            tmp.insert(d);
+        cin >> A[i] >> B[i];
+        B[i]--;
+        vm[B[i]].insert(make_pair(A[i], i));
+    }
+    set<pair<int, int>> st;
+    rep(i,MAXX){
+        if(not vm[i].empty()){
+            int maxx = (*vm[i].rbegin()).first;
+            st.insert(make_pair(maxx, i));
         }
-        dbg(b[i], tmp);
-        for(auto x: tmp)v.push_back(x);
     }
-    Compress<ll> comp(v);
-    comp.build();
-    int sz = v.size();
-    rep(i,sz){
-        cerr << comp[i] << " ";
+    rep(i,Q){
+        cin >> C[i] >> D[i];
+        C[i]--, D[i]--;
     }
-    cerr << endl;
-    dump(v);
-    for(auto p: comp.get(v)){
-        cerr << p <<  " ";
+    rep(i,Q){
+        int from = B[C[i]];
+        int to = D[i];
+        // fromから削除して最大値を取り直す
+        {
+            int pre_max = (*vm[from].rbegin()).first;
+            st.erase(make_pair(pre_max, from));
+            vm[from].erase(make_pair(A[C[i]], C[i]));
+            // dump(pre_max);
+            if(vm[from].size() > 0){
+                int nxt_max = (*vm[from].rbegin()).first;
+                st.insert(make_pair(nxt_max, from));
+            }
+        }
+        // toに追加して最大値を取り直す
+        {
+            if(vm[to].size() > 0){
+                int pre_max = (*vm[to].rbegin()).first;
+                st.erase(make_pair(pre_max, to));
+            }
+            vm[to].insert(make_pair(A[C[i]], C[i]));
+            int nxt_max = (*vm[to].rbegin()).first;
+
+            st.insert(make_pair(nxt_max, to));
+        }
+        B[C[i]] = to;
+        cout << (*st.begin()).first << endl;
     }
-    cerr << endl;
-    vector<ll> dp(sz, INFLL);
 }

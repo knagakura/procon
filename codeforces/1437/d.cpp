@@ -46,87 +46,38 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-template< typename T >
-struct Compress {
-  vector< T > xs;
-
-  Compress() = default;
-
-  Compress(const vector< T > &vs) {
-    add(vs);
-  }
-
-  Compress(const initializer_list< vector< T > > &vs) {
-    for(auto &p : vs) add(p);
-  }
-
-  void add(const vector< T > &vs) {
-    copy(begin(vs), end(vs), back_inserter(xs));
-  }
-
-  void add(const T &x) {
-    xs.emplace_back(x);
-  }
-
-  void build() {
-    sort(begin(xs), end(xs));
-    xs.erase(unique(begin(xs), end(xs)), end(xs));
-  }
-
-  vector< int > get(const vector< T > &vs) const {
-    vector< int > ret;
-    transform(begin(vs), end(vs), back_inserter(ret), [&](const T &x) {
-      return lower_bound(begin(xs), end(xs), x) - begin(xs);
-    });
-    return ret;
-  }
-
-  int get(const T &x) const {
-    return lower_bound(begin(xs), end(xs), x) - begin(xs);
-  }
-
-  const T &operator[](int k) const {
-    return xs[k];
-  }
-};
-
-int main() {
-    vector<ll> a(6);
-    cin >> a;
+void solve(){
     int N;
     cin >> N;
-    vector<ll> b(N);
-    cin >> b;
-
-
-    sort(all(a));
-    sort(all(b));
+    vector<int> a(N);
+    rep(i,N)cin >> a[i];
     dump(a);
-    dump(b);
-    map<ll,int> mp;
-    vector<ll> v;
-    rep(i,N){
-        set<ll> tmp;
-        for(int j = 5; j >= 0; j--){
-            ll d = b[i] - a[j];
-            tmp.insert(d);
+    deque<int> dq;
+    dq.push_back(0);
+    for(int l = 1, r = 1; l < N; ){
+        int cnt = dq.front()+1;
+        r = l;
+        dq.push_back(cnt);
+        while(r + 1 < N && a[r] < a[r+1]){
+            dq.push_back(cnt);
+            r++;
         }
-        dbg(b[i], tmp);
-        for(auto x: tmp)v.push_back(x);
+        dq.pop_front();
+        dbg(2, l, r);
+        if(l == r){
+            l++, r++;
+            cnt++;
+        }
+        else{
+            l = r+1;
+            // r++;
+            cnt++;
+        }
     }
-    Compress<ll> comp(v);
-    comp.build();
-    int sz = v.size();
-    rep(i,sz){
-        cerr << comp[i] << " ";
-    }
-    cerr << endl;
-    dump(v);
-    for(auto p: comp.get(v)){
-        cerr << p <<  " ";
-    }
-    cerr << endl;
-    vector<ll> dp(sz, INFLL);
+    cout << dq.back() << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

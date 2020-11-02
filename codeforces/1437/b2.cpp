@@ -46,87 +46,26 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-template< typename T >
-struct Compress {
-  vector< T > xs;
-
-  Compress() = default;
-
-  Compress(const vector< T > &vs) {
-    add(vs);
-  }
-
-  Compress(const initializer_list< vector< T > > &vs) {
-    for(auto &p : vs) add(p);
-  }
-
-  void add(const vector< T > &vs) {
-    copy(begin(vs), end(vs), back_inserter(xs));
-  }
-
-  void add(const T &x) {
-    xs.emplace_back(x);
-  }
-
-  void build() {
-    sort(begin(xs), end(xs));
-    xs.erase(unique(begin(xs), end(xs)), end(xs));
-  }
-
-  vector< int > get(const vector< T > &vs) const {
-    vector< int > ret;
-    transform(begin(vs), end(vs), back_inserter(ret), [&](const T &x) {
-      return lower_bound(begin(xs), end(xs), x) - begin(xs);
-    });
-    return ret;
-  }
-
-  int get(const T &x) const {
-    return lower_bound(begin(xs), end(xs), x) - begin(xs);
-  }
-
-  const T &operator[](int k) const {
-    return xs[k];
-  }
-};
-
-int main() {
-    vector<ll> a(6);
-    cin >> a;
+void solve(){
     int N;
-    cin >> N;
-    vector<ll> b(N);
-    cin >> b;
-
-
-    sort(all(a));
-    sort(all(b));
-    dump(a);
-    dump(b);
-    map<ll,int> mp;
-    vector<ll> v;
+    string S;
+    cin >> N >> S;
+    int cnt = 0;
+    int cnt2 = 0;
     rep(i,N){
-        set<ll> tmp;
-        for(int j = 5; j >= 0; j--){
-            ll d = b[i] - a[j];
-            tmp.insert(d);
+        if(i%2 == 1 && S[i] == '0'){
+            cnt++;
         }
-        dbg(b[i], tmp);
-        for(auto x: tmp)v.push_back(x);
+        if(i%2 == 0 && S[i] == '0'){
+            cnt2++;
+        }
     }
-    Compress<ll> comp(v);
-    comp.build();
-    int sz = v.size();
-    rep(i,sz){
-        cerr << comp[i] << " ";
-    }
-    cerr << endl;
-    dump(v);
-    for(auto p: comp.get(v)){
-        cerr << p <<  " ";
-    }
-    cerr << endl;
-    vector<ll> dp(sz, INFLL);
+    dump(cnt, N/2-cnt);
+    dump(cnt2, N/2-cnt2);
+    cout << (cnt * cnt2 + 1) / 2 << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

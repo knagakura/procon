@@ -48,85 +48,50 @@ const string dir = "DRUL";
 */
 
 
-template< typename T >
-struct Compress {
-  vector< T > xs;
-
-  Compress() = default;
-
-  Compress(const vector< T > &vs) {
-    add(vs);
-  }
-
-  Compress(const initializer_list< vector< T > > &vs) {
-    for(auto &p : vs) add(p);
-  }
-
-  void add(const vector< T > &vs) {
-    copy(begin(vs), end(vs), back_inserter(xs));
-  }
-
-  void add(const T &x) {
-    xs.emplace_back(x);
-  }
-
-  void build() {
-    sort(begin(xs), end(xs));
-    xs.erase(unique(begin(xs), end(xs)), end(xs));
-  }
-
-  vector< int > get(const vector< T > &vs) const {
-    vector< int > ret;
-    transform(begin(vs), end(vs), back_inserter(ret), [&](const T &x) {
-      return lower_bound(begin(xs), end(xs), x) - begin(xs);
-    });
-    return ret;
-  }
-
-  int get(const T &x) const {
-    return lower_bound(begin(xs), end(xs), x) - begin(xs);
-  }
-
-  const T &operator[](int k) const {
-    return xs[k];
-  }
-};
-
 int main() {
-    vector<ll> a(6);
-    cin >> a;
-    int N;
-    cin >> N;
-    vector<ll> b(N);
-    cin >> b;
-
-
-    sort(all(a));
-    sort(all(b));
-    dump(a);
-    dump(b);
-    map<ll,int> mp;
-    vector<ll> v;
-    rep(i,N){
-        set<ll> tmp;
-        for(int j = 5; j >= 0; j--){
-            ll d = b[i] - a[j];
-            tmp.insert(d);
+    string S;
+    cin >> S;
+    map<char,int> mp;
+    for(auto c: S)mp[c]++;
+    auto check = [&](int x) -> bool{
+        string T = to_string(x);
+        map<char, int> tmp;
+        for(char a: T)tmp[a]++;
+        for(auto[a, cnt]: tmp){
+            if(mp[a] < cnt)return false;
         }
-        dbg(b[i], tmp);
-        for(auto x: tmp)v.push_back(x);
+        return true;
+    };
+    if(S.size() == 1){
+        if(S[0] == '8'){
+            cout << "Yes" << endl;
+        }
+        else {
+            cout << "No" << endl;
+        }
+        return 0;
     }
-    Compress<ll> comp(v);
-    comp.build();
-    int sz = v.size();
-    rep(i,sz){
-        cerr << comp[i] << " ";
+    if(S.size() == 2){
+        for(int a = 16; a <= 96; a += 8){
+            if(check(a)){
+                cout << "Yes" << endl;
+                return 0;
+            }
+        }
+        cout << "No" << endl;
+        return 0;
     }
-    cerr << endl;
-    dump(v);
-    for(auto p: comp.get(v)){
-        cerr << p <<  " ";
+    bool ok = false;
+
+    for(int a = 1; a <= 125; a++){
+        int x = a * 8;
+        if(x < 100)continue;
+        if(check(x))ok = true;
     }
-    cerr << endl;
-    vector<ll> dp(sz, INFLL);
+    if(ok){
+        cout << "Yes"<< endl;
+    }
+    else {
+        cout << "No"<< endl;
+    }
 }

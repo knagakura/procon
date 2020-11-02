@@ -46,87 +46,29 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-template< typename T >
-struct Compress {
-  vector< T > xs;
-
-  Compress() = default;
-
-  Compress(const vector< T > &vs) {
-    add(vs);
-  }
-
-  Compress(const initializer_list< vector< T > > &vs) {
-    for(auto &p : vs) add(p);
-  }
-
-  void add(const vector< T > &vs) {
-    copy(begin(vs), end(vs), back_inserter(xs));
-  }
-
-  void add(const T &x) {
-    xs.emplace_back(x);
-  }
-
-  void build() {
-    sort(begin(xs), end(xs));
-    xs.erase(unique(begin(xs), end(xs)), end(xs));
-  }
-
-  vector< int > get(const vector< T > &vs) const {
-    vector< int > ret;
-    transform(begin(vs), end(vs), back_inserter(ret), [&](const T &x) {
-      return lower_bound(begin(xs), end(xs), x) - begin(xs);
-    });
-    return ret;
-  }
-
-  int get(const T &x) const {
-    return lower_bound(begin(xs), end(xs), x) - begin(xs);
-  }
-
-  const T &operator[](int k) const {
-    return xs[k];
-  }
-};
-
-int main() {
-    vector<ll> a(6);
-    cin >> a;
+void solve(){
     int N;
     cin >> N;
-    vector<ll> b(N);
-    cin >> b;
-
-
-    sort(all(a));
-    sort(all(b));
-    dump(a);
-    dump(b);
-    map<ll,int> mp;
-    vector<ll> v;
+    vector<int> t(N);
     rep(i,N){
-        set<ll> tmp;
-        for(int j = 5; j >= 0; j--){
-            ll d = b[i] - a[j];
-            tmp.insert(d);
+        cin >> t[i];
+    }
+    sort(all(t));
+    vector<ll> dp(3*N, 0);
+    rep(i,N){
+        vector<ll> nxt(3*N, INFLL);
+        ll pre_min = dp[0];
+        rep1(j,3*N){
+            chmin(nxt[j], pre_min + abs(j - t[i]));
+            chmin(pre_min, dp[j]);
         }
-        dbg(b[i], tmp);
-        for(auto x: tmp)v.push_back(x);
+        swap(nxt, dp);
     }
-    Compress<ll> comp(v);
-    comp.build();
-    int sz = v.size();
-    rep(i,sz){
-        cerr << comp[i] << " ";
-    }
-    cerr << endl;
-    dump(v);
-    for(auto p: comp.get(v)){
-        cerr << p <<  " ";
-    }
-    cerr << endl;
-    vector<ll> dp(sz, INFLL);
+    cout << *min_element(all(dp)) << endl;
+
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

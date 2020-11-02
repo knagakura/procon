@@ -99,34 +99,37 @@ int main() {
     cin >> N;
     vector<ll> b(N);
     cin >> b;
-
-
     sort(all(a));
     sort(all(b));
-    dump(a);
-    dump(b);
-    map<ll,int> mp;
-    vector<ll> v;
+    vector<ll> dp(6, INFLL);
+    set<ll> st;
     rep(i,N){
-        set<ll> tmp;
-        for(int j = 5; j >= 0; j--){
-            ll d = b[i] - a[j];
-            tmp.insert(d);
+        vector<ll> nxt(6, INFLL);
+        if(i == 0){
+            rep(j,6){
+                nxt[j] = 0;
+                ll d = b[i] - a[j];
+                st.insert(d);
+            }
+            swap(nxt, dp);
+            continue;
         }
-        dbg(b[i], tmp);
-        for(auto x: tmp)v.push_back(x);
+        rep(j,6){
+            ll d = b[i]-a[j];
+            auto itr = st.lower_bound(d);
+            ll ue = -1;
+            ll sita = -1;
+            if(itr != st.end()){
+                ue = *itr;
+                if(chmin(nxt[j], abs(ue-d)))st.insert(d);
+            }
+            if(itr != st.begin()){
+                itr--;
+                sita = *itr;
+                if(chmin(nxt[j], abs(sita-d)))st.insert(d);
+            }
+        }
+        swap(nxt, dp);
     }
-    Compress<ll> comp(v);
-    comp.build();
-    int sz = v.size();
-    rep(i,sz){
-        cerr << comp[i] << " ";
-    }
-    cerr << endl;
-    dump(v);
-    for(auto p: comp.get(v)){
-        cerr << p <<  " ";
-    }
-    cerr << endl;
-    vector<ll> dp(sz, INFLL);
+    cout << *min_element(all(dp)) << endl;
 }

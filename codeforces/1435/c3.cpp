@@ -48,85 +48,32 @@ const string dir = "DRUL";
 */
 
 
-template< typename T >
-struct Compress {
-  vector< T > xs;
-
-  Compress() = default;
-
-  Compress(const vector< T > &vs) {
-    add(vs);
-  }
-
-  Compress(const initializer_list< vector< T > > &vs) {
-    for(auto &p : vs) add(p);
-  }
-
-  void add(const vector< T > &vs) {
-    copy(begin(vs), end(vs), back_inserter(xs));
-  }
-
-  void add(const T &x) {
-    xs.emplace_back(x);
-  }
-
-  void build() {
-    sort(begin(xs), end(xs));
-    xs.erase(unique(begin(xs), end(xs)), end(xs));
-  }
-
-  vector< int > get(const vector< T > &vs) const {
-    vector< int > ret;
-    transform(begin(vs), end(vs), back_inserter(ret), [&](const T &x) {
-      return lower_bound(begin(xs), end(xs), x) - begin(xs);
-    });
-    return ret;
-  }
-
-  int get(const T &x) const {
-    return lower_bound(begin(xs), end(xs), x) - begin(xs);
-  }
-
-  const T &operator[](int k) const {
-    return xs[k];
-  }
-};
-
 int main() {
-    vector<ll> a(6);
+    vector<int> a(6);
     cin >> a;
     int N;
     cin >> N;
-    vector<ll> b(N);
+    vector<int> b(N);
     cin >> b;
-
-
-    sort(all(a));
-    sort(all(b));
-    dump(a);
-    dump(b);
-    map<ll,int> mp;
-    vector<ll> v;
-    rep(i,N){
-        set<ll> tmp;
-        for(int j = 5; j >= 0; j--){
-            ll d = b[i] - a[j];
-            tmp.insert(d);
+    vector<pair<int,int>> v;
+    rep(i,N)rep(j,6){
+        v.emplace_back(b[i]-a[j], i);
+    }
+    sort(all(v));
+    int val = 0;
+    vector<int> cnt(N, 0);
+    int ans = INF;
+    int M = 6 * N;
+    for(int l = 0, r = 0; l < M; l++){
+        while(r < M && val < N){
+            int ridx = v[r].second;
+            if(cnt[ridx] == 0)val++;
+            cnt[ridx]++;
+            r++;
         }
-        dbg(b[i], tmp);
-        for(auto x: tmp)v.push_back(x);
+        if(val == N)chmin(ans, v[r-1].first - v[l].first);
+        cnt[v[l].second]--;
+        if(cnt[v[l].second] == 0)val--;
     }
-    Compress<ll> comp(v);
-    comp.build();
-    int sz = v.size();
-    rep(i,sz){
-        cerr << comp[i] << " ";
-    }
-    cerr << endl;
-    dump(v);
-    for(auto p: comp.get(v)){
-        cerr << p <<  " ";
-    }
-    cerr << endl;
-    vector<ll> dp(sz, INFLL);
+    cout << ans << endl;
 }

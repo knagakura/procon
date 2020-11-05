@@ -16,15 +16,10 @@
 #include <algorithm>
 #include <queue>
 #include <cmath>
-//--------------------------------my macro----------------------------------------------
+//--------------------------------my macro--------------------------------------
 using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
-const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
-const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
-template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
-template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
-
-//--------------------------------debug functions----------------------------------------------
+//--------------------------------debug functions-------------------------------
 #define TOSTRING(x) string(#x)
 
 ostream &operator<<(ostream &os, hpc::Vector2 &val) {os  << "{" << val.x << ", " << val.y << "}";return os; };
@@ -53,7 +48,14 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 
 //------------------------------------------------------------------------------------------
 namespace hpc {
+// const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
+// const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
+const int dx[8] = {1, 1, 0, -1, -1, -1, 0, 1};
+const int dy[8] = {0, 1, 1, 1, 0, -1, -1, -1};
+template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
+template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 // 変数
+const int StartPos = 0;
 const int M = Parameter::MaxScrollCount;
 const int H = Parameter::StageHeight;
 const int W = Parameter::StageWidth;
@@ -66,7 +68,7 @@ vector<int> scrollseq; // 巻物の周り順（本質情報）
 int scrollseq_idx;
 int cell_idx;
 float distScroll[M+5][M+5];
-// この中に
+// chokudai search用のクラス。priority_queueに入れてコストを管理する
 struct ScrollTour{
     vector<int> seq;
     vector<bool> used;
@@ -216,6 +218,12 @@ uint32_t XorShift(void) {
 bool issame(const hpc::Scroll &a, const hpc::Scroll &b){
     return a.pos().x == b.pos().x && a.pos().y == b.pos().y;
 }
+float dist(float x, float y){
+    return sqrt(x*x+y*y);
+}
+float dist(const Vector2& a,const Vector2& b){
+    return dist(abs(a.x-b.x), abs(a.y-b.y));
+}
 //--------------------------------my libraries----------------------------------------------
 
 
@@ -286,14 +294,15 @@ void build_make_edges(const Stage& aStage, Dijkstra<T>& G){
         Vector2 from = {float(i), float(j)};
         Terrain from_tr = aStage.terrain(from);
         int from_idx = idx_encode(from);
-        rep(k,8){
-            int nx = i + dx[k];
-            int ny = j + dy[k];
+        for(int k = StartPos; k > StartPos - 8; k--){
+            int nx = i + dx[(k+8)%8];
+            int ny = j + dy[(k+8)%8];
             if(aStage.isOutOfBounds(Vector2(nx, ny)))continue;
             Vector2 to = {float(nx), float(ny)};
             // Terrain to_tr = aStage.terrain(to);
             int to_idx = idx_encode(to);
             float cost = terrain_cost(from_tr) /*+ terrain_cost(to_tr)*/;
+            cost *= dist(dx[(k+8)%8], dy[(k+8)%8]);
             G.make_edge(from_idx, to_idx, cost);
         }
     }
@@ -365,15 +374,34 @@ float calc_cost(const vector<int>& v){
     }
     return cost;
 }
-vector<int> chokudai_search(){
+
+int gochagocha(const vector<int> &tmpseq){
+    vector<int> cntx(H,0), cnty(W,0);
+    rep(i,tmpseq.size()-1){
+        int scroll_l = tmpseq[i];
+        int scroll_r = tmpseq[i+1];
+        int path_idx = scroll_l* scrollN + scroll_r;
+        for(auto v: paths[path_idx]){
+            int a = v.x;
+            int b = v.y;
+            cntx[a]++;
+            cnty[b]++;
+        }
+    }
+    int res = 0;
+    rep(i,H)res += max(0, cntx[i]-2);
+    rep(i,W)res += max(0, cnty[i]-2);
+    return res;
+}
+vector<int> chokudai_search(const Stage &aStage){
     // 定数
     MyTimer timer;
-    timer.reset();
-    int Chokudai_width = 5;
-    double TIME_LIMIT = 0.60;
-
     //　初期はクラスカルでやる
     auto ini_seq = kuraskal();
+
+    //　この時の形状の特徴量を測る
+    // int gocha = gochagocha(ini_seq);
+    // dump(gocha);
     // dump(ini_seq);
     ScrollTour ini_tour;
     // ターン毎にpqに突っ込んでいく
@@ -381,14 +409,22 @@ vector<int> chokudai_search(){
         ini_tour.add_scroll(ini_seq[t]);
         vpq[t].push(ini_tour);
     }
+
+
+    timer.reset();
+    int cnt = 0;
+    double TIME_LIMIT = 0.40;
+    int Chokudai_width = 1;
     while(true){
+        cnt++;
+        // if(cnt%20 == 0)Chokudai_width++;
         auto now_time = timer.get();
         if(now_time >= TIME_LIMIT) break;
         for(int t = 0; t < scrollN - 1; t++){
             rep(_,Chokudai_width){
                 if(vpq[t].empty())break;
                 ScrollTour past = vpq[t].top();
-                if(t > 0)vpq[t].pop();
+                vpq[t].pop();
                 for(int l = 0; l < scrollN; l++){
                     if(not past.used[l]){
                         ScrollTour nxt = past;
@@ -400,9 +436,12 @@ vector<int> chokudai_search(){
         }
     }
     ScrollTour res = vpq[scrollN-1].top();
-    // dump(res.seq);
+    // dbg(scrollN);
+    // dbg(ini_tour.seq, ini_tour.cost);
+    // dbg(res.seq, res.cost);
     return res.seq;
 }
+
 vector<int> bluteforce(){
     float min_cost = 1e5;
     vector<int> tmp, res;
@@ -443,16 +482,16 @@ void bluteforce(int l, int r, vector<int>& scrollseq_){
 
 
 void build_scrollseq(const Stage &aStage){
-    if(scrollN < 13){
-        // scrollseq.resize(scrollN);
-        // scrollseq[0] = scrollN-1;
-        // rep(i,scrollN-1)scrollseq[i+1] = i;
-        // bluteforce(1, scrollN, scrollseq);
-        scrollseq = kuraskal();
+    if(scrollN < 12){
+        scrollseq.resize(scrollN);
+        scrollseq[0] = scrollN-1;
+        rep(i,scrollN-1)scrollseq[i+1] = i;
+        bluteforce(1, scrollN, scrollseq);
+        // scrollseq = kuraskal();
     }
     else{
         // scrollseq = kuraskal();
-        scrollseq = chokudai_search();
+        scrollseq = chokudai_search(aStage);
     }
 }
 /// コンストラクタ
@@ -485,12 +524,7 @@ float get_jumpdist(const Stage& aStage, const Rabbit& rabbit){
     return rabbit.power() * terrain_magni(aStage.terrain(rabbit.pos()));
 }
 
-float dist(float x, float y){
-    return sqrt(x*x+y*y);
-}
-float dist(const Vector2& a,const Vector2& b){
-    return dist(abs(a.x-b.x), abs(a.y-b.y));
-}
+
 //------------------------------------------------------------------------------
 /// 毎フレーム呼び出される処理
 /// @detail 移動先を決定して返します
@@ -525,7 +559,6 @@ Vector2 Answer::getTargetPos(const Stage& aStage){
 /// @param aStage 現在のステージ
 void Answer::finalize(const Stage& aStage)
 {
-    anslist.clear();
 }
 } // namespace
 

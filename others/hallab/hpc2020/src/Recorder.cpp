@@ -46,12 +46,12 @@ void Recorder::dumpJson() const
 void Recorder::dumpResult(bool aIsSilent) const
 {
     if (!aIsSilent) {
-        HPC_PRINTF("stage | turn\n");
+        HPC_PRINTF("stage, scrollcount, turn\n");
         for (int i = 0; i < Parameter::GameStageCount; ++i) {
-            HPC_PRINTF("% 5d | % 4d\n", i, mGameRecord.stageRecords[i].scoreTurn);
+            HPC_PRINTF("% 5d, % 4d, %3d\n", i, mGameRecord.stageRecords[i].scrollCount ,mGameRecord.stageRecords[i].scoreTurn);
         }
     }
-    HPC_PRINTF("TotalTurn: %d\n", mGameRecord.totalTurn);
+    HPC_PRINTF("TotalTurn, 0, %d\n", mGameRecord.totalTurn);
 }
 
 //------------------------------------------------------------------------------

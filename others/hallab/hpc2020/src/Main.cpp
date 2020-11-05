@@ -12,7 +12,8 @@
 
 #include <cstdlib>
 #include <cstring>
-
+#include <string>
+#include <iostream>
 //------------------------------------------------------------------------------
 namespace {
 hpc::Simulator fSim;
@@ -23,6 +24,8 @@ int main(int aArgc, const char* aArgv[])
 {
     bool willPrintJson = false;
     bool silentMode = false;
+    bool expMode = false;
+    std::string exp_name;
     if (aArgc > 1) {
         for (int n = 1; n < aArgc; ++n) {
             // 引数がある場合、引数を記憶します
@@ -49,6 +52,17 @@ int main(int aArgc, const char* aArgv[])
                 }
             } else if (!std::strcmp(aArgv[n], "-s")) {
                 silentMode = true;
+            }
+              else if(!std::strcmp(aArgv[n], "-e")){
+                  expMode = true;
+                if(n+1 < aArgc){
+                    exp_name = std::string(aArgv[n+1]);
+                    n++;
+                }
+                else{
+                    HPC_PRINTF("Invalid Argument.(-e) requires one experiment name.\n");
+                    return 1;
+                }
             } else {
                 // 不明な引数
                 HPC_PRINTF("Invalid Argument.(%s)\n", aArgv[n]);
@@ -58,8 +72,11 @@ int main(int aArgc, const char* aArgv[])
     }
 
     fSim.run();
-
-    if (willPrintJson) {
+    if(expMode){
+        fSim.printJson();
+        fSim.printResult(silentMode = false);
+    }
+    else if (willPrintJson) {
         // Jsonを出力します
         fSim.printJson();
     } else {

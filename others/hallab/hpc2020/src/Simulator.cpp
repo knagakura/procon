@@ -40,7 +40,7 @@ void Simulator::run()
 void Simulator::printResult(bool aIsSilent) const
 {
     mGame.recorder().dumpResult(aIsSilent);
-    HPC_PRINTF("Time: %.3f sec\n", mGame.timer().elapsedSec());
+    HPC_PRINTF("# Time: %.3f sec\n", mGame.timer().elapsedSec());
 }
 
 //------------------------------------------------------------------------------

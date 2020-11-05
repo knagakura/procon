@@ -50,3 +50,4 @@ ac-library/*
 others/hallab/hpc2020/viewer
 others/hallab/hpc2020_bug/*/
 others/hallab/hpc2020_bug/*
+*.csv

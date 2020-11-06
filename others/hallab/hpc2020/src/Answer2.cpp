@@ -417,7 +417,6 @@ vector<int> chokudai_search(const Stage &aStage){
     int Chokudai_width = 1;
     while(true){
         cnt++;
-        // if(cnt%20 == 0)Chokudai_width++;
         auto now_time = timer.get();
         if(now_time >= TIME_LIMIT) break;
         for(int t = 0; t < scrollN - 1; t++){
@@ -517,8 +516,8 @@ void Answer::initialize(const Stage& aStage)
 {
     parametar_clear();
     parametar_ini(aStage);
-    build_distance_matrix(aStage);
-    build_scrollseq(aStage);
+    build_distance_matrix(aStage); // scroll x scrollの距離行列の構築
+    build_scrollseq(aStage); // scroll Tourの構築
 }
 float get_jumpdist(const Stage& aStage, const Rabbit& rabbit){
     return rabbit.power() * terrain_magni(aStage.terrain(rabbit.pos()));

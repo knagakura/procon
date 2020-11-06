@@ -482,37 +482,39 @@ void build_scrollseq2(const Stage &aStage){
 }
 
 void build_dxdycost2(){
-    int tmpdx[] = {1, 0, -1, 0};
-    int tmpdy[] = {0, 1, 0, -1};
+    const int tmpdx[8] = {1, 1, 0, -1, -1, -1, 0, 1};
+    const int tmpdy[8] = {0, 1, 1, 1, 0, -1, -1, -1};
     for(int terra = 0; terra < 4; terra++){
         for(int seq_idx = 0; seq_idx <= M; seq_idx++){
             int idx = terra * (M+1) + seq_idx;
             float length = beki[seq_idx] * Parameter::JumpTerrianCoefficient[terra];
+            rep(i,8){
+                float d = dist(tmpdx[i], tmpdy[i]);
+                dx2[idx].push_back(tmpdx[i]);
+                dy2[idx].push_back(tmpdy[i]);
+                cost2[idx].push_back(d/length); // ここ本当は例えば0.3のとき4回かかるので、ちょっと微妙
+            }
             // dump(idx, idx/(M+1), idx % (M+1));
             // dump(length);
             // if(length < 1){
-                rep(i,4){
-                    float d = dist(tmpdx[i], tmpdy[i]);
-                    dx2[idx].push_back(tmpdx[i]);
-                    dy2[idx].push_back(tmpdy[i]);
-                    cost2[idx].push_back(d/length); // ここ本当は例えば0.3のとき4回かかるので、ちょっと微妙
-                }
             //     // dump(dx2[idx]);
             //     // dump(dy2[idx]);
             //     // dump(cost2[idx]);
             //     continue;
             // }
-            // for(int i = -6; i <= 6; i++){
-            //     for(int j = -6; j <= 6; j++){
-            //         if(i == 0 && j == 0)continue;
-            //         float d = dist(i, j);
-            //         if(d <= length){
-            //             dx2[idx].push_back(i);
-            //             dy2[idx].push_back(j);
-            //             cost2[idx].push_back(1.0);
-            //         }
-            //     }
-            // }
+
+            // all direction
+            for(int i = -6; i <= 6; i++){
+                for(int j = -6; j <= 6; j++){
+                    if(i == 0 && j == 0)continue;
+                    float d = dist(i, j);
+                    if(d <= length-0.5){
+                        dx2[idx].push_back(i);
+                        dy2[idx].push_back(j);
+                        cost2[idx].push_back(1.0);
+                    }
+                }
+            }
             // dump(dx2[idx]);
             // dump(dy2[idx]);
             // dump(cost2[idx]);
@@ -585,7 +587,6 @@ Vector2 MygetTargetPos2(const Stage& aStage){
     }
     auto res = paths2[getNum][path_idx][cell_idx];
     return res;
-
 }
 
 /// 毎フレーム呼び出される処理

@@ -386,25 +386,12 @@ void build_dist_matrix2(const Stage &aStage){
 vector<int> chokudai_search2(const Stage &aStage){
     // 定数
     MyTimer timer;
-    //　初期はクラスカルでやる
-    // auto ini_seq = kuraskal();
-
-    // //　この時の形状の特徴量を測る
-    // // int gocha = gochagocha(ini_seq);
-    // // dump(gocha);
-    // // dump(ini_seq);
-    // ScrollTour2 ini_tour;
-    // // ターン毎にpqに突っ込んでいく
-    // rep(t,scrollN){
-    //     ini_tour.add_scroll(ini_seq[t]);
-    //     vpq2[t].push(ini_tour);
-    // }
-    ScrollTour2 ini_seq;
-    ini_seq.add_scroll(scrollN-1);
-    vpq2[0].push(ini_seq);
+    ScrollTour2 ini_tour;
+    ini_tour.add_scroll(scrollN-1);
+    vpq2[0].push(ini_tour);
     timer.reset();
     int cnt = 0;
-    double TIME_LIMIT = 0.40;
+    double TIME_LIMIT = 0.30;
     int Chokudai_width = 1;
     while(true){
         cnt++;
@@ -579,28 +566,6 @@ float get_jumpdist(const Stage& aStage, const Rabbit& rabbit){
 
 
 //------------------------------------------------------------------------------
-// Vector2 MygetTargetPos(const Stage& aStage){
-
-//     auto player = aStage.rabbit();
-//     Vector2 now_pos = player.pos();
-//     float length = get_jumpdist(aStage, player);
-
-//     while(scrollseq_idx+1 < (int)scrollseq.size() && aStage.scrolls()[scrollseq[scrollseq_idx+1]].isGotten()){ // 2
-//         scrollseq_idx++;
-//         cell_idx = 0;
-//     }
-//     // return scrollseq_idx+1 < scrollseq.size() ? aStage.scrolls()[scrollseq[scrollseq_idx+1]].pos() : aStage.rabbit().pos(); //2
-
-//     int scroll_l = scrollseq[scrollseq_idx];
-//     int scroll_r = scrollseq[scrollseq_idx+1];
-//     int path_idx = scroll_l* scrollN + scroll_r;
-//     while(cell_idx+1 < (int)paths[path_idx].size() && length > dist(now_pos, paths[path_idx][cell_idx])){
-//         cell_idx++;
-//     }
-//     auto res = paths[path_idx][cell_idx];
-//     return res;
-
-// }
 Vector2 MygetTargetPos2(const Stage& aStage){
     auto player = aStage.rabbit();
     Vector2 now_pos = player.pos();

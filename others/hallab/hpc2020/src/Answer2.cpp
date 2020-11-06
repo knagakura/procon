@@ -67,10 +67,12 @@ vector<vector<Vector2>> paths; // path[idx_encode(i, j)] := i -> jへの最短�
 vector<int> scrollseq; // 巻物の周り順（本質情報）
 int scrollseq_idx;
 int cell_idx;
+vector<Vector2> scrollPositions;
 float distScroll[M+5][M+5];
 int distScroll2[M+5][M+5][M+5];
 vector<int> dx2[100], dy2[100];
 vector<float> cost2[100];
+vector<vector<vector<Vector2>>> paths2;
 // chokudai search用のクラス。priority_queueに入れてコストを管理する
 struct ScrollTour{
     vector<int> seq;
@@ -238,6 +240,8 @@ void parametar_clear(){
     paths.clear();
     vpq.clear();
     rep(i,M)rep(j,M)rep(k,M)distScroll2[i][j][k] = -1;
+    scrollPositions.clear();
+    paths2.clear();
 }
 void parametar_ini(const Stage &aStage){
     scrollN = aStage.scrolls().count() + 1; // +1は最初の点
@@ -246,6 +250,12 @@ void parametar_ini(const Stage &aStage){
     cell_idx = 0;
     paths.resize(scrollN*scrollN);
     vpq.resize(scrollN);
+    paths2.resize(scrollN);
+    rep(i,scrollN)paths2[i].resize(scrollN*scrollN);
+    // 巻物
+    rep(i,scrollN-1)scrollPositions.push_back(aStage.scrolls()[i].pos());
+    // 最初のポジション
+    scrollPositions.push_back(ini_pos);
 }
 // 処理
 Vector2 random_move(const Stage& aStage){
@@ -316,19 +326,14 @@ void build_dist_matrix(const Stage& aStage){
     Dijkstra<float> G(H*W, 1e5);
     build_make_edges(aStage, G);
 
-    vector<Vector2> positions;
-    // 巻物
-    rep(i,scrollN-1)positions.push_back(aStage.scrolls()[i].pos());
-    // 最初のポジション
-    positions.push_back(ini_pos);
 
 
     rep(i,scrollN){
-        Vector2 scroll_from = positions[i];
+        Vector2 scroll_from = scrollPositions[i];
         int start_idx = idx_encode(scroll_from);
         G.solve(start_idx);
         rep(j,scrollN){
-            Vector2 scroll_to = positions[j];
+            Vector2 scroll_to = scrollPositions[j];
             int to_idx = idx_encode(scroll_to);
             distScroll[i][j] = G.cost[to_idx];
             paths[i*scrollN+j] = G.get_path(to_idx);
@@ -398,15 +403,52 @@ int gochagocha(const vector<int> &tmpseq){
     return res;
 }
 
-// 
-void calc_distScroll2_i(const Stage& aStage, int idx){
+template<typename T>
+void build_make_edges2(const Stage& aStage, Dijkstra<T>& G, const int getNum){
+    rep(i,H)rep(j,W){
+        Vector2 from = {float(i), float(j)};
+        Terrain from_tr = aStage.terrain(from);
+        int from_idx = idx_encode(from);
 
+        int idxx = (M+1)*(int)from_tr + getNum;
+        vector<int> tmp_dx = dx2[idxx];
+        vector<int> tmp_dy = dy2[idxx];
+        vector<float> tmp_cost = cost2[idxx];
+        int sz = tmp_dx.size();
+        rep(k,sz){
+            int nx = i + tmp_dx[k];
+            int ny = j + tmp_dy[k];
+            if(aStage.isOutOfBounds(Vector2(nx, ny)))continue;
+            Vector2 to = {float(nx), float(ny)};
+            // Terrain to_tr = aStage.terrain(to);
+            int to_idx = idx_encode(to);
+            // float cost = terrain_cost(from_tr) /*+ terrain_cost(to_tr)*/;
+            G.make_edge(from_idx, to_idx, tmp_cost[k]);
+        }
+    }
+}
+
+// いくつ取った後なのかという情報を固定したときに、scroll -> scrollの距離を計算する　-> distScroll2[getNum]に格納される
+void calc_distScroll2_getNum(const Stage& aStage, const int getNum){
+    Dijkstra<float> G(H*W, 1e5);
+    build_make_edges2(aStage, G, getNum);
+    rep(i,scrollN){
+        Vector2 scroll_from = scrollPositions[i];
+        int start_idx = idx_encode(scroll_from);
+        G.solve(start_idx);
+        rep(j,scrollN){
+            Vector2 scroll_to = scrollPositions[j];
+            int to_idx = idx_encode(scroll_to);
+            distScroll2[getNum][i][j] = G.cost[to_idx];
+            paths2[getNum][i*scrollN+j] = G.get_path(to_idx);
+        }
+    }
 }
 
 void build_dist_matrix2(const Stage &aStage){
-    // distScroll2[i]を埋めるための計算をする
-    for(int i = 0; i < scrollN; i++){
-        calc_distScroll2_i(aStage, i);
+    // distScroll2[getNum]を埋めるための計算をする
+    for(int getNum = 0; getNum < scrollN; getNum++){
+        calc_distScroll2_getNum(aStage, getNum);
     }
 }
 vector<int> chokudai_search(const Stage &aStage){
@@ -584,7 +626,7 @@ void Answer::initialize(const Stage& aStage)
     //
     parametar_clear();
     parametar_ini(aStage);
-    
+
     build_dist_matrix(aStage); // scroll x scrollの距離行列の構築
     build_scrollseq(aStage); // scroll Tourの構築
 

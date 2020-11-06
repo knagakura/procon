@@ -68,6 +68,9 @@ vector<int> scrollseq; // 巻物の周り順（本質情報）
 int scrollseq_idx;
 int cell_idx;
 float distScroll[M+5][M+5];
+int distScroll2[M+5][M+5][M+5];
+vector<int> dx2[100], dy2[100];
+vector<float> cost2[100];
 // chokudai search用のクラス。priority_queueに入れてコストを管理する
 struct ScrollTour{
     vector<int> seq;
@@ -234,6 +237,7 @@ void parametar_clear(){
     scrollseq.clear();
     paths.clear();
     vpq.clear();
+    rep(i,M)rep(j,M)rep(k,M)distScroll2[i][j][k] = -1;
 }
 void parametar_ini(const Stage &aStage){
     scrollN = aStage.scrolls().count() + 1; // +1は最初の点
@@ -308,7 +312,7 @@ void build_make_edges(const Stage& aStage, Dijkstra<T>& G){
     }
 }
 
-void build_distance_matrix(const Stage& aStage){
+void build_dist_matrix(const Stage& aStage){
     Dijkstra<float> G(H*W, 1e5);
     build_make_edges(aStage, G);
 
@@ -392,6 +396,18 @@ int gochagocha(const vector<int> &tmpseq){
     rep(i,H)res += max(0, cntx[i]-2);
     rep(i,W)res += max(0, cnty[i]-2);
     return res;
+}
+
+// 
+void calc_distScroll2_i(const Stage& aStage, int idx){
+
+}
+
+void build_dist_matrix2(const Stage &aStage){
+    // distScroll2[i]を埋めるための計算をする
+    for(int i = 0; i < scrollN; i++){
+        calc_distScroll2_i(aStage, i);
+    }
 }
 vector<int> chokudai_search(const Stage &aStage){
     // 定数
@@ -493,12 +509,58 @@ void build_scrollseq(const Stage &aStage){
         scrollseq = chokudai_search(aStage);
     }
 }
+
+void build_scrollseq2(const Stage &aStage){
+
+}
+
+void build_dxdycost2(){
+    int tmpdx[] = {1, 0, -1, 0};
+    int tmpdy[] = {0, 1, 0, -1};
+    for(int terra = 0; terra < 4; terra++){
+        for(int seq_idx = 0; seq_idx <= M; seq_idx++){
+            int idx = terra * (M+1) + seq_idx;
+            float length = beki[seq_idx] * Parameter::JumpTerrianCoefficient[terra];
+            // dump(idx, idx/(M+1), idx % (M+1));
+            // dump(length);
+            if(length < 1){
+                rep(i,4){
+                    float d = dist(tmpdx[i], tmpdy[i]);
+                    dx2[idx].push_back(tmpdx[i]);
+                    dy2[idx].push_back(tmpdy[i]);
+                    cost2[idx].push_back(ceil(d/length)); // ここ本当は例えば0.3のとき4回かかるので、ちょっと微妙
+                }
+                // dump(dx2[idx]);
+                // dump(dy2[idx]);
+                // dump(cost2[idx]);
+                continue;
+            }
+            for(int i = -6; i <= 6; i++){
+                for(int j = -6; j <= 6; j++){
+                    if(i == 0 && j == 0)continue;
+                    float d = dist(i, j);
+                    // dump(d);
+                    // if(d < length){
+                        dx2[idx].push_back(i);
+                        dy2[idx].push_back(j);
+                        cost2[idx].push_back(max(1.0f, d/length));
+                    // }
+                }
+            }
+            // dump(dx2[idx]);
+            // dump(dy2[idx]);
+            // dump(cost2[idx]);
+        }
+    }
+}
+
 /// コンストラクタ
 /// @detail 最初のステージ開始前に実行したい処理があればここに書きます
 Answer::Answer()
 {
     beki[0] = 1.0f;
     rep(i,M)beki[i+1] = beki[i] * 1.1f;
+    build_dxdycost2();
 }
 
 //------------------------------------------------------------------------------
@@ -519,10 +581,17 @@ void Answer::initialize(const Stage& aStage)
     dbg(stagenum, a);
     MyTimer t;
     t.reset();;
+    //
     parametar_clear();
     parametar_ini(aStage);
-    build_distance_matrix(aStage); // scroll x scrollの距離行列の構築
+    
+    build_dist_matrix(aStage); // scroll x scrollの距離行列の構築
     build_scrollseq(aStage); // scroll Tourの構築
+
+    // build_dist_matrix2(aStage); // scroll x scrollの距離行列の構築
+    // build_scrollseq2(aStage); // scroll Tourの構築
+
+    //
     dbg(t.get());
 }
 float get_jumpdist(const Stage& aStage, const Rabbit& rabbit){

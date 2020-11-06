@@ -18,7 +18,7 @@ class Parameter
 {
 public:
     /// ステージ数
-    static const int GameStageCount = 20; // 
+    static const int GameStageCount = 200; // 
     /// 各ステージのターン数
     static const int GameTurnLimit = 1000;
     /// ステージの横幅

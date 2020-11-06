@@ -511,13 +511,19 @@ Answer::~Answer()
 //------------------------------------------------------------------------------
 /// 各ステージ開始時に呼び出される処理
 /// @detail 各ステージに対する初期化処理が必要ならここに書きます
+int stagenum = 0;
 /// @param aStage 現在のステージ
 void Answer::initialize(const Stage& aStage)
 {
+    int a = stagenum++ % 20 + 1;
+    dbg(stagenum, a);
+    MyTimer t;
+    t.reset();;
     parametar_clear();
     parametar_ini(aStage);
     build_distance_matrix(aStage); // scroll x scrollの距離行列の構築
     build_scrollseq(aStage); // scroll Tourの構築
+    dbg(t.get());
 }
 float get_jumpdist(const Stage& aStage, const Rabbit& rabbit){
     return rabbit.power() * terrain_magni(aStage.terrain(rabbit.pos()));

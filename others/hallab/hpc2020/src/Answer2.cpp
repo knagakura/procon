@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <queue>
 #include <cmath>
+#include <map>
 //--------------------------------my macro--------------------------------------
 using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -59,6 +60,8 @@ const int StartPos = 0;
 const int M = Parameter::MaxScrollCount;
 const int H = Parameter::StageHeight;
 const int W = Parameter::StageWidth;
+
+const int n_Splits = 3; // 座標を何倍に拡大してみるか
 float beki[M+5];
 int scrollN; // ステージにある巻物の個数
 Vector2 ini_pos;
@@ -138,6 +141,7 @@ inline long long getCycle() {
     return ((long long) low) | ((long long) high << 32);
 }
 };
+
 
 // ダイクストラ法
 template<class T> class Dijkstra {
@@ -391,17 +395,22 @@ vector<int> chokudai_search2(const Stage &aStage){
     vpq2[0].push(ini_tour);
     timer.reset();
     int cnt = 0;
-    double TIME_LIMIT = 0.30;
+    double TIME_LIMIT = 0.20;
     int Chokudai_width = 1;
+    long long maxtimes = 1;
+    rep(i,scrollN)maxtimes *= (i+1);
+    map<vector<int>, int> mp;
     while(true){
         cnt++;
         auto now_time = timer.get();
-        if(now_time >= TIME_LIMIT) break;
+        if(now_time >= TIME_LIMIT || vpq2.back().size() > maxtimes) break;
         for(int t = 0; t < scrollN - 1; t++){
             rep(_,Chokudai_width){
                 if(vpq2[t].empty())break;
                 ScrollTour2 past = vpq2[t].top();
                 vpq2[t].pop();
+                if(mp[past.seq] > 0)continue;
+                mp[past.seq]++;
                 for(int l = 0; l < scrollN; l++){
                     if(not past.used[l]){
                         ScrollTour2 nxt = past;
@@ -411,6 +420,7 @@ vector<int> chokudai_search2(const Stage &aStage){
                 }
             }
         }
+        // break;
     }
     ScrollTour2 res = vpq2[scrollN-1].top();
     dbg(scrollN);
@@ -469,7 +479,7 @@ void bluteforce2(int l, int r, vector<int>& scrollseq_){
 
 void build_scrollseq2(const Stage &aStage){
     dump(scrollN);
-    if(scrollN < 12){
+    if(false && scrollN < 12){
         scrollseq.resize(scrollN);
         scrollseq[0] = scrollN-1;
         rep(i,scrollN-1)scrollseq[i+1] = i;
@@ -502,19 +512,18 @@ void build_dxdycost2(){
             //     // dump(cost2[idx]);
             //     continue;
             // }
-
             // all direction
-            for(int i = -6; i <= 6; i++){
-                for(int j = -6; j <= 6; j++){
-                    if(i == 0 && j == 0)continue;
-                    float d = dist(i, j);
-                    if(d <= length-0.5){
-                        dx2[idx].push_back(i);
-                        dy2[idx].push_back(j);
-                        cost2[idx].push_back(1.0);
-                    }
-                }
-            }
+            // for(int i = -6; i <= 6; i++){
+            //     for(int j = -6; j <= 6; j++){
+            //         if(i == 0 && j == 0)continue;
+            //         float d = dist(i, j);
+            //         if(d <= length){
+            //             dx2[idx].push_back(i);
+            //             dy2[idx].push_back(j);
+            //             cost2[idx].push_back(1.0);
+            //         }
+            //     }
+            // }
             // dump(dx2[idx]);
             // dump(dy2[idx]);
             // dump(cost2[idx]);
@@ -545,10 +554,20 @@ int stagenum = 0;
 /// @param aStage 現在のステージ
 void Answer::initialize(const Stage& aStage)
 {
+    
     int a = stagenum++ % 20 + 1;
+    {
+        auto bStage = aStage;
+        Vector2 b(1.0f, 1.0f);
+        auto now_terrain = (int)aStage.terrain(aStage.rabbit().pos());
+        auto now = aStage.rabbit().pos();
+        auto nxt = bStage.getNextPos(aStage.rabbit().pos(), 1.0f, b);
+        dump(now, nxt, now_terrain);
+    }
+
     dbg(stagenum, a);
     MyTimer t;
-    t.reset();;
+    t.reset();
     //
     parametar_clear();
     parametar_ini(aStage);

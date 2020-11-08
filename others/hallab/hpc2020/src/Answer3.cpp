@@ -49,98 +49,108 @@ const int dy[8] = {0, 1, 1, 1, 0, -1, -1, -1};
 template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
 template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 // 変数
-const int StartPos = 0;
 const int M = Parameter::MaxScrollCount;
 const int H = Parameter::StageHeight;
 const int W = Parameter::StageWidth;
-const int n_Splits = 3; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
-const int Hn = H * n_Splits;
-const int Wn = W * n_Splits;
+//const int n_Splits = 3; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
+//const int Hn = H * n_Splits;
+//const int Wn = W * n_Splits;
 
 //--------------------------------my libraries----------------------------------------------
+class MyAnswer{
+public:
+    vector<Vector2> PositionSeq;
+    int positionSeqIdx{};
+    int SolverSelection = 2;
+    static const int Random = 0;
+    static const int BluteKur = 1;
+    static const int BluteKurCell = 2;
 
-    class MyAnswer{
-    public:
-        vector<Vector2> PositionSeq;
-        int positionSeqIdx{};
-        int SolverSelection;
-        static const int Random = 0;
-        static const int BluteKur = 1;
-        static const int BluteKurCell = 2;
-        explicit MyAnswer(int type_): SolverSelection(std::move(type_)){
-            clear();
-        }
-        void clear(){
-            PositionSeq.clear();
-            positionSeqIdx = 0;
-        }
-    };
 
-    class CellStage {
-    public:
-        // 共通
-        vector <vector<Vector2>> pos; // n_Splitしたcellのposition
-        float beki[M + 5]{};
-        // 共通Initiation
-        CellStage() = default;
-        void Initiation(){
-            buildCellPos();
-            buildBeki();
-        }
-        void buildCellPos(){
-            pos.resize(Hn);
-            rep(i, Hn) {
-                pos[i].resize(Wn);
-                rep(j, Wn) {
-                    pos[i][j] = {float(2 * i + 1) / float(2 * n_Splits),
-                                 float(2 * j + 1) / float(2 * n_Splits)};
-                }
+    static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT = 0.08;
+    static const int CHOKUDAI_WIDTH = 1;
+
+
+    static const int n_Splits = 5; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
+    static const int Hn = H * n_Splits;
+    static const int Wn = W * n_Splits;
+    explicit MyAnswer(int type_): SolverSelection(type_){
+        clear();
+    }
+    void clear(){
+        PositionSeq.clear();
+        positionSeqIdx = 0;
+    }
+};
+#define n_Splits MyAnswer::n_Splits
+#define Hn MyAnswer::Hn
+#define Wn MyAnswer::Wn
+
+class CellStage {
+public:
+    // 共通
+    vector <vector<Vector2>> pos; // n_Splitしたcellのposition
+    float beki[M + 5]{};
+    // 共通Initiation
+    CellStage() = default;
+    void Initiation(){
+        buildCellPos();
+        buildBeki();
+    }
+    void buildCellPos(){
+        pos.resize(Hn);
+        rep(i, Hn) {
+            pos[i].resize(Wn);
+            rep(j, Wn) {
+                pos[i][j] = {float(2 * i + 1) / float(2 * n_Splits),
+                             float(2 * j + 1) / float(2 * n_Splits)};
             }
         }
-        void buildBeki(){
-            beki[0] = 1.0f;
-            rep(i,M)beki[i+1] = beki[i] * Parameter::JumpPowerUpRate;
-        }
-        // インターフェース
-        Vector2 getCellPos(int i, int j){
-            return pos[i][j];
-        }
-        static pair<int, int> getCellCenterIdx(const Vector2 &v){
-            return getCellCenterIdx(v.x, v.y);
-        }
-        static pair<int, int> getCellCenterIdx(int i, int j){
+    }
+    void buildBeki(){
+        beki[0] = 1.0f;
+        rep(i,M)beki[i+1] = beki[i] * Parameter::JumpPowerUpRate;
+    }
+    // インターフェース
+    Vector2 getCellPos(int i, int j){
+        return pos[i][j];
+    }
+    static pair<int, int> getCellCenterIdx(const Vector2 &v){
+        return getCellCenterIdx(v.x, v.y);
+    }
+    static pair<int, int> getCellCenterIdx(int i, int j){
 //        assert(0 <= i && i < H && 0 <= j && j < W);
-            return {n_Splits * i + n_Splits / 2,
-                    n_Splits * j + n_Splits / 2};
-        }
-        Vector2 getCellCenterPos(int i, int j){
+        return {n_Splits * i + n_Splits / 2,
+                n_Splits * j + n_Splits / 2};
+    }
+    Vector2 getCellCenterPos(int i, int j){
 //        assert(0 <= i && i < H && 0 <= j && j < W);
-            pair<int, int> CenterIdx = getCellCenterIdx(i, j);
-            return getCellPos(CenterIdx.first, CenterIdx.second);
+        pair<int, int> CenterIdx = getCellCenterIdx(i, j);
+        return getCellPos(CenterIdx.first, CenterIdx.second);
+    }
+    Vector2 cellIdx2Pos(int cellIdx){
+        return getCellPos(cellIdx / Wn, cellIdx % Wn);
+    }
+    bool isOutOfBounds(int i, int j){
+        return i < 0 || i >= Hn || j < 0 || j  >= Wn;
+    }
+    bool isOutOfBounds(const Vector2 aPos) const
+    {
+        if(aPos.x < 0.0f || Parameter::StageWidth <= aPos.x || aPos.y < 0.0f || Parameter::StageHeight <= aPos.y) {
+            return true;
+        } else {
+            return false;
         }
-        Vector2 cellIdx2Pos(int cellIdx){
-            return getCellPos(cellIdx / Wn, cellIdx % Wn);
-        }
-        bool isOutOfBounds(int i, int j){
-            return i < 0 || i >= Hn || j < 0 || j  >= Wn;
-        }
-        bool isOutOfBounds(const Vector2 aPos) const
-        {
-            if(aPos.x < 0.0f || Parameter::StageWidth <= aPos.x || aPos.y < 0.0f || Parameter::StageHeight <= aPos.y) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    };
+    }
+};
 
 
 // ------------------------------------------------------------
-    CellStage aCellStage; // 一番最初に行われる処理。
-    MyAnswer aMyAnswer(MyAnswer::BluteKurCell);
+CellStage aCellStage; // 一番最初に行われる処理。
+MyAnswer aMyAnswer(2);
 // ------------------------------------------------------------
 
-//constexpr double TL = 2.09;
 constexpr long long CYCLES_PER_SEC = 2800000000;
 struct MyTimer {
         long long start{};
@@ -421,7 +431,7 @@ public:
         return res;
     }
     void buildScrollSeq(){
-        if(scrollN < 12){
+        if(scrollN <= MyAnswer::BluteMAX_N){
             bluteForce(1, scrollN);
         }
         else{
@@ -548,12 +558,8 @@ public:
         // 定数
         MyTimer timer;
         timer.reset();
-        int Chokudai_width = 5;
-        double TIME_LIMIT = 0.30;
-
         //　初期はクラスカルでやる
         auto ini_seq = kuraskal();
-        // dump(ini_seq);
         ScrollTour ini_tour;
         // ターン毎にpqに突っ込んでいく
         rep(t,scrollN){
@@ -561,10 +567,11 @@ public:
             vpq[t].push(ini_tour);
         }
         while(true){
-            auto now_time = timer.get();
-            if(now_time >= TIME_LIMIT) break;
+            if(timerCheck(timer.get())) break;
             for(int t = 0; t < scrollN - 1; t++){
-                rep(_,Chokudai_width){
+                if(timerCheck(timer.get())) break;
+                rep(_,MyAnswer::CHOKUDAI_WIDTH){
+                    if(timerCheck(timer.get())) break;
                     if(vpq[t].empty())break;
                     ScrollTour past = vpq[t].top();
                     vpq[t].pop();
@@ -579,8 +586,10 @@ public:
             }
         }
         ScrollTour res = vpq[scrollN-1].top();
-        // dump(res.seq);
         return res.seq;
+    }
+    bool timerCheck(float nowTime){
+        return nowTime >= MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT;
     }
 };
 
@@ -675,7 +684,7 @@ class BluteKurCellSolver : public SolverBase{
             return res;
         } //
         void buildScrollSeq(){
-            if(scrollN < 12){
+            if(scrollN <= MyAnswer::BluteMAX_N){
                 bluteForce(1, scrollN);
             }
             else{
@@ -702,6 +711,8 @@ class BluteKurCellSolver : public SolverBase{
         }
         template<typename T>
         void buildMakeEdges(Dijkstra<T>& G){ //
+            int Dx[] = {-2, -2, -1, -1, 1, 1, 2, 2};
+            int Dy[] = {-1, 1, -2, 2, -2, 2, -1, 1};
             rep(i,Hn)rep(j,Wn){
 //                    Vector2 from = {float(i), float(j)};
                     Vector2 from = aCellStage.getCellPos(i, j);
@@ -717,6 +728,17 @@ class BluteKurCellSolver : public SolverBase{
                         float cost = terrain_cost(from_tr) * dist(dx[k], dy[k])/*+ terrain_cost(to_tr)*/;
                         G.make_edge(from_idx, to_idx, cost);
                     }
+                    rep(k,8){
+                        int nx = i + Dx[k];
+                        int ny = j + Dy[k];
+                        if(aCellStage.isOutOfBounds(nx, ny))continue;
+//                        Vector2 to = aCellStage.getCellPos(i, j);
+                        // Terrain to_tr = aStage.terrain(to);
+                        int to_idx = idxEncodeCell(nx, ny);
+                        float cost = terrain_cost(from_tr) * dist(Dx[k], Dy[k])/*+ terrain_cost(to_tr)*/;
+                        G.make_edge(from_idx, to_idx, cost);
+                    }
+
                 }
         } // Cell仕様
         void buildDistanceMatrix(){
@@ -726,6 +748,8 @@ class BluteKurCellSolver : public SolverBase{
         } // Cell仕様
         template <typename T>
         void buildPaths(Dijkstra<T> &G){ //
+            MyTimer t;
+            t.reset();
             vector<Vector2> positions;
             // 巻物
             rep(i,scrollN-1)positions.push_back(bStage.scrolls()[i].pos());
@@ -744,7 +768,7 @@ class BluteKurCellSolver : public SolverBase{
                     paths[i*scrollN+j] = G.getCellPath(to_idx);
                 }
             }
-            dump(paths[1]);
+            dump("buildPath", t.get());
         } // Cell仕様
         // [l, r)に関して、順列を変えてみてコストが最小のものに変換する
         void bluteForce(int l, int r){
@@ -806,12 +830,8 @@ class BluteKurCellSolver : public SolverBase{
             // 定数
             MyTimer timer;
             timer.reset();
-            int Chokudai_width = 5;
-            double TIME_LIMIT = 0.30;
-
             //　初期はクラスカルでやる
             auto ini_seq = kuraskal();
-            // dump(ini_seq);
             ScrollTour ini_tour;
             // ターン毎にpqに突っ込んでいく
             rep(t,scrollN){
@@ -819,10 +839,11 @@ class BluteKurCellSolver : public SolverBase{
                 vpq[t].push(ini_tour);
             }
             while(true){
-                auto now_time = timer.get();
-                if(now_time >= TIME_LIMIT) break;
+                if(timerCheck(timer.get())) break;
                 for(int t = 0; t < scrollN - 1; t++){
-                    rep(_,Chokudai_width){
+                    if(timerCheck(timer.get())) break;
+                    rep(_, MyAnswer::CHOKUDAI_WIDTH){
+                        if(timerCheck(timer.get())) break;
                         if(vpq[t].empty())break;
                         ScrollTour past = vpq[t].top();
                         vpq[t].pop();
@@ -837,8 +858,11 @@ class BluteKurCellSolver : public SolverBase{
                 }
             }
             ScrollTour res = vpq[scrollN-1].top();
-            // dump(res.seq);
+            dump("chokudai", timer.get());
             return res.seq;
+        }
+        bool timerCheck(float nowTime){
+            return nowTime >= MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT;
         }
     };
 //-----------------------------------------------------------------------------
@@ -873,7 +897,6 @@ void BluteKurCellSolve(const Stage& aStage){
     aMyAnswer.PositionSeq = Solver.solve();
 }
 void Solve(const Stage& aStage) {
-    dump(aMyAnswer.SolverSelection);
     if (aMyAnswer.SolverSelection == MyAnswer::Random) {
         RandomSolve(aStage);
     } else if (aMyAnswer.SolverSelection == MyAnswer::BluteKur) {
@@ -888,7 +911,7 @@ void Solve(const Stage& aStage) {
 //------------------------------------------------------------------------------
 /// 各ステージ開始時に呼び出される処理
 /// @detail 各ステージに対する初期化処理が必要ならここに書きます
-int StageNumber = 0;
+//int StageNumber = 0;
 /// @param aStage 現在のステージ
 void Answer::initialize(const Stage& aStage)
 {
@@ -898,7 +921,7 @@ void Answer::initialize(const Stage& aStage)
     MyTimer t;
     t.reset();
     Solve(aStage);
-    dbg(t.get());
+    dbg("終了", t.get());
 }
 
 //------------------------------------------------------------------------------
@@ -908,8 +931,6 @@ void Answer::initialize(const Stage& aStage)
 /// @param aStage 現在のステージ
 /// @return 移動の目標座標
 Vector2 Answer::getTargetPos(const Stage& aStage){
-    // return MygetTargetPos(aStage);
-    // return MygetTargetPos2(aStage);
     return aMyAnswer.PositionSeq[aMyAnswer.positionSeqIdx++];
 }
 //------------------------------------------------------------------------------

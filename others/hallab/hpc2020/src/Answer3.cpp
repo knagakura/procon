@@ -28,6 +28,7 @@ ostream &operator<<(ostream &os, hpc::Scroll &val) {os  << "{" << val.pos().x <<
 template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto x: v) os << x << ", "; os << "]"; return os; }
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
 template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
+template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
 
 
 #define DUMPOUT cerr
@@ -60,6 +61,7 @@ const int W = Parameter::StageWidth;
 class MyAnswer{
 public:
     vector<Vector2> PositionSeq;
+    int StageNum = 0;
     int positionSeqIdx{};
     int SolverSelection = 2;
     static const int Random = 0;
@@ -67,18 +69,23 @@ public:
     static const int BluteKurCell = 2;
 
 
-    static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT = 0.08;
-    static const int CHOKUDAI_WIDTH = 1;
+    static const int BluteMAX_N = 6; // ((BluteMAX_N-1) !の計算量を許す)
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.1;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.20;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.30;
+    constexpr static const int SCROLLN_MAX_SMALL = 10;
+    constexpr static const int SCROLLN_MAX_MEDIAM = 15;
+    static const int CHOKUDAI_WIDTH = 10;
 
 
-    static const int n_Splits = 5; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
+    static const int n_Splits = 3; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
     static const int Hn = H * n_Splits;
     static const int Wn = W * n_Splits;
     explicit MyAnswer(int type_): SolverSelection(type_){
         clear();
     }
     void clear(){
+        StageNum++;
         PositionSeq.clear();
         positionSeqIdx = 0;
     }
@@ -589,7 +596,7 @@ public:
         return res.seq;
     }
     bool timerCheck(float nowTime){
-        return nowTime >= MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT;
+        return nowTime >= MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_LARGE;
     }
 };
 
@@ -607,17 +614,21 @@ class BluteKurCellSolver : public SolverBase{
                 used.assign(M+5, false);
                 for(auto x: seq)used[x] = true;
             }
-            void add_scroll(const BluteKurCellSolver &Solver, int idx){
+            void add_scroll(BluteKurCellSolver &Solver, int idx){
                 if(seq.empty()){
                     used[idx] = true;
                     seq.emplace_back(idx);
+                    Solver.isVisited[seq]++;
                     return;
                 }
                 used[idx] = true;
                 cost += Solver.distScroll[seq.back()][idx] / aCellStage.beki[(int)seq.size()-1];
                 seq.emplace_back(idx);
+                Solver.isVisited[seq]++;
             }
-
+            bool isEmpty(){
+                return seq.empty();
+            }
             float added_cost_if(const BluteKurCellSolver &Solver, int idx) const{
                 if(seq.empty())return 0;
                 return cost + Solver.distScroll[seq.back()][idx] / aCellStage.beki[(int)seq.size()-1];
@@ -630,15 +641,19 @@ class BluteKurCellSolver : public SolverBase{
         float distScroll[M + 5][M + 5]{};
         vector<vector<Vector2>> paths; // path[idx_encode(i, j)] := i -> jへの最短経路
         vector<priority_queue<ScrollTour>> vpq;
+        vector<int> vpqSizes;
         vector<int> scrollSeq;
         int scrollSeqIdx{};
         int cellIdx{};
+        map<vector<int>, int> isVisited;
         BluteKurCellSolver(): SolverBase(){}
         Vector2 ini_pos;
         explicit BluteKurCellSolver(const Stage& aStage): SolverBase(aStage){
             ini_pos = aStage.rabbit().pos();
-            vpq.resize(scrollN+5);
+            vpq.resize(scrollN);
+            vpqSizes.assign(scrollN,0);
             paths.resize(scrollN * scrollN);
+            isVisited.clear();
         }
         vector<Vector2> solve() override{
             buildDistanceMatrix();
@@ -836,33 +851,77 @@ class BluteKurCellSolver : public SolverBase{
             // ターン毎にpqに突っ込んでいく
             rep(t,scrollN){
                 ini_tour.add_scroll(*this, ini_seq[t]);
-                vpq[t].push(ini_tour);
+                addVps(t, ini_tour);
             }
+//            int itr = 0;
             while(true){
+//                if(itr++%1000 == 0) {
+//                        dump(itr);
+//                        dbg(vpqSizes);
+//                        dmpMinimumState();
+//                        dump(isVisited.size());
+//                        dump(isVisited);
+//                }
                 if(timerCheck(timer.get())) break;
-                for(int t = 0; t < scrollN - 1; t++){
-                    if(timerCheck(timer.get())) break;
-                    rep(_, MyAnswer::CHOKUDAI_WIDTH){
-                        if(timerCheck(timer.get())) break;
-                        if(vpq[t].empty())break;
-                        ScrollTour past = vpq[t].top();
-                        vpq[t].pop();
-                        for(int l = 0; l < scrollN; l++){
-                            if(not past.used[l]){
+                bool ugoki = false;
+                for(int t = 0; t < scrollN - 1; t++) {
+                    if (timerCheck(timer.get())) break;
+                    rep(_, MyAnswer::CHOKUDAI_WIDTH) {
+                        if(timerCheck(timer.get()))break;
+                        if (vpq[t].empty())break;
+                        auto past = popVps(t);
+                        for (int l = 0; l < scrollN; l++) {
+                            if (not past.used[l]) {
                                 ScrollTour nxt = past;
+                                auto nxtvec = nxt.seq;
+                                nxtvec.push_back(l);
+//                                if (isVisited[nxtvec])continue;
                                 nxt.add_scroll(*this, l);
-                                vpq[t+1].push(nxt);
+                                addVps(t + 1, nxt);
+                                ugoki = true;
                             }
                         }
                     }
                 }
+                if(not ugoki)break;
             }
             ScrollTour res = vpq[scrollN-1].top();
+            dump(ini_seq, ini_tour.cost);
+            dump(res.seq, res.cost);
             dump("chokudai", timer.get());
             return res.seq;
         }
         bool timerCheck(float nowTime){
-            return nowTime >= MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT;
+            float TIME_LIMIT;
+            if(scrollN-1 <= MyAnswer::SCROLLN_MAX_SMALL) {
+                TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_SMALL;
+            }
+            else if(scrollN-1 <= MyAnswer::SCROLLN_MAX_MEDIAM){
+                TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM;
+            }
+            else{
+                TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_LARGE;
+            }
+            return nowTime >= TIME_LIMIT;
+        }
+        void addVps(int idx, const ScrollTour& tour){
+            vpq[idx].push(tour);
+            vpqSizes[idx]++;
+        }
+        ScrollTour popVps(int idx){
+            // vpq[idx]には一つ以上要素がある
+            auto res = vpq[idx].top();
+//            if(idx > 0) {
+                vpq[idx].pop();
+                vpqSizes[idx]--;
+//            }
+            return res;
+        }
+        void dmpMinimumState(){
+            rep(i,scrollN){
+                DUMPOUT << vpq[i].top().cost << " ";
+            }
+            DUMPOUT << endl;
         }
     };
 //-----------------------------------------------------------------------------
@@ -911,12 +970,10 @@ void Solve(const Stage& aStage) {
 //------------------------------------------------------------------------------
 /// 各ステージ開始時に呼び出される処理
 /// @detail 各ステージに対する初期化処理が必要ならここに書きます
-//int StageNumber = 0;
 /// @param aStage 現在のステージ
 void Answer::initialize(const Stage& aStage)
 {
-//    int tmpScrollN = (StageNumber++ % 20) + 1;
-//    dump(StageNumber, tmpScrollN);
+    dump(aMyAnswer.StageNum);
     aMyAnswer.clear();
     MyTimer t;
     t.reset();

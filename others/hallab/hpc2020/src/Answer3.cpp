@@ -296,7 +296,10 @@ public:
     // 変数の初期化
     virtual vector<Vector2> solve() = 0;
     bool isSame(const hpc::Scroll &a, const hpc::Scroll &b){
-        return a.pos().x == b.pos().x && a.pos().y == b.pos().y;
+        return isSame(a.pos(), b.pos());
+    }
+    bool isSame(const Vector2 &a, const Vector2 &b){
+        return (int)a.x == (int)b.x && (int)a.y == (int)b.y;
     }
     float dist(float x, float y){
         return sqrt(x*x+y*y);
@@ -679,11 +682,25 @@ class BluteKurCellSolver : public SolverBase{
             if(t == Terrain::TERM)idx = 0; // 置物
             return Parameter::JumpTerrianCoefficient[idx];
         }
-        bool shouldStop(const Stage &tmpStage, const int path_idx){
+        bool shouldGaman(const Stage &tmpStage, const int path_idx){
             int nowRabiTer = (int) tmpStage.terrain(tmpStage.rabbit().pos());
             int nowCellTer = (int) tmpStage.terrain(paths[path_idx][cellIdx]);
             int nxtCellTer = (int) tmpStage.terrain(paths[path_idx][cellIdx + 1]);
             return nowRabiTer == nowCellTer && nxtCellTer - nowCellTer > 1;
+        }
+        bool shouldMate(const Stage &tmpStage, const int path_idx, const int targetScrollIdx){
+            Vector2 nowRabitPos = tmpStage.rabbit().pos();
+            Vector2 nowCellPos = paths[path_idx][cellIdx];
+            Vector2 nowTargetScrollPos = tmpStage.scrolls()[targetScrollIdx].pos();
+            Vector2 nxtCellPos = paths[path_idx][cellIdx];
+            if(not isSame(nowCellPos, nowTargetScrollPos))return false; // 今のマスが目指してる巻物圏内である必要がある
+            if(not path_idx + 1 < scrollN)return false; //　今のpathが最後ではないことが必要
+            int notScrollCellIdx = 0;
+            while(isSame(paths[path_idx][notScrollCellIdx], nowTargetScrollPos)){
+                notScrollCellIdx++;
+            }
+            Vector2 nxtPathStartPos = paths[path_idx + 1][notScrollCellIdx];
+            return dist(nowRabitPos, nxtPathStartPos) < dist(nxtCellPos, nxtPathStartPos);
         }
         vector<Vector2> moveByScrollSeq(){
             Stage pseudoStage = bStage; // この後も初期状態を使う可能性があるので完全には破壊したくない
@@ -704,7 +721,8 @@ class BluteKurCellSolver : public SolverBase{
                 int path_idx = scroll_l * scrollN + scroll_r;
                 bool isSecondMove = false;
                 while (cellIdx + 1 < (int) paths[path_idx].size() && length > dist(now_pos, paths[path_idx][cellIdx])) {
-                    if(isSecondMove && shouldStop(pseudoStage, path_idx))break;
+                    if(isSecondMove && shouldGaman(pseudoStage, path_idx))break;
+                    if(isSecondMove && shouldMate(pseudoStage, path_idx, scroll_r))break;
                     cellIdx++;
                     isSecondMove = true;
                 }

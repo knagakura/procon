@@ -75,9 +75,9 @@ public:
     static const int CHOKUDAI_INITIATION_NULL = 0;
     static const int CHOKUDAI_INITIATION_KUR = 1;
     static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.20;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.20;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.20;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.27;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.27;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.27;
     constexpr static const int SCROLLN_MAX_SMALL = 10;
     constexpr static const int SCROLLN_MAX_MEDIAM = 15;
     static const int CHOKUDAI_WIDTH = 1;
@@ -679,6 +679,12 @@ class BluteKurCellSolver : public SolverBase{
             if(t == Terrain::TERM)idx = 0; // 置物
             return Parameter::JumpTerrianCoefficient[idx];
         }
+        bool shouldStop(const Stage &tmpStage, const int path_idx){
+            int nowRabiTer = (int) tmpStage.terrain(tmpStage.rabbit().pos());
+            int nowCellTer = (int) tmpStage.terrain(paths[path_idx][cellIdx]);
+            int nxtCellTer = (int) tmpStage.terrain(paths[path_idx][cellIdx + 1]);
+            return nowRabiTer == nowCellTer && nxtCellTer - nowCellTer > 1;
+        }
         vector<Vector2> moveByScrollSeq(){
             Stage pseudoStage = bStage; // この後も初期状態を使う可能性があるので完全には破壊したくない
             vector<Vector2> res;
@@ -698,15 +704,7 @@ class BluteKurCellSolver : public SolverBase{
                 int path_idx = scroll_l * scrollN + scroll_r;
                 bool isSecondMove = false;
                 while (cellIdx + 1 < (int) paths[path_idx].size() && length > dist(now_pos, paths[path_idx][cellIdx])) {
-                    if(isSecondMove)
-                    {
-                        int nowRabiTre = (int) pseudoStage.terrain(now_pos);
-                        int nowCellTre = (int)pseudoStage.terrain(paths[path_idx][cellIdx]);
-                        int nxtCelltre = (int) pseudoStage.terrain(paths[path_idx][cellIdx + 1]);
-                        if(nowRabiTre == nowCellTre && nxtCelltre - nowCellTre > 2){
-                            break;
-                        }
-                    }
+                    if(isSecondMove && shouldStop(pseudoStage, path_idx))break;
                     cellIdx++;
                     isSecondMove = true;
                 }

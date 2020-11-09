@@ -42,7 +42,7 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #define dbg(...)
 #define dump(...)
 #endif
-///--------------------------------debug functions-------------------------------
+//--------------------------------debug functions-------------------------------
 
 namespace hpc {
 const int dx[8] = {1, 1, 0, -1, -1, -1, 0, 1};
@@ -63,22 +63,27 @@ public:
     vector<Vector2> PositionSeq;
     int StageNum = 0;
     int positionSeqIdx{};
+
+    // Solverクラスを選択する変数
     int SolverSelection = 2;
     static const int Random = 0;
     static const int BluteKur = 1;
     static const int BluteKurCell = 2;
 
-
-    static const int BluteMAX_N = 6; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.00;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.01;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.01;
+    // cnhokudai_searchに関するパラメータ
+    int CHOKUDAI_INITIATION = CHOKUDAI_INITIATION_NULL;
+    static const int CHOKUDAI_INITIATION_NULL = 0;
+    static const int CHOKUDAI_INITIATION_KUR = 1;
+    static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.20;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.20;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.20;
     constexpr static const int SCROLLN_MAX_SMALL = 10;
     constexpr static const int SCROLLN_MAX_MEDIAM = 15;
-    static const int CHOKUDAI_WIDTH = 10;
+    static const int CHOKUDAI_WIDTH = 1;
 
 
-    static const int n_Splits = 7; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
+    static const int n_Splits = 5; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
     static const int Hn = H * n_Splits;
     static const int Wn = W * n_Splits;
     explicit MyAnswer(int type_): SolverSelection(type_){
@@ -151,6 +156,7 @@ public:
         }
     }
 };
+
 
 // ------------------------------------------------------------
 CellStage aCellStage; // 一番最初に行われる処理。
@@ -344,6 +350,7 @@ public:
         return res;
     }
 };
+
 
 class BluteKurSolver : public SolverBase{
 public:
@@ -616,13 +623,13 @@ class BluteKurCellSolver : public SolverBase{
                 if(seq.empty()){
                     used[idx] = true;
                     seq.emplace_back(idx);
-                    Solver.isVisited[seq]++;
+//                    Solver.isVisited[seq]++;
                     return;
                 }
                 used[idx] = true;
                 cost += Solver.distScroll[seq.back()][idx] / aCellStage.beki[(int)seq.size()-1];
                 seq.emplace_back(idx);
-                Solver.isVisited[seq]++;
+//                Solver.isVisited[seq]++;
             }
             bool isEmpty(){
                 return seq.empty();
@@ -640,6 +647,7 @@ class BluteKurCellSolver : public SolverBase{
         vector<vector<Vector2>> paths; // path[idx_encode(i, j)] := i -> jへの最短経路
         vector<priority_queue<ScrollTour>> vpq;
         vector<int> vpqSizes;
+        float vpqLastMinCost;
         vector<int> scrollSeq;
         int scrollSeqIdx{};
         int cellIdx{};
@@ -652,6 +660,7 @@ class BluteKurCellSolver : public SolverBase{
             vpqSizes.assign(scrollN,0);
             paths.resize(scrollN * scrollN);
             isVisited.clear();
+            vpqLastMinCost = 1e9;
         }
         vector<Vector2> solve() override{
             buildDistanceMatrix();
@@ -687,8 +696,19 @@ class BluteKurCellSolver : public SolverBase{
                 int scroll_l = scrollSeq[scrollSeqIdx];
                 int scroll_r = scrollSeq[scrollSeqIdx + 1];
                 int path_idx = scroll_l * scrollN + scroll_r;
+                bool isSecondMove = false;
                 while (cellIdx + 1 < (int) paths[path_idx].size() && length > dist(now_pos, paths[path_idx][cellIdx])) {
+                    if(isSecondMove)
+                    {
+                        int nowRabiTre = (int) pseudoStage.terrain(now_pos);
+                        int nowCellTre = (int)pseudoStage.terrain(paths[path_idx][cellIdx]);
+                        int nxtCelltre = (int) pseudoStage.terrain(paths[path_idx][cellIdx + 1]);
+                        if(nowRabiTre == nowCellTre && nxtCelltre - nowCellTre > 2){
+                            break;
+                        }
+                    }
                     cellIdx++;
+                    isSecondMove = true;
                 }
                 auto nextPos = paths[path_idx][cellIdx];
                 pseudoStage.update(nextPos);
@@ -751,7 +771,6 @@ class BluteKurCellSolver : public SolverBase{
                         float cost = terrain_cost(from_tr) * dist(Dx[k], Dy[k])/*+ terrain_cost(to_tr)*/;
                         G.make_edge(from_idx, to_idx, cost);
                     }
-
                 }
         } // Cell仕様
         void buildDistanceMatrix(){
@@ -781,7 +800,7 @@ class BluteKurCellSolver : public SolverBase{
                     paths[i*scrollN+j] = G.getCellPath(to_idx);
                 }
             }
-            dump("buildPath", t.get());
+//            dump("buildPath", t.get());
         } // Cell仕様
         // [l, r)に関して、順列を変えてみてコストが最小のものに変換する
         void bluteForce(int l, int r){
@@ -844,16 +863,27 @@ class BluteKurCellSolver : public SolverBase{
             MyTimer timer;
             timer.reset();
             //　初期はクラスカルでやる
-            auto ini_seq = kuraskal();
-            ScrollTour ini_tour;
-            // ターン毎にpqに突っ込んでいく
-            rep(t,scrollN){
-                ini_tour.add_scroll(*this, ini_seq[t]);
-                addVps(t, ini_tour);
+            if(aMyAnswer.CHOKUDAI_INITIATION == MyAnswer::CHOKUDAI_INITIATION_KUR){
+                auto ini_seq = kuraskal();
+                ScrollTour ini_tour;
+                // ターン毎にpqに突っ込んでいく
+                rep(t,scrollN) {
+                    ini_tour.add_scroll(*this, ini_seq[t]);
+                    addVps(t, ini_tour);
+                }
+            }
+            else if(aMyAnswer.CHOKUDAI_INITIATION == MyAnswer::CHOKUDAI_INITIATION_NULL){
+                vector<int> ini_seq;
+                ini_seq.push_back(scrollN-1);
+                ScrollTour ini_tour(ini_seq);
+                addVps(0, ini_tour);
+            }
+            else{
+                DUMPOUT << "DAMEDESU" << endl;
             }
 //            int itr = 0;
             while(true){
-//                if(itr++%1000 == 0) {
+//                if(itr++%100 == 0) {
 //                        dump(itr);
 //                        dbg(vpqSizes);
 //                        dmpMinimumState();
@@ -867,16 +897,17 @@ class BluteKurCellSolver : public SolverBase{
                     rep(_, MyAnswer::CHOKUDAI_WIDTH) {
                         if(timerCheck(timer.get()))break;
                         if (vpq[t].empty())break;
-                        auto past = popVps(t);
+                        ScrollTour past = popVps(t);
                         for (int l = 0; l < scrollN; l++) {
                             if (not past.used[l]) {
                                 ScrollTour nxt = past;
-                                auto nxtvec = nxt.seq;
-                                nxtvec.push_back(l);
-//                                if (isVisited[nxtvec])continue;
+//                                auto nxtvec = nxt.seq;
+//                                nxtvec.push_back(l);
+//                                if (isVisited.count(nxtvec))continue;
                                 nxt.add_scroll(*this, l);
-                                addVps(t + 1, nxt);
-                                ugoki = true;
+                                if(addVps(t + 1, nxt)) {
+                                    ugoki = true;
+                                }
                             }
                         }
                     }
@@ -884,9 +915,10 @@ class BluteKurCellSolver : public SolverBase{
                 if(not ugoki)break;
             }
             ScrollTour res = vpq[scrollN-1].top();
-            dump(ini_seq, ini_tour.cost);
-            dump(res.seq, res.cost);
-            dump("chokudai", timer.get());
+//            dump(ini_seq, ini_tour.cost);
+//            dump(res.seq, res.cost);
+//            dump("chokudai", timer.get());
+//            dbg(ini_tour.cost, res.cost - ini_tour.cost);
             return res.seq;
         }
         bool timerCheck(float nowTime){
@@ -902,17 +934,20 @@ class BluteKurCellSolver : public SolverBase{
             }
             return nowTime >= TIME_LIMIT;
         }
-        void addVps(int idx, const ScrollTour& tour){
+        bool addVps(int idx, const ScrollTour& tour){
+            if(tour.cost > vpqLastMinCost)return false;
             vpq[idx].push(tour);
             vpqSizes[idx]++;
+            if(idx == scrollN - 1) {
+                chmin(vpqLastMinCost, tour.cost);
+            }
+            return true;
         }
         ScrollTour popVps(int idx){
             // vpq[idx]には一つ以上要素がある
             auto res = vpq[idx].top();
-//            if(idx > 0) {
-                vpq[idx].pop();
-                vpqSizes[idx]--;
-//            }
+            vpq[idx].pop();
+            vpqSizes[idx]--;
             return res;
         }
         void dmpMinimumState(){
@@ -923,9 +958,10 @@ class BluteKurCellSolver : public SolverBase{
         }
     };
 
+// ある値以下のときはbitdpをするようにする。
 class BitdpChokudaiSolver : public BluteKurCellSolver {
-
 };
+
 //-----------------------------------------------------------------------------
 
 /// コンストラクタ
@@ -980,7 +1016,7 @@ void Answer::initialize(const Stage& aStage)
     MyTimer t;
     t.reset();
     Solve(aStage);
-    dbg("終了", t.get());
+//    dbg("終了", t.get());
 }
 
 //------------------------------------------------------------------------------
@@ -996,7 +1032,9 @@ Vector2 Answer::getTargetPos(const Stage& aStage){
 /// 各ステージ終了時に呼び出される処理
 /// @detail 各ステージに対する終了処理が必要ならここに書きます
 /// @param aStage 現在のステージ
-void Answer::finalize(const Stage& aStage){}
+void Answer::finalize(const Stage& aStage){
+    dump(aStage.turn());
+}
 } // namespace
 
 ///

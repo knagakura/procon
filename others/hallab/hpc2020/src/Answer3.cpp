@@ -42,7 +42,7 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #define dbg(...)
 #define dump(...)
 #endif
-//--------------------------------debug functions-------------------------------
+///--------------------------------debug functions-------------------------------
 
 namespace hpc {
 const int dx[8] = {1, 1, 0, -1, -1, -1, 0, 1};
@@ -70,15 +70,15 @@ public:
 
 
     static const int BluteMAX_N = 6; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.1;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.20;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.30;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.00;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.01;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.01;
     constexpr static const int SCROLLN_MAX_SMALL = 10;
     constexpr static const int SCROLLN_MAX_MEDIAM = 15;
     static const int CHOKUDAI_WIDTH = 10;
 
 
-    static const int n_Splits = 3; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
+    static const int n_Splits = 7; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
     static const int Hn = H * n_Splits;
     static const int Wn = W * n_Splits;
     explicit MyAnswer(int type_): SolverSelection(type_){
@@ -151,7 +151,6 @@ public:
         }
     }
 };
-
 
 // ------------------------------------------------------------
 CellStage aCellStage; // 一番最初に行われる処理。
@@ -345,7 +344,6 @@ public:
         return res;
     }
 };
-
 
 class BluteKurSolver : public SolverBase{
 public:
@@ -924,6 +922,10 @@ class BluteKurCellSolver : public SolverBase{
             DUMPOUT << endl;
         }
     };
+
+class BitdpChokudaiSolver : public BluteKurCellSolver {
+
+};
 //-----------------------------------------------------------------------------
 
 /// コンストラクタ

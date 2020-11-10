@@ -725,15 +725,17 @@ class BluteKurCellSolver : public SolverBase{
                 Vector2 LPos = pathsDeque[pathLIdx].back();
                 Vector2 RPos = pathsDeque[pathRIdx].front();
                 float sumDist = dist(LPos, midScrollPos) + dist(RPos, midScrollPos);
-                rep(k,8){
-                    int nx = midCenterX + dx[k];
-                    int ny = midCenterY + dy[k];
-                    if(aCellStage.isOutOfBounds(nx, ny))continue;
-                    Vector2 tmpScrollPos = aCellStage.getCellPos(nx,ny);
-                    float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
-                    if(chmin(sumDist, sumDistTmp)){
-                        scrollX = nx;
-                        scrollY = ny;
+                for(int dxx = -n_Splits / 2; dxx <= n_Splits/2; dxx++) {
+                    for (int dyy = -n_Splits / 2; dyy <= n_Splits / 2; dyy++) {
+                        int nx = midCenterX + dxx;
+                        int ny = midCenterY + dyy;
+                        if (aCellStage.isOutOfBounds(nx, ny))continue;
+                        Vector2 tmpScrollPos = aCellStage.getCellPos(nx, ny);
+                        float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
+                        if (chmin(sumDist, sumDistTmp)) {
+                            scrollX = nx;
+                            scrollY = ny;
+                        }
                     }
                 }
                 Vector2 NewScrollPos = aCellStage.getCellPos(scrollX, scrollY);

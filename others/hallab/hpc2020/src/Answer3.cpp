@@ -77,13 +77,14 @@ public:
     static const int CHOKUDAI_INITIATION_NULL = 0;
     static const int CHOKUDAI_INITIATION_KUR = 1;
     static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_ALL = 0.27;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_ALL = 0.10;
     constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
     constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
     constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
     constexpr static const int SCROLLN_MAX_SMALL = 10;
     constexpr static const int SCROLLN_MAX_MEDIAM = 15;
     static const int CHOKUDAI_WIDTH = 1;
+    static const bool VISITED_CHECK = false; // iterationの回数が少なくなるから禁止！
 
 
     static const int n_Splits = 5; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
@@ -107,11 +108,13 @@ public:
     // 共通
     vector <vector<Vector2>> pos; // n_Splitしたcellのposition
     float beki[M + 5]{};
+    long long fact[M+5]{};
     // 共通Initiation
     CellStage() = default;
     void Initiation(){
         buildCellPos();
         buildBeki();
+        if(MyAnswer::VISITED_CHECK)buildFact();
     }
     void buildCellPos(){
         pos.resize(Hn);
@@ -126,6 +129,10 @@ public:
     void buildBeki(){
         beki[0] = 1.0f;
         rep(i,M)beki[i+1] = beki[i] * Parameter::JumpPowerUpRate;
+    }
+    void buildFact(){
+        fact[0] = 1;
+        rep(i,M)fact[i+1] = fact[i] * (i+1);
     }
     // インターフェース
     Vector2 getCellPos(int i, int j){
@@ -646,13 +653,13 @@ class BluteKurCellSolver : public SolverBase{
                 if(seq.empty()){
                     used[idx] = true;
                     seq.emplace_back(idx);
-//                    Solver.isVisited[seq]++;
+                    if(MyAnswer::VISITED_CHECK)Solver.isVisited[seq]++;
                     return;
                 }
                 used[idx] = true;
                 cost += Solver.distScroll[seq.back()][idx] / aCellStage.beki[(int)seq.size()-1];
                 seq.emplace_back(idx);
-//                Solver.isVisited[seq]++;
+                if(MyAnswer::VISITED_CHECK)Solver.isVisited[seq]++;
             }
             bool isEmpty(){
                 return seq.empty();
@@ -674,7 +681,7 @@ class BluteKurCellSolver : public SolverBase{
         vector<int> scrollSeq;
         int scrollSeqIdx{};
         int cellIdx{};
-        map<vector<int>, int> isVisited;
+        map<vector<int>, long long> isVisited;
         BluteKurCellSolver(): SolverBase(){}
         Vector2 ini_pos;
         explicit BluteKurCellSolver(const Stage& aStage): SolverBase(aStage){
@@ -682,7 +689,7 @@ class BluteKurCellSolver : public SolverBase{
             vpq.resize(scrollN);
             vpqSizes.assign(scrollN,0);
             pathsDeque.resize(scrollN * scrollN);
-            isVisited.clear();
+            if(MyAnswer::VISITED_CHECK)isVisited.clear();
             vpqLastMinCost = 1e9;
         }
         vector<Vector2> solve() override{
@@ -740,20 +747,20 @@ class BluteKurCellSolver : public SolverBase{
                         }
                     }
                 }
-                float ScrollIntX = int(NewScrollPos.x);
-                float ScrollIntY = int(NewScrollPos.y);
-                for(float dd = 0.0; dd < 1.0; dd += 0.099){
-                    Vector2 tmpScrollPos = {ScrollIntX + dd, ScrollIntY};
-                    float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
-                    if(chmin(sumDist, sumDistTmp)){
-                        NewScrollPos = tmpScrollPos;
-                    }
-                    tmpScrollPos = {ScrollIntX, ScrollIntY + dd};
-                    sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
-                    if(chmin(sumDist, sumDistTmp)){
-                        NewScrollPos = tmpScrollPos;
-                    }
-                }
+//                float ScrollIntX = int(NewScrollPos.x);
+//                float ScrollIntY = int(NewScrollPos.y);
+//                for(float dd = 0.0; dd < 1.0; dd += 0.099){
+//                    Vector2 tmpScrollPos = {ScrollIntX + dd, ScrollIntY};
+//                    float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
+//                    if(chmin(sumDist, sumDistTmp)){
+//                        NewScrollPos = tmpScrollPos;
+//                    }
+//                    tmpScrollPos = {ScrollIntX, ScrollIntY + dd};
+//                    sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
+//                    if(chmin(sumDist, sumDistTmp)){
+//                        NewScrollPos = tmpScrollPos;
+//                    }
+//                }
                 pathsDeque[pathLIdx].push_back(NewScrollPos);
                 pathsDeque[pathRIdx].push_front(NewScrollPos);
             }
@@ -994,9 +1001,7 @@ class BluteKurCellSolver : public SolverBase{
                         for (int l = 0; l < scrollN; l++) {
                             if (not past.used[l]) {
                                 ScrollTour nxt = past;
-//                                auto nxtvec = nxt.seq;
-//                                nxtvec.push_back(l);
-//                                if (isVisited.count(nxtvec))continue;
+                                if(visitedCheck(nxt, l))continue;
                                 nxt.add_scroll(*this, l);
                                 if(addVps(t + 1, nxt)) {
                                     ugoki = true;
@@ -1013,6 +1018,14 @@ class BluteKurCellSolver : public SolverBase{
 //            dump("chokudai", timer.get());
 //            dbg(ini_tour.cost, res.cost - ini_tour.cost);
             return res.seq;
+        }
+        bool visitedCheck(const ScrollTour& pastTour, int nxtl){
+            if(not MyAnswer::VISITED_CHECK)return false;
+            int pastSize = pastTour.seq.size();
+            auto nxtSeq = pastTour.seq;
+            nxtSeq.emplace_back(nxtl);
+            if(isVisited.count(nxtSeq) && isVisited[nxtSeq] > aCellStage.fact[scrollN - pastSize])return true;
+            return false;
         }
         bool timerCheck(float nowTime){
             float TIME_LIMIT;
@@ -1032,7 +1045,9 @@ class BluteKurCellSolver : public SolverBase{
             vpq[idx].push(tour);
             vpqSizes[idx]++;
             if(idx == scrollN - 1) {
-                chmin(vpqLastMinCost, tour.cost);
+                if(chmin(vpqLastMinCost, tour.cost)){
+                    dump(tour.seq);
+                }
             }
             return true;
         }
@@ -1050,7 +1065,6 @@ class BluteKurCellSolver : public SolverBase{
             DUMPOUT << endl;
         }
     };
-
 // ある値以下のときはbitdpをするようにする。
 class BitdpChokudaiSolver : public BluteKurCellSolver {
 };

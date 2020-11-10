@@ -77,9 +77,10 @@ public:
     static const int CHOKUDAI_INITIATION_NULL = 0;
     static const int CHOKUDAI_INITIATION_KUR = 1;
     static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.20;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.20;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.20;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_ALL = 0.27;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
     constexpr static const int SCROLLN_MAX_SMALL = 10;
     constexpr static const int SCROLLN_MAX_MEDIAM = 15;
     static const int CHOKUDAI_WIDTH = 1;
@@ -722,8 +723,10 @@ class BluteKurCellSolver : public SolverBase{
                 int midCenterY = midScrollCellCenterIdx.second;
                 int scrollX = midCenterX;
                 int scrollY = midCenterY;
+                Vector2 NewScrollPos = aCellStage.getCellPos(scrollX, scrollY);
                 Vector2 LPos = pathsDeque[pathLIdx].back();
                 Vector2 RPos = pathsDeque[pathRIdx].front();
+
                 float sumDist = dist(LPos, midScrollPos) + dist(RPos, midScrollPos);
                 for(int dxx = -n_Splits / 2; dxx <= n_Splits/2; dxx++) {
                     for (int dyy = -n_Splits / 2; dyy <= n_Splits / 2; dyy++) {
@@ -733,12 +736,24 @@ class BluteKurCellSolver : public SolverBase{
                         Vector2 tmpScrollPos = aCellStage.getCellPos(nx, ny);
                         float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
                         if (chmin(sumDist, sumDistTmp)) {
-                            scrollX = nx;
-                            scrollY = ny;
+                            NewScrollPos = aCellStage.getCellPos(nx, ny);
                         }
                     }
                 }
-                Vector2 NewScrollPos = aCellStage.getCellPos(scrollX, scrollY);
+                float ScrollIntX = int(NewScrollPos.x);
+                float ScrollIntY = int(NewScrollPos.y);
+                for(float dd = 0.0; dd < 1.0; dd += 0.099){
+                    Vector2 tmpScrollPos = {ScrollIntX + dd, ScrollIntY};
+                    float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
+                    if(chmin(sumDist, sumDistTmp)){
+                        NewScrollPos = tmpScrollPos;
+                    }
+                    tmpScrollPos = {ScrollIntX, ScrollIntY + dd};
+                    sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
+                    if(chmin(sumDist, sumDistTmp)){
+                        NewScrollPos = tmpScrollPos;
+                    }
+                }
                 pathsDeque[pathLIdx].push_back(NewScrollPos);
                 pathsDeque[pathRIdx].push_front(NewScrollPos);
             }
@@ -1094,7 +1109,7 @@ void Answer::initialize(const Stage& aStage)
     MyTimer t;
     t.reset();
     Solve(aStage);
-//    dbg("終了", t.get());
+    dbg(t.get());
 }
 
 //------------------------------------------------------------------------------

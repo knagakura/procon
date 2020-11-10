@@ -18,6 +18,7 @@
 #include <cmath>
 #include <map>
 #include <random>
+#include <deque>
 //--------------------------------my macro--------------------------------------
 using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -26,6 +27,7 @@ using namespace std;
 ostream &operator<<(ostream &os, hpc::Vector2 &val) {os  << "{" << val.x << ", " << val.y << "}";return os; }
 ostream &operator<<(ostream &os, hpc::Scroll &val) {os  << "{" << val.pos().x << ", " << val.pos().y << "}";return os; }
 template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto x: v) os << x << ", "; os << "]"; return os; }
+template <typename T> ostream &operator<<(ostream &os, const deque<T> &v) { os  << "["; for(auto x: v) os << x << ", "; os << "]"; return os; }
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
 template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
 template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
@@ -75,9 +77,9 @@ public:
     static const int CHOKUDAI_INITIATION_NULL = 0;
     static const int CHOKUDAI_INITIATION_KUR = 1;
     static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.27;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.27;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.27;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = 0.20;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = 0.20;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = 0.20;
     constexpr static const int SCROLLN_MAX_SMALL = 10;
     constexpr static const int SCROLLN_MAX_MEDIAM = 15;
     static const int CHOKUDAI_WIDTH = 1;
@@ -228,6 +230,23 @@ public:
             res.push_back(cellIdx2Pos(t));
         }
         reverse(res.begin(), res.end());
+        return res;
+    }
+
+    deque<Vector2> getFieldPathDeque(int t){
+        deque<Vector2> res;
+        for(; t != -1; t = prev[t]){
+            res.push_front(fieldIdx2pos(t));
+        }
+        // reverse(res.begin(), res.end());
+        return res;
+    }
+    deque<Vector2> getCellPathDeque(int t){
+        deque<Vector2> res;
+        for(; t != -1; t = prev[t]){
+            res.push_front(cellIdx2Pos(t));
+        }
+        // reverse(res.begin(), res.end());
         return res;
     }
     Vector2 fieldIdx2pos(int fieldIdx){
@@ -647,7 +666,7 @@ class BluteKurCellSolver : public SolverBase{
         };
 
         float distScroll[M + 5][M + 5]{};
-        vector<vector<Vector2>> paths; // path[idx_encode(i, j)] := i -> jへの最短経路
+        vector<deque<Vector2>> pathsDeque;
         vector<priority_queue<ScrollTour>> vpq;
         vector<int> vpqSizes;
         float vpqLastMinCost;
@@ -661,13 +680,14 @@ class BluteKurCellSolver : public SolverBase{
             ini_pos = aStage.rabbit().pos();
             vpq.resize(scrollN);
             vpqSizes.assign(scrollN,0);
-            paths.resize(scrollN * scrollN);
+            pathsDeque.resize(scrollN * scrollN);
             isVisited.clear();
             vpqLastMinCost = 1e9;
         }
         vector<Vector2> solve() override{
             buildDistanceMatrix();
             buildScrollSeq();
+            setScrollPosAfterBuildScrollSeq();
             return moveByScrollSeq();
         }
         float getJumpDist(const Stage& aStage, const Rabbit& rabbit){
@@ -682,25 +702,64 @@ class BluteKurCellSolver : public SolverBase{
             if(t == Terrain::TERM)idx = 0; // 置物
             return Parameter::JumpTerrianCoefficient[idx];
         }
+        void setScrollPosAfterBuildScrollSeq(){
+            for(int i = 0; i < scrollN - 2; i++){
+                int l = scrollSeq[i];
+                int mid = scrollSeq[i+1];
+                int r = scrollSeq[i+2];
+                int pathLIdx = l * scrollN + mid;
+                int pathRIdx = mid * scrollN + r;
+                // rの位置を設定する
+                Vector2 midScrollPos = bStage.scrolls()[mid].pos();
+                while(isSame(pathsDeque[pathLIdx].back(), midScrollPos)){
+                    pathsDeque[pathLIdx].pop_back();
+                }
+                while(isSame(pathsDeque[pathRIdx].front(), midScrollPos)){
+                    pathsDeque[pathRIdx].pop_front();
+                }
+                pair<int, int> midScrollCellCenterIdx = aCellStage.getCellCenterIdx(midScrollPos);
+                int midCenterX = midScrollCellCenterIdx.first;
+                int midCenterY = midScrollCellCenterIdx.second;
+                int scrollX = midCenterX;
+                int scrollY = midCenterY;
+                Vector2 LPos = pathsDeque[pathLIdx].back();
+                Vector2 RPos = pathsDeque[pathRIdx].front();
+                float sumDist = dist(LPos, midScrollPos) + dist(RPos, midScrollPos);
+                rep(k,8){
+                    int nx = midCenterX + dx[k];
+                    int ny = midCenterY + dy[k];
+                    if(aCellStage.isOutOfBounds(nx, ny))continue;
+                    Vector2 tmpScrollPos = aCellStage.getCellPos(nx,ny);
+                    float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
+                    if(chmin(sumDist, sumDistTmp)){
+                        scrollX = nx;
+                        scrollY = ny;
+                    }
+                }
+                Vector2 NewScrollPos = aCellStage.getCellPos(scrollX, scrollY);
+                pathsDeque[pathLIdx].push_back(NewScrollPos);
+                pathsDeque[pathRIdx].push_front(NewScrollPos);
+            }
+        }
         bool shouldGaman(const Stage &tmpStage, const int path_idx){
             int nowRabiTer = (int) tmpStage.terrain(tmpStage.rabbit().pos());
-            int nowCellTer = (int) tmpStage.terrain(paths[path_idx][cellIdx]);
-            int nxtCellTer = (int) tmpStage.terrain(paths[path_idx][cellIdx + 1]);
+            int nowCellTer = (int) tmpStage.terrain(pathsDeque[path_idx][cellIdx]);
+            int nxtCellTer = (int) tmpStage.terrain(pathsDeque[path_idx][cellIdx + 1]);
             return nowRabiTer == nowCellTer && nxtCellTer - nowCellTer > 1;
         }
         bool shouldMate(const Stage &tmpStage, const int path_idx, const int targetScrollIdx){
-            Vector2 nowRabitPos = tmpStage.rabbit().pos();
-            Vector2 nowCellPos = paths[path_idx][cellIdx];
+//            Vector2 nowRabitPos = tmpStage.rabbit().pos();
+            Vector2 nowCellPos = pathsDeque[path_idx][cellIdx];
             Vector2 nowTargetScrollPos = tmpStage.scrolls()[targetScrollIdx].pos();
-            Vector2 nxtCellPos = paths[path_idx][cellIdx];
+            Vector2 nxtCellPos = pathsDeque[path_idx][cellIdx];
             if(not isSame(nowCellPos, nowTargetScrollPos))return false; // 今のマスが目指してる巻物圏内である必要がある
             if(not path_idx + 1 < scrollN)return false; //　今のpathが最後ではないことが必要
             int notScrollCellIdx = 0;
-            while(isSame(paths[path_idx][notScrollCellIdx], nowTargetScrollPos)){
+            while(isSame(pathsDeque[path_idx + 1][notScrollCellIdx], nowTargetScrollPos)){
                 notScrollCellIdx++;
             }
-            Vector2 nxtPathStartPos = paths[path_idx + 1][notScrollCellIdx];
-            return dist(nowRabitPos, nxtPathStartPos) < dist(nxtCellPos, nxtPathStartPos);
+            Vector2 nxtPathStartPos = pathsDeque[path_idx + 1][notScrollCellIdx];
+            return dist(nowCellPos, nxtPathStartPos) < dist(nxtCellPos, nxtPathStartPos);
         }
         vector<Vector2> moveByScrollSeq(){
             Stage pseudoStage = bStage; // この後も初期状態を使う可能性があるので完全には破壊したくない
@@ -720,13 +779,13 @@ class BluteKurCellSolver : public SolverBase{
                 int scroll_r = scrollSeq[scrollSeqIdx + 1];
                 int path_idx = scroll_l * scrollN + scroll_r;
                 bool isSecondMove = false;
-                while (cellIdx + 1 < (int) paths[path_idx].size() && length > dist(now_pos, paths[path_idx][cellIdx])) {
+                while (cellIdx + 1 < (int) pathsDeque[path_idx].size() && length > dist(now_pos, pathsDeque[path_idx][cellIdx])) {
                     if(isSecondMove && shouldGaman(pseudoStage, path_idx))break;
-                    if(isSecondMove && shouldMate(pseudoStage, path_idx, scroll_r))break;
+                   if(isSecondMove && shouldMate(pseudoStage, path_idx, scroll_r))break;
                     cellIdx++;
                     isSecondMove = true;
                 }
-                auto nextPos = paths[path_idx][cellIdx];
+                auto nextPos = pathsDeque[path_idx][cellIdx];
                 pseudoStage.update(nextPos);
                 res.emplace_back(pseudoStage.rabbit().pos());
             }
@@ -813,7 +872,8 @@ class BluteKurCellSolver : public SolverBase{
                     pair<int, int> toCellIdx = aCellStage.getCellCenterIdx(scroll_to);
                     int to_idx = idxEncodeCell(toCellIdx.first, toCellIdx.second);
                     distScroll[i][j] = G.cost[to_idx];
-                    paths[i*scrollN+j] = G.getCellPath(to_idx);
+//                    paths[i*scrollN+j] = G.getCellPath(to_idx);
+                    pathsDeque[i*scrollN+j] = G.getCellPathDeque(to_idx);
                 }
             }
 //            dump("buildPath", t.get());

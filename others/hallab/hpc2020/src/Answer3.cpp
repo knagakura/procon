@@ -855,8 +855,12 @@ public:
         if(scrollN <= MyAnswer::BluteMAX_N){
             bluteForce(1, scrollN, scrollSeq);
         }
-        else{
-            chokudaiSearch(scrollSeq);
+        else {
+            float TIME_LIMIT;
+            if (scrollN - 1 <= MyAnswer::SCROLLN_MAX_SMALL)TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_SMALL;
+            else if (scrollN - 1 <= MyAnswer::SCROLLN_MAX_MEDIAM)TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM;
+            else TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_LARGE;
+            chokudaiSearch(scrollSeq, TIME_LIMIT);
         }
     }
     float calcCost(const vector<int>& v){
@@ -994,7 +998,7 @@ public:
         dfs(scrollN-1, -1, tree, res);
         return res;
     }
-    void chokudaiSearch(vector<int> &scrollSeq){
+    void chokudaiSearch(vector<int> &scrollSeq, const float TIME_LIMIT){
         // 定数
         MyTimer timer;
         timer.reset();
@@ -1026,12 +1030,12 @@ public:
 //                        dump(isVisited.size());
 //                        dump(isVisited);
 //                }
-            if(timerCheck(timer.get())) break;
+            if(timerCheck(timer.get(), TIME_LIMIT)) break;
             bool ugoki = false;
             for(int t = 0; t < scrollN - 1; t++) {
-                if (timerCheck(timer.get())) break;
+                if (timerCheck(timer.get(), TIME_LIMIT)) break;
                 rep(_, MyAnswer::CHOKUDAI_WIDTH) {
-                    if(timerCheck(timer.get()))break;
+                    if(timerCheck(timer.get(), TIME_LIMIT))break;
                     if (vpq[t].empty())break;
                     ScrollTour past = popVps(t);
                     for (int l = 0; l < scrollN; l++) {
@@ -1063,18 +1067,8 @@ public:
         if(isVisited.count(nxtSeq) && isVisited[nxtSeq] > aCellStage.fact[scrollN - pastSize])return true;
         return false;
     }
-    bool timerCheck(float nowTime){
+    bool timerCheck(float nowTime, const float TIME_LIMIT){
         if(vpq.back().empty())return false;
-        float TIME_LIMIT;
-        if(scrollN-1 <= MyAnswer::SCROLLN_MAX_SMALL) {
-            TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_SMALL;
-        }
-        else if(scrollN-1 <= MyAnswer::SCROLLN_MAX_MEDIAM){
-            TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM;
-        }
-        else{
-            TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_LARGE;
-        }
         return nowTime >= TIME_LIMIT;
     }
     bool addVps(int idx, const ScrollTour& tour){
@@ -1105,6 +1099,8 @@ public:
 };
 // ある値以下のときはbitdpをするようにする。
 class TSPSolver : public BluteKurCellSolver {
+    TSPSolver(): BluteKurCellSolver(){}
+
 };
 
 //-----------------------------------------------------------------------------

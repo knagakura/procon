@@ -77,11 +77,11 @@ public:
     static const int CHOKUDAI_INITIATION_NULL = 0;
     static const int CHOKUDAI_INITIATION_KUR = 1;
     static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_ALL = 0.20;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_ALL = 0.22;
     constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
     constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
     constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
-    constexpr static const float SIMULATION_TIME_LIMT = 0.01;
+    constexpr static const float SIMULATION_TIME_LIMT = 0.10;
     constexpr static const int SCROLLN_MAX_SMALL = 10;
     constexpr static const int SCROLLN_MAX_MEDIAM = 15;
     static const int CHOKUDAI_WIDTH = 1;
@@ -708,7 +708,7 @@ public:
         });
         MyTimer t;
         t.reset();
-        for(int i = 0; i < betterScrollTours.size(); i++){
+        for(int i = 0; i < (int)betterScrollTours.size(); i++){
             if(t.get() > MyAnswer::SIMULATION_TIME_LIMT){
                 dump(i);
                 break;
@@ -720,8 +720,8 @@ public:
             auto x = moveByScrollSeq(tmpScrollseq, tmpPathsDeque);
             int tmpCost = x.size();
             if(chmin(realMinCost, tmpCost)){
-                BestScrollSeq = tmpScrollseq;
-                BestPathsDeque = tmpPathsDeque;
+                swap(BestScrollSeq,tmpScrollseq);
+                swap(BestPathsDeque,tmpPathsDeque);
                 dbg(tmpTour.seq, tmpTour.cost, tmpCost);
             }
         }

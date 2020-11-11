@@ -948,7 +948,7 @@ public:
         }
 //            dump("buildPath", t.get());
     } // Cell仕様
-    // [l, r)に関して、順列を変えてみてコストが最小のものに変換する
+    virtual // [l, r)に関して、順列を変えてみてコストが最小のものに変換する
     void bluteForce(int l, int r, vector<int> &scrollSeq){
         scrollSeq.resize(scrollN);
         scrollSeq[0] = scrollN-1;
@@ -1107,8 +1107,6 @@ public:
 
 class TSPSolver : public BluteKurCellSolver {
 public:
-    TSPSolver(): BluteKurCellSolver(){}
-    explicit TSPSolver(const Stage& aStage): BluteKurCellSolver(aStage){}
     struct ScrollTSP{
         int cost;
         vector<int> seq;
@@ -1150,8 +1148,10 @@ public:
             }
             return tmpSeq;
         }
-        ScrollTSP swapEdges_2opt(int p, int q, TSPSolver &Solver){
-            vector<int> tmpSeq;
+        ScrollTSP swapEdges_2opt(TSPSolver &Solver){
+            int p = XorShift() % (scrollN-1) + 1;
+            int q = XorShift() % (scrollN-1) + 1;
+            vector<int> tmpSeq = seq;
             if(p > q)swap(p, q);
             reverse(tmpSeq.begin() + p, tmpSeq.begin() + q);
             auto res = ScrollTSP(tmpSeq, Solver);
@@ -1161,6 +1161,30 @@ public:
             return (*this).cost > b.cost;
         }
     };
+    TSPSolver(): BluteKurCellSolver(){}
+    explicit TSPSolver(const Stage& aStage): BluteKurCellSolver(aStage){}
+    void bluteForce(int l, int r, vector<int>& scrollseq)override{
+        scrollseq.resize(scrollN);
+        scrollseq[0] = scrollN - 1;
+        rep(i,scrollN-1)scrollseq[i+1] = i;
+        chmin(r, (int)scrollseq.size());
+        int min_cost = 1e5;
+        vector<int> tmp_changed, res;
+        vector<int> tmp_prefix, tmp_suffix;
+        for(int i = 0; i < l; i++)tmp_prefix.push_back(scrollseq[i]);
+        for(int i = l; i < r; i++)tmp_changed.push_back(scrollseq[i]);
+        for(int i = r; i < (int)scrollseq.size(); i++)tmp_suffix.push_back(scrollseq[i]);
+        sort(tmp_changed.begin(), tmp_changed.end());
+        do{
+            vector<int> tmp2;
+            for(auto x: tmp_prefix)tmp2.push_back(x);
+            for(auto x: tmp_changed)tmp2.push_back(x);
+            for(auto x: tmp_suffix)tmp2.push_back(x);
+            if(chmin(min_cost, ScrollTSP(tmp2, *this).cost)){
+                scrollseq = tmp2;
+            }
+        }while(next_permutation(tmp_changed.begin(), tmp_changed.end()));
+    }
     void buildScrollSeqEazy(vector<int> & ScrollSeq){
         chokudaiSearchEasy(ScrollSeq);
     }
@@ -1172,10 +1196,15 @@ public:
         // これらの変数は、scrollSeqに依存して変化
         vector<int> BestScrollSeq;
         vector<deque<Vector2>> BestPathsDeque = pathsDeque;
-        buildScrollSeqEazy(BestScrollSeq); // 0秒のchokudai search
-        // ここでTSPにする
-        solveTSP(BestScrollSeq);
-        //
+        if(scrollN < 9){
+            bluteForce(1, scrollN, BestScrollSeq);
+        }
+        else{
+            buildScrollSeqEazy(BestScrollSeq); // 0秒のchokudai search
+            // ここでTSPにする
+            solveTSP(BestScrollSeq);
+            //
+        }
         setScrollPosAfterBuildScrollSeq(BestScrollSeq, BestPathsDeque);
         return moveByScrollSeq(BestScrollSeq, BestPathsDeque);
     }
@@ -1186,14 +1215,24 @@ public:
         dump(iniTSP.edges);
         priority_queue<ScrollTSP> pq;
         pq.push(iniTSP);
-//        MyTimer time;
-//        time.reset();
-//        while(true) {
-//            if (timerCheck(time.get()))break;
-//            auto tmp = iniTSP.swapEdges_2opt();
-//        }
-//        vector<int> BestScrollSeq = pq.top().seq;
-//        swap(iniScrollSeq, BestScrollSeq);
+        MyTimer time;
+        time.reset();
+        int itr = 0;
+        while(true) {
+            itr++;
+            if(itr%100 == 0){
+                dump(itr);
+            }
+            if (timerCheck(time.get()))break;
+            auto tmp = iniTSP.swapEdges_2opt(*this);
+            if(iniTSP.cost > tmp.cost) {
+                swap(iniTSP, tmp);
+                pq.push(iniTSP);
+                dump(iniTSP.cost);
+            }
+        }
+        vector<int> BestScrollSeq = pq.top().seq;
+        swap(iniScrollSeq, BestScrollSeq);
     }
     bool timerCheck(float time){
         return BluteKurCellSolver::timerCheck(time, MyAnswer::TSP_TIME_LIMIT);

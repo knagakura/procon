@@ -1064,6 +1064,7 @@ class BluteKurCellSolver : public SolverBase{
             return false;
         }
         bool timerCheck(float nowTime){
+            if(vpq.back().empty())return false;
             float TIME_LIMIT;
             if(scrollN-1 <= MyAnswer::SCROLLN_MAX_SMALL) {
                 TIME_LIMIT = MyAnswer::CHOKUDAI_SEARCH_TIME_LIMIT_SMALL;

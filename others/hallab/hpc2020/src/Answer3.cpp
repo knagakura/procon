@@ -67,7 +67,7 @@ public:
     int positionSeqIdx{};
 
     // Solverクラスを選択する変数
-    int SolverSelection = TSPSolver;
+    int SolverSelection = 2;
     static const int Random = 0;
     static const int BluteKur = 1;
     static const int BluteKurCell = 2;
@@ -77,7 +77,7 @@ public:
     static const int CHOKUDAI_INITIATION_NULL = 0;
     static const int CHOKUDAI_INITIATION_KUR = 1;
     static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_ALL = 0.22;
+    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_ALL = 0.20;
     constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
     constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
     constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
@@ -154,6 +154,9 @@ public:
         pair<int, int> CenterIdx = getCellCenterIdx(i, j);
         return getCellPos(CenterIdx.first, CenterIdx.second);
     }
+    Vector2 getCellCenterPos(const Vector2& v){
+        return getCellCenterPos(int(v.x), int(v.y));
+    }
     Vector2 cellIdx2Pos(int cellIdx){
         return getCellPos(cellIdx / Wn, cellIdx % Wn);
     }
@@ -168,12 +171,31 @@ public:
             return false;
         }
     }
+    // その座標と同じ升目にあるますを列挙する
+    vector<Vector2> getAroundCells(int i, int j){
+        pair<int,int> centerPIdx = getCellCenterIdx(i, j);
+        int centerI = centerPIdx.first;
+        int centerJ = centerPIdx.second;
+        vector<Vector2> res;
+        for(int di = - n_Splits / 2; di <= n_Splits/2; di++){
+            for(int dj = - n_Splits / 2; dj <= n_Splits/2; dj++) {
+                int ni = centerI + di;
+                int nj = centerJ + dj;
+                if(isOutOfBounds(ni, nj))continue;
+                res.emplace_back(pos[ni][nj]);
+            }
+        }
+        return res;
+    }
+    vector<Vector2> getAroundCells(const Vector2& v){
+        return getAroundCells((int)v.x, (int)v.y);
+    }
 };
 
 
 // ------------------------------------------------------------
 CellStage aCellStage; // 一番最初に行われる処理。
-MyAnswer aMyAnswer(3);
+MyAnswer aMyAnswer(2);
 // ------------------------------------------------------------
 
 constexpr long long CYCLES_PER_SEC = 2800000000;
@@ -396,6 +418,7 @@ public:
             used.assign(M+5, false);
         }
         explicit ScrollTour(vector<int>& seq_): seq(seq_){
+            cost  = 0.0f;
             used.assign(M+5, false);
             for(auto x: seq)used[x] = true;
         }
@@ -676,7 +699,6 @@ public:
             return (*this).cost > b.cost;
         }
     };
-
     float distScroll[M + 5][M + 5]{};
     vector<deque<Vector2>> pathsDeque;
     vector<priority_queue<ScrollTour>> vpq;
@@ -804,8 +826,14 @@ public:
     }
     bool shouldGaman(const Stage &tmpStage, const int path_idx, const vector<deque<Vector2>> &pathsDequeNow){
         int nowRabiTer = (int) tmpStage.terrain(tmpStage.rabbit().pos());
-        int nowCellTer = (int) tmpStage.terrain(pathsDequeNow[path_idx][cellIdx]);
-        int nxtCellTer = (int) tmpStage.terrain(pathsDequeNow[path_idx][cellIdx + 1]);
+        auto nowTargetCellPos = pathsDequeNow[path_idx][cellIdx];
+        auto nxtTargetCellPos = pathsDequeNow[path_idx][cellIdx+1];
+        auto nowCellPos = tmpStage.getNextPos(tmpStage.rabbit().pos(), tmpStage.rabbit().power(), nowTargetCellPos);
+        auto nxtCellPos = tmpStage.getNextPos(tmpStage.rabbit().pos(), tmpStage.rabbit().power(), nxtTargetCellPos);
+//        int nowCellTer = (int) tmpStage.terrain(pathsDequeNow[path_idx][cellIdx]);
+//        int nxtCellTer = (int) tmpStage.terrain(pathsDequeNow[path_idx][cellIdx + 1]);
+        int nowCellTer = (int) tmpStage.terrain(nowCellPos);
+        int nxtCellTer = (int) tmpStage.terrain(nxtCellPos);
         return nowRabiTer == nowCellTer && nxtCellTer - nowCellTer > 1;
     }
     bool shouldMate(const Stage &tmpStage, const int path_idx, const int targetScrollIdx, const vector<deque<Vector2>> &pathsDequeNow){
@@ -822,7 +850,7 @@ public:
         Vector2 nxtPathStartPos = pathsDequeNow[path_idx + 1][notScrollCellIdx];
         return dist(nowCellPos, nxtPathStartPos) < dist(nxtCellPos, nxtPathStartPos);
     }
-    vector<Vector2> moveByScrollSeq(const vector<int> &scrollSeq, const vector<deque<Vector2>> &pathsDequeNow, bool isTimeShow = false){
+    vector<Vector2> moveByScrollSeq(const vector<int> &scrollSeq, const vector<deque<Vector2>> &pathsDequeNow, bool isTimeShow = false, bool isReConstruct = false){
         MyTimer t;
         if(isTimeShow)t.reset();
         Stage pseudoStage = bStage; // この後も初期状態を使う可能性があるので完全には破壊したくない
@@ -848,8 +876,22 @@ public:
                 cellIdx++;
                 isSecondMove = true;
             }
-            auto nextPos = pathsDequeNow[path_idx][cellIdx];
-            pseudoStage.update(nextPos);
+            auto nextTargetPos = pathsDequeNow[path_idx][cellIdx];
+//            if(isReConstruct) {
+//                auto nxtPos = pseudoStage.getNextPos(now_pos, player.power(), nextTargetPos);
+//                if (cellIdx + 1 < pathsDequeNow[path_idx].size()-5 && not isSame(now_pos, nxtPos)) {
+//                    auto nnPos = pathsDequeNow[path_idx].back();
+//                    float minDist = dist(now_pos, nxtPos) + dist(nxtPos, nnPos);
+//                    for(const Vector2 &tmpTargetPos: aCellStage.getAroundCells(nxtPos)){
+//                        auto tmpNxtPos = pseudoStage.getNextPos(now_pos, player.power(), tmpTargetPos);
+//                        float tmpDist = dist(now_pos, tmpNxtPos) + dist(tmpNxtPos, nnPos);
+//                        if(length < dist(now_pos, tmpTargetPos) && length < dist(nxtPos, nnPos) && chmin(minDist, tmpDist)){
+//                            nextTargetPos = tmpTargetPos;
+//                        }
+//                    }
+//                }
+//            }
+            pseudoStage.update(nextTargetPos);
             res.emplace_back(pseudoStage.rabbit().pos());
         }
         if(isTimeShow) {

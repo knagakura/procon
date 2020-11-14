@@ -802,7 +802,7 @@ public:
                     int ny = midCenterY + dyy;
                     if (aCellStage.isOutOfBounds(nx, ny))continue;
                     Vector2 tmpScrollPos = aCellStage.getCellPos(nx, ny);
-                    float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
+                    float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos) * 1.1;
                     if (chmin(sumDist, sumDistTmp)) {
                         NewScrollPos = aCellStage.getCellPos(nx, ny);
                     }
@@ -1231,11 +1231,9 @@ public:
             int cnt = __builtin_popcount(i);
             for (int j = 0; j < n; ++j) {
                 if (dp[i][j] == INF) continue;
-                if(dp[i][j] > minCost)continue;
                 for (int k = 0; k < n; ++k) {
                     if (!((i >> k) & 1)) {
                         int nxtCost = dp[i][j] + memoCost[cnt][j][k];
-                        if(nxtCost > minCost)continue;
                         if (dp[i | (1 << k)][k] >  nxtCost) {
                             dp[i | (1 << k)][k] = dp[i][j] + memoCost[cnt][j][k];
                             prevdp[i | (1 << k)][k] = j;

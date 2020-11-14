@@ -19,6 +19,7 @@
 #include <map>
 #include <random>
 #include <deque>
+#include <set>
 //--------------------------------my macro--------------------------------------
 using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -90,7 +91,7 @@ public:
 
     constexpr static const float TSP_TIME_LIMIT = 0.1;
 
-    static const int n_Splits = 7; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
+    static const int n_Splits = 5; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
     static const int Hn = H * n_Splits;
     static const int Wn = W * n_Splits;
     explicit MyAnswer(int type_): SolverSelection(type_){
@@ -1229,11 +1230,11 @@ public:
             int cnt = __builtin_popcount(i);
             for (int j = 0; j < n; ++j) {
                 if (dp[i][j] == INF) continue;
-                if(dp[i][j] > minCost+50)continue;
+                if(dp[i][j] > minCost)continue;
                 for (int k = 0; k < n; ++k) {
                     if (!((i >> k) & 1)) {
                         int nxtCost = dp[i][j] + memoCost[cnt][j][k];
-                        if(nxtCost > minCost+50)continue;
+                        if(nxtCost > minCost)continue;
                         if (dp[i | (1 << k)][k] >  nxtCost) {
                             dp[i | (1 << k)][k] = dp[i][j] + memoCost[cnt][j][k];
                             prevdp[i | (1 << k)][k] = j;

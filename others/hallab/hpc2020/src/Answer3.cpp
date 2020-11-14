@@ -20,6 +20,7 @@
 #include <random>
 #include <deque>
 #include <set>
+#include <climits>
 //--------------------------------my macro--------------------------------------
 using namespace std;
 #define rep(i,N) for(int i=0;i<int(N);++i)
@@ -1290,6 +1291,33 @@ public:
                     swap(BestPathsDeque, tmpDeque);
                 }
             }
+            /*
+             * 山登りをする
+             */
+            MyTimer t;
+            t.reset();
+            while(true) {
+                if(t.get() > 0.03) {
+                    break;
+                }
+                int rand = XorShift() % (scrollN - 1);
+                int pathsIdx = BestScrollSeq[rand] * scrollN + BestScrollSeq[rand+1];
+                int cellIdx = XorShift() % ((int)BestPathsDeque[pathsIdx].size() - 1) + 1;
+                float randX = Prob()/5;
+                float randY = Prob()/5;
+                auto tmpPathsDeque = BestPathsDeque;
+                dump(pathsIdx, cellIdx, randX, randY);
+                tmpPathsDeque[pathsIdx][cellIdx].x += randX;
+                tmpPathsDeque[pathsIdx][cellIdx].y += randY;
+                if(not isSame(tmpPathsDeque[pathsIdx][cellIdx], BestPathsDeque[pathsIdx][cellIdx]))continue;
+                int tmpCost = calcCostFromScrollSeq(BestScrollSeq, tmpPathsDeque);
+                if(minCost >= tmpCost){
+                    minCost = tmpCost;
+                    dump(minCost, tmpCost);
+                    swap(tmpPathsDeque, BestPathsDeque);
+                }
+            }
+            return moveByScrollSeq(BestScrollSeq, BestPathsDeque);
         }
         else {
 //        if(scrollN < 9){
@@ -1312,8 +1340,12 @@ public:
 //            assert(abs(sumMemoCost - realCost) < 30);
             dbg(BestScrollSeq);
             dbg(tmpMemoCosts);
+            return moveByScrollSeq(BestScrollSeq, BestPathsDeque);
         }
-        return moveByScrollSeq(BestScrollSeq, BestPathsDeque);
+    }
+    double Prob(void){
+        double ret = (double)XorShift() / UINT_MAX;
+        return ret;
     }
     int calcCostForMemo(int cnt, int from, int to){
         if(to == scrollN-1)return -1;

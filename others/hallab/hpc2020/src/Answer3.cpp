@@ -966,7 +966,8 @@ public:
             pair<int, int> startCellIdx = aCellStage.getCellCenterIdx(scroll_from);
             int start_idx = idxEncodeCell(startCellIdx.first, startCellIdx.second);
             G.solve(start_idx);
-            rep(j,scrollN){
+            rep(j,scrollN-1){
+                if(i == j)continue;
                 Vector2 scroll_to = positions[j];
                 pair<int, int> toCellIdx = aCellStage.getCellCenterIdx(scroll_to);
                 int to_idx = idxEncodeCell(toCellIdx.first, toCellIdx.second);

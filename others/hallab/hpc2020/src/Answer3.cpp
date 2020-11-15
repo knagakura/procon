@@ -58,6 +58,7 @@ const int M = Parameter::MaxScrollCount;
 const int H = Parameter::StageHeight;
 const int W = Parameter::StageWidth;
 constexpr int INF = 100000;
+const float PI = acos(-1);
 //--------------------------------my libraries----------------------------------------------
 class MyAnswer{
 public:
@@ -656,27 +657,60 @@ public:
          */
         MyTimer t;
         t.reset();
+        int itr = 0;
+        float tl = 0.045;
+//        float tl = 0.003 * scrollN;
+//        if(scrollN == 21)tl += 0.1;
+        // 元々0.049
+//        dump(tl);
         while(true) {
-            if(t.get() > 0.03) {
-                break;
+            itr++;
+            if(itr % 10 == 0){
+                if(t.get() > tl)break;
+//                dump(itr);
             }
             int rand = XorShift() % (scrollN - 1);
             int pathsIdx = BestScrollSeq[rand] * scrollN + BestScrollSeq[rand+1];
             int cellIdx = XorShift() % ((int)BestPathsDeque[pathsIdx].size() - 1) + 1;
+            float theta = kaku(BestPathsDeque[pathsIdx][cellIdx-1], BestPathsDeque[pathsIdx][cellIdx], BestPathsDeque[pathsIdx][cellIdx+1]);
+            if((theta/PI) * 180 < 10)continue;
             float randX = Prob()/5;
             float randY = Prob()/5;
             auto tmpPathsDeque = BestPathsDeque;
             tmpPathsDeque[pathsIdx][cellIdx].x += randX;
             tmpPathsDeque[pathsIdx][cellIdx].y += randY;
+//            float nxtTheta = kaku(tmpPathsDeque[pathsIdx][cellIdx-1], tmpPathsDeque[pathsIdx][cellIdx], tmpPathsDeque[pathsIdx][cellIdx+1]);
             if(not isSame(tmpPathsDeque[pathsIdx][cellIdx], BestPathsDeque[pathsIdx][cellIdx]))continue;
             int tmpCost = calcCostFromScrollSeq(BestScrollSeq, tmpPathsDeque);
             if(minCost >= tmpCost){
+                if(minCost > tmpCost){
+                    dump((theta/PI) * 180);
+//                    dump((nxtTheta/PI)*180);
+                }
                 minCost = tmpCost;
                 swap(tmpPathsDeque, BestPathsDeque);
             }
         }
+        dump(itr);
         return moveByScrollSeq(BestScrollSeq, BestPathsDeque);
 
+    }
+    float kaku(Vector2 &a, Vector2 &b, Vector2 &c)const{
+        float ax = a.x - b.x;
+        float ay = a.y - b.y;
+        float cx = c.x - b.x;
+        float cy = c.y - b.y;
+        float alpha = atan2(ax, ay);
+        float beta = atan2(cx, cy);
+        float res = abs(alpha - beta);
+        res = abs(res - PI);
+        res = abs(res);
+        while(res > PI){
+            res -= PI;
+        }
+        // res < PI
+        if(PI - res < res)res = PI - res;
+        return res;
     }
     double Prob(void){
         double ret = (double)XorShift() / UINT_MAX;

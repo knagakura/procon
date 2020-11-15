@@ -664,7 +664,7 @@ public:
         MyTimer t;
         t.reset();
         int itr = 0;
-        float tl = 0.043;
+        float tl = 0.063;
 //        float tl = 0.003 * scrollN;
 //        if(scrollN == 21)tl += 0.1;
         // 元々0.049

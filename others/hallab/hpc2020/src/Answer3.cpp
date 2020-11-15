@@ -639,7 +639,7 @@ public:
         buildMemoCost();
         // これらの変数は、scrollSeqに依存して変化
         vector<int> BestScrollSeq;
-        vector<deque<Vector2>> BestPathsDeque = pathsDeque;
+        vector<deque<Vector2>> BestPathsDeque;
         int minCost = INF;
         vector<vector<int>> betterScrollSeqs;
         solveBitDP(betterScrollSeqs);
@@ -647,6 +647,7 @@ public:
             auto tmpDeque = pathsDeque;
             setScrollPosAfterBuildScrollSeq(v, tmpDeque);
             int cost = calcCostFromScrollSeq(v, tmpDeque);
+//            dump(v, cost, dp[(1 << (scrollN-1)) - 1][v.back()]);
             if(chmin(minCost, cost)){
                 swap(BestScrollSeq, v);
                 swap(BestPathsDeque, tmpDeque);
@@ -658,13 +659,13 @@ public:
         MyTimer t;
         t.reset();
         int itr = 0;
-        float tl = 0.045;
+        float tl = 0.043;
 //        float tl = 0.003 * scrollN;
 //        if(scrollN == 21)tl += 0.1;
         // 元々0.049
 //        dump(tl);
         while(true) {
-            itr++;
+//            itr++;
             if(itr % 10 == 0){
                 if(t.get() > tl)break;
 //                dump(itr);
@@ -682,9 +683,9 @@ public:
 //            float nxtTheta = kaku(tmpPathsDeque[pathsIdx][cellIdx-1], tmpPathsDeque[pathsIdx][cellIdx], tmpPathsDeque[pathsIdx][cellIdx+1]);
             if(not isSame(tmpPathsDeque[pathsIdx][cellIdx], BestPathsDeque[pathsIdx][cellIdx]))continue;
             int tmpCost = calcCostFromScrollSeq(BestScrollSeq, tmpPathsDeque);
-            if(minCost >= tmpCost){
+            if(minCost > tmpCost){
                 if(minCost > tmpCost){
-                    dump((theta/PI) * 180);
+                    // dbg('\t', itr, (theta/PI) * 180, tmpCost);
 //                    dump((nxtTheta/PI)*180);
                 }
                 minCost = tmpCost;
@@ -693,7 +694,6 @@ public:
         }
         dump(itr);
         return moveByScrollSeq(BestScrollSeq, BestPathsDeque);
-
     }
     float kaku(Vector2 &a, Vector2 &b, Vector2 &c)const{
         float ax = a.x - b.x;

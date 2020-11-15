@@ -157,6 +157,9 @@ public:
     Vector2 getCellCenterPos(const Vector2& v){
         return getCellCenterPos(int(v.x), int(v.y));
     }
+    pair<int, int> cellIdx2PosIdxs(int cellIdx){
+        return make_pair(cellIdx / Wn, cellIdx % Wn);
+    }
     Vector2 cellIdx2Pos(int cellIdx){
         return getCellPos(cellIdx / Wn, cellIdx % Wn);
     }
@@ -340,6 +343,8 @@ public:
     float distScroll[M + 5][M + 5]{};
     vector<deque<Vector2>> pathsDeque;
     Vector2 ini_pos;
+    vector<Vector2> positions;
+
     SolverBase(){};
     SolverBase(const Stage &aStage){
         stageInitiation(aStage);
@@ -350,6 +355,10 @@ public:
         iniPos = bStage.rabbit().pos();
         ini_pos = aStage.rabbit().pos();
         pathsDeque.resize(scrollN * scrollN);
+        // 巻物
+        rep(i,scrollN-1)positions.push_back(bStage.scrolls()[i].pos());
+        // 最初のポジション
+        positions.push_back(ini_pos);
     }
     bool isSame(const Vector2 &a, const Vector2 &b){
         return (int)a.x == (int)b.x && (int)a.y == (int)b.y;
@@ -518,8 +527,8 @@ public:
     }
     template<typename T>
     void buildMakeEdges(Dijkstra<T>& G){ //
-        int Dx[] = {-2, -2, -1, -1, 1, 1, 2, 2};
-        int Dy[] = {-1, 1, -2, 2, -2, 2, -1, 1};
+        const int Dx[] = {-2, -2, -1, -1, 1, 1, 2, 2};
+        const int Dy[] = {-1, 1, -2, 2, -2, 2, -1, 1};
         rep(i,Hn)rep(j,Wn){
 //                    Vector2 from = {float(i), float(j)};
                 Vector2 from = aCellStage.getCellPos(i, j);
@@ -556,11 +565,6 @@ public:
     void buildPaths(Dijkstra<T> &G){ //
         MyTimer t;
         t.reset();
-        vector<Vector2> positions;
-        // 巻物
-        rep(i,scrollN-1)positions.push_back(bStage.scrolls()[i].pos());
-        // 最初のポジション
-        positions.push_back(ini_pos);
         rep(i,scrollN){
             Vector2 scroll_from = positions[i];
             pair<int, int> startCellIdx = aCellStage.getCellCenterIdx(scroll_from);
@@ -635,7 +639,8 @@ public:
         }
     }
     vector<Vector2> solve() /*override*/{
-        buildDistanceMatrix(); // そのままでOK
+//        buildDistanceMatrix(); // そのままでOK
+        dijkstra();
         buildMemoCost();
         // これらの変数は、scrollSeqに依存して変化
         vector<int> BestScrollSeq;
@@ -765,6 +770,89 @@ public:
         rep(i,scrollN-1)rep(l,scrollN)rep(r,scrollN){
             memoCost[i][l][r] = calcCostForMemo(i, l, r);
         }
+    }
+
+
+    int nV = Hn * Wn;
+    float inf = 1e5;
+    vector<float> costs;
+    vector<int> prev;
+    void dijkstra(){
+        // startを決める
+        rep(i,scrollN) {
+            dijkstraSolve(i); // iから解く
+            rep(j,scrollN-1){
+                if(i == j)continue;
+                Vector2 scroll_to = positions[j];
+                pair<int, int> toCellIdx = aCellStage.getCellCenterIdx(scroll_to);
+                int to_idx = idxEncodeCell(toCellIdx.first, toCellIdx.second);
+                distScroll[i][j] = costs[to_idx];
+                pathsDeque[i * scrollN + j] = getPathsDeque(to_idx);
+//                distScroll[i][j] = G.cost[to_idx];
+//                paths[i*scrollN+j] = G.getCellPath(to_idx);
+//                pathsDeque[i*scrollN+j] = G.getCellPathDeque(to_idx);
+            }
+        }
+    }
+    void dijkstraSolve(int startScrollIdx){
+        const int Dx[] = {-2, -2, -1, -1, 1, 1, 2, 2};
+        const int Dy[] = {-1, 1, -2, 2, -2, 2, -1, 1};
+        priority_queue<pair<float, int>, vector<pair<float, int>> , greater<pair<float, int>>> pq;
+        costs.assign(nV, inf);
+        prev.assign(nV, -1);
+        Vector2 scroll_from = positions[startScrollIdx];
+        pair<int, int> startCellIdx = aCellStage.getCellCenterIdx(scroll_from);
+        int start_idx = idxEncodeCell(startCellIdx.first, startCellIdx.second);
+        costs[start_idx] = 0;
+        pq.push({0, start_idx});
+        while(not pq.empty()){
+            float preCost = pq.top().first;
+            int fromCellIdx = pq.top().second;
+            pq.pop();
+            pair<int, int> fromP = aCellStage.cellIdx2PosIdxs(fromCellIdx);
+            int fromX = fromP.first;
+            int fromY = fromP.second;
+            Terrain from_tr = bStage.terrain(aCellStage.getCellPos(fromX, fromY));
+            if(costs[fromCellIdx] < preCost)continue;
+            // 別の頂点へ遷移
+            rep(k,8){
+                int nx = fromX + dx[k];
+                int ny = fromY + dy[k];
+                if(aCellStage.isOutOfBounds(nx, ny))continue;
+//                        Vector2 to = aCellStage.getCellPos(i, j);
+                // Terrain to_tr = aStage.terrain(to);
+                int toCellIdx = idxEncodeCell(nx, ny);
+                float cost = terrain_cost(from_tr) * dist(dx[k], dy[k])/*+ terrain_cost(to_tr)*/;
+                if(preCost + cost < costs[toCellIdx]){
+                    costs[toCellIdx] = preCost + cost;
+                    prev[toCellIdx] = fromCellIdx;
+                    pq.push({costs[toCellIdx], toCellIdx});
+                }
+//                G.make_edge(from_idx, to_idx, cost);
+            }
+            rep(k,8){
+                int nx = fromX + Dx[k];
+                int ny = fromY + Dy[k];
+                if(aCellStage.isOutOfBounds(nx, ny))continue;
+//                        Vector2 to = aCellStage.getCellPos(i, j);
+                // Terrain to_tr = aStage.terrain(to);
+                int toCellIdx = idxEncodeCell(nx, ny);
+                float cost = terrain_cost(from_tr) * dist(Dx[k], Dy[k])/*+ terrain_cost(to_tr)*/;
+                if(preCost + cost < costs[toCellIdx]){
+                    costs[toCellIdx] = preCost + cost;
+                    prev[toCellIdx] = fromCellIdx;
+                    pq.push({costs[toCellIdx], toCellIdx});
+                }
+//                G.make_edge(from_idx, to_idx, cost);
+            }
+        }
+    }
+    deque<Vector2> getPathsDeque(int t){
+        deque<Vector2> res;
+        for(; t != -1; t = prev[t]){
+            res.push_front(aCellStage.cellIdx2Pos(t));
+        }
+        return res;
     }
 };
 

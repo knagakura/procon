@@ -341,6 +341,7 @@ public:
     Vector2 iniPos;
     vector<int> PositionSeq;
     float distScroll[M + 5][M + 5]{};
+    bool existScroll[H][W]{};
     vector<deque<Vector2>> pathsDeque;
     Vector2 ini_pos;
     vector<Vector2> positions;
@@ -355,8 +356,16 @@ public:
         iniPos = bStage.rabbit().pos();
         ini_pos = aStage.rabbit().pos();
         pathsDeque.resize(scrollN * scrollN);
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                existScroll[i][j] = false;
+            }
+        }
         // 巻物
-        rep(i,scrollN-1)positions.push_back(bStage.scrolls()[i].pos());
+        rep(i,scrollN-1){
+            positions.push_back(bStage.scrolls()[i].pos());
+            existScroll[(int)positions[i].x][(int)positions[i].y] = true;
+        }
         // 最初のポジション
         positions.push_back(ini_pos);
     }
@@ -664,7 +673,7 @@ public:
         MyTimer t;
         t.reset();
         int itr = 0;
-        float tl = 0.063;
+        float tl = 0.068;
 //        float tl = 0.003 * scrollN;
 //        if(scrollN == 21)tl += 0.1;
         // 元々0.049
@@ -686,7 +695,16 @@ public:
             tmpPathsDeque[pathsIdx][cellIdx].x += randX;
             tmpPathsDeque[pathsIdx][cellIdx].y += randY;
 //            float nxtTheta = kaku(tmpPathsDeque[pathsIdx][cellIdx-1], tmpPathsDeque[pathsIdx][cellIdx], tmpPathsDeque[pathsIdx][cellIdx+1]);
-            if(not isSame(tmpPathsDeque[pathsIdx][cellIdx], BestPathsDeque[pathsIdx][cellIdx]))continue;
+            if(existScroll[(int)BestPathsDeque[pathsIdx][cellIdx].x][(int)BestPathsDeque[pathsIdx][cellIdx].y]) {
+                if (not isSame(tmpPathsDeque[pathsIdx][cellIdx], BestPathsDeque[pathsIdx][cellIdx])) {
+                    continue;
+                }
+            }
+            else{
+                if(int(bStage.terrain(BestPathsDeque[pathsIdx][cellIdx])) < int(bStage.terrain(tmpPathsDeque[pathsIdx][cellIdx]))){
+                    continue;
+                }
+            }
             int tmpCost = calcCostFromScrollSeq(BestScrollSeq, tmpPathsDeque);
             if(minCost > tmpCost){
                 if(minCost > tmpCost){

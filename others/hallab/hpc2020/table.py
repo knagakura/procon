@@ -14,7 +14,7 @@ d = d.drop(d.index[0])
 d["Diff"] = diff;
 d = d.set_index("順位")
 dt_now = datetime.datetime.now();
-dt_str = dt_now.strftime('%Y%m_%H:%M')
+dt_str = dt_now.strftime('%Y%m%d_%H:%M')
 
 
 d.to_csv("./data/{}.csv".format(dt_str))

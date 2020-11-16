@@ -65,35 +65,13 @@ public:
     vector<Vector2> PositionSeq;
     int StageNum = 0;
     int positionSeqIdx{};
-
-    // Solverクラスを選択する変数
-    int SolverSelection = 2;
-    static const int Random = 0;
-    static const int BluteKur = 1;
-    static const int BluteKurCell = 2;
-    static const int TSPSolver = 3;
-    // cnhokudai_searchに関するパラメータ
-    int CHOKUDAI_INITIATION = CHOKUDAI_INITIATION_NULL;
-    static const int CHOKUDAI_INITIATION_NULL = 0;
-    static const int CHOKUDAI_INITIATION_KUR = 1;
-    static const int BluteMAX_N = 0; // ((BluteMAX_N-1) !の計算量を許す)
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_ALL = 0.20;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_SMALL = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_MEDIAM = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
-    constexpr static const float CHOKUDAI_SEARCH_TIME_LIMIT_LARGE = CHOKUDAI_SEARCH_TIME_LIMIT_ALL;
-    constexpr static const float SIMULATION_TIME_LIMT = 0.10;
-    constexpr static const int SCROLLN_MAX_SMALL = 10;
-    constexpr static const int SCROLLN_MAX_MEDIAM = 15;
-    static const int CHOKUDAI_WIDTH = 1;
-    static const bool VISITED_CHECK = false; // iterationの回数が少なくなるから禁止！
-
-
-    constexpr static const float TSP_TIME_LIMIT = 0.1;
-
+    constexpr static const float RANDOM_LIMIT = 0.060;
+    constexpr static const float GREEDY_TSP_LIMIT = 0.00;
     static const int n_Splits = 5; // 座標を何倍に拡大してみるか, 中心を定義したいので奇数
     static const int Hn = H * n_Splits;
     static const int Wn = W * n_Splits;
-    explicit MyAnswer(int type_): SolverSelection(type_){
+    Stage bStage;
+    explicit MyAnswer(int t){
         clear();
     }
     void clear(){
@@ -101,10 +79,14 @@ public:
         PositionSeq.clear();
         positionSeqIdx = 0;
     }
+    void setStage(const Stage &aStage){
+        bStage = aStage;
+    }
 };
 #define n_Splits MyAnswer::n_Splits
 #define Hn MyAnswer::Hn
 #define Wn MyAnswer::Wn
+#define bStage aMyAnswer.bStage
 
 class CellStage {
 public:
@@ -117,7 +99,6 @@ public:
     void Initiation(){
         buildCellPos();
         buildBeki();
-        if(MyAnswer::VISITED_CHECK)buildFact();
     }
     void buildCellPos(){
         pos.resize(Hn);
@@ -132,10 +113,6 @@ public:
     void buildBeki(){
         beki[0] = 1.0f;
         rep(i,M)beki[i+1] = beki[i] * Parameter::JumpPowerUpRate;
-    }
-    void buildFact(){
-        fact[0] = 1;
-        rep(i,M)fact[i+1] = fact[i] * (i+1);
     }
     // インターフェース
     Vector2 getCellPos(int i, int j){
@@ -198,7 +175,7 @@ public:
 
 // ------------------------------------------------------------
 CellStage aCellStage; // 一番最初に行われる処理。
-MyAnswer aMyAnswer(3);
+MyAnswer aMyAnswer(1);
 // ------------------------------------------------------------
 
 constexpr long long CYCLES_PER_SEC = 2800000000;
@@ -330,18 +307,241 @@ uint32_t XorShift() {
         return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
     }
 //--------------------------------my libraries----------------------------------------------
+bool isSame(const Vector2 &a, const Vector2 &b){
+    return (int)a.x == (int)b.x && (int)a.y == (int)b.y;
+}
+float dist(float x, float y){
+    return sqrt(x*x+y*y);
+}
+float dist(const Vector2& a,const Vector2& b){
+    return dist(abs(a.x-b.x), abs(a.y-b.y));
+}
+float terrain_magni(const Terrain& t){
+    int idx = 0;
+    if(t == Terrain::Plain)idx = 0; // 平地
+    if(t == Terrain::Bush)idx = 1; // 茂み
+    if(t == Terrain::Sand)idx = 2; // 砂池
+    if(t == Terrain::Pond)idx = 3; // 池
+    if(t == Terrain::TERM)idx = 0; // 置物
+    return Parameter::JumpTerrianCoefficient[idx];
+}
+float terrain_magni(const Vector2& pos){
+    return terrain_magni(bStage.terrain(pos));
+}
+float getJumpDist(const Rabbit& rabbit){
+    return rabbit.power() * terrain_magni(bStage.terrain(rabbit.pos()));
+}
+float kaku(const Vector2 &a, const Vector2 &b, const Vector2 &c){
+    float ax = a.x - b.x;
+    float ay = a.y - b.y;
+    float cx = c.x - b.x;
+    float cy = c.y - b.y;
+    float alpha = atan2(ax, ay);
+    float beta = atan2(cx, cy);
+    float res = abs(alpha - beta);
+    res = abs(res - PI);
+    res = abs(res);
+    while(res > PI){
+        res -= PI;
+    }
+    // res < PI
+    if(PI - res < res)res = PI - res;
+    return res;
+}
+double Prob(void){
+    double ret = (double)XorShift() / UINT_MAX;
+    return ret;
+}
 int dp[1<<21][21];
 int prevdp[1<<21][21];
 int memoCost[M+5][M+5][M+5];
+bool existScroll[H][W]{};
+struct hoge{
+    int scrollN;
+    vector<int> seq;
+    vector<deque<Vector2>> pathsDeque;
+    vector<int> costSeq;
+    vector<Vector2> scrollPosSeq;
+    vector<Vector2> tourPosSeq;
+    float distAll;
+    int costAll;
+    hoge(){}
+    hoge(vector<int> &seq_,
+         vector<deque<Vector2>>&pathsDeque_,
+         vector<int> &costseq_,
+         vector<Vector2> posSeq_,
+         float dist_,
+         int costAll_): scrollN((int)seq_.size()), seq(seq_), pathsDeque(pathsDeque_), costSeq(costseq_), scrollPosSeq(posSeq_), distAll(dist_), costAll(costAll_){
+    }
+    hoge(vector<int>& seq_, vector<deque<Vector2>> &pathsDeque_): scrollN((int)seq_.size()), seq(seq_), pathsDeque(pathsDeque_){
+        costSeq.assign(scrollN-1, 0);
+        scrollPosSeq.resize(scrollN-1);
+        distAll = 0;
+        costAll = 0;
+    }
+    void setScrollPosAfterBuildScrollSeq(){
+        for(int i = 0; i < scrollN - 2; i++){
+            int l = seq[i];
+            int mid = seq[i+1];
+            int r = seq[i+2];
+            int pathLIdx = l * scrollN + mid;
+            int pathRIdx = mid * scrollN + r;
+            // rの位置を設定する
+            Vector2 midScrollPos = bStage.scrolls()[mid].pos();
+            while(isSame(pathsDeque[pathLIdx].back(), midScrollPos)){
+                pathsDeque[pathLIdx].pop_back();
+            }
+            while(isSame(pathsDeque[pathRIdx].front(), midScrollPos)){
+                pathsDeque[pathRIdx].pop_front();
+            }
+            pair<int, int> midScrollCellCenterIdx = aCellStage.getCellCenterIdx(midScrollPos);
+            int midCenterX = midScrollCellCenterIdx.first;
+            int midCenterY = midScrollCellCenterIdx.second;
+            int scrollX = midCenterX;
+            int scrollY = midCenterY;
+            Vector2 NewScrollPos = aCellStage.getCellPos(scrollX, scrollY);
+            Vector2 LPos = pathsDeque[pathLIdx].back();
+            Vector2 RPos = pathsDeque[pathRIdx].front();
 
+            float sumDist = dist(LPos, midScrollPos) + dist(RPos, midScrollPos);
+            for(int dxx = -n_Splits / 2; dxx <= n_Splits/2; dxx++) {
+                for (int dyy = -n_Splits / 2; dyy <= n_Splits / 2; dyy++) {
+                    int nx = midCenterX + dxx;
+                    int ny = midCenterY + dyy;
+                    if (aCellStage.isOutOfBounds(nx, ny))continue;
+                    Vector2 tmpScrollPos = aCellStage.getCellPos(nx, ny);
+                    float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos) * 1.1;
+                    if (chmin(sumDist, sumDistTmp)) {
+                        NewScrollPos = aCellStage.getCellPos(nx, ny);
+                    }
+                }
+            }
+            pathsDeque[pathLIdx].push_back(NewScrollPos);
+            pathsDeque[pathRIdx].push_front(NewScrollPos);
+        }
+    }
+    bool shouldGaman(const Stage &tmpStage, const int path_idx, const int cellIdx, const vector<deque<Vector2>> &pathsDequeNow){
+        int nowRabiTer = (int) tmpStage.terrain(tmpStage.rabbit().pos());
+        auto nowTargetCellPos = pathsDequeNow[path_idx][cellIdx];
+        auto nxtTargetCellPos = pathsDequeNow[path_idx][cellIdx+1];
+        auto nowCellPos = tmpStage.getNextPos(tmpStage.rabbit().pos(), tmpStage.rabbit().power(), nowTargetCellPos);
+        auto nxtCellPos = tmpStage.getNextPos(tmpStage.rabbit().pos(), tmpStage.rabbit().power(), nxtTargetCellPos);
+//        int nowCellTer = (int) tmpStage.terrain(pathsDequeNow[path_idx][cellIdx]);
+//        int nxtCellTer = (int) tmpStage.terrain(pathsDequeNow[path_idx][cellIdx + 1]);
+        int nowCellTer = (int) tmpStage.terrain(nowCellPos);
+        int nxtCellTer = (int) tmpStage.terrain(nxtCellPos);
+        return nowRabiTer == nowCellTer && nxtCellTer - nowCellTer > 1;
+    }
+    vector<Vector2> moveByScrollSeq(){
+        Stage pseudoStage = bStage; // この後も初期状態を使う可能性があるので完全には破壊したくない
+        int scrollSeqIdx = 0;
+        int cellIdx = 0;
+        int cost = 0;
+        costAll = 0;
+        tourPosSeq.clear();
+        tourPosSeq.emplace_back(pseudoStage.rabbit().pos());
+        while(not pseudoStage.isEnd()) {
+            auto player = pseudoStage.rabbit();
+            Vector2 now_pos = player.pos();
+            float length = getJumpDist(player);
+            while (scrollSeqIdx + 1 < (int) seq.size() &&
+                   pseudoStage.scrolls()[seq[scrollSeqIdx + 1]].isGotten()) { // 2
+                costSeq[scrollSeqIdx] = cost;
+                scrollPosSeq[scrollSeqIdx] = now_pos;
+                scrollSeqIdx++;
+                cellIdx = 0;
+                cost = 0;
+            }
+            int scroll_l = seq[scrollSeqIdx];
+            int scroll_r = seq[scrollSeqIdx + 1];
+            int path_idx = scroll_l * scrollN + scroll_r;
+            //
+            int iniCellIdx = cellIdx;
+            bool isSecondMove = false;
+            bool gamanned = false;
+            while (cellIdx + 1 < (int) pathsDeque[path_idx].size() &&
+                   length > dist(now_pos, pathsDeque[path_idx][cellIdx])) {
+                if (isSecondMove && shouldGaman(pseudoStage, path_idx, cellIdx, pathsDeque)) {
+                    gamanned = true;
+                    break;
+                }
+                cellIdx++;
+                isSecondMove = true;
+            }
+            if (gamanned && length > 2) {
+                // 最大限伸ばしたときに何が起きるかを見てから手前で止まるか考えるべき
+                int nowTer = int(pseudoStage.terrain(now_pos));
+                int tmpCellIdx = iniCellIdx;
+                int okCellIdx = -1; // 今より悪くならない場所の最も奥の座標を保存する
+                while (tmpCellIdx + 1 < (int) pathsDeque[path_idx].size() &&
+                       length > dist(now_pos, pathsDeque[path_idx][tmpCellIdx])) {
+                    tmpCellIdx++;
+                    auto tmpNxtTargetPos = pathsDeque[path_idx][tmpCellIdx];
+                    auto tmpNxtPos = pseudoStage.getNextPos(player.pos(), player.power(), tmpNxtTargetPos);
+                    int tmpNxtTer = (int) pseudoStage.terrain(tmpNxtPos);
+                    if (nowTer >= tmpNxtTer) {
+                        okCellIdx = tmpCellIdx;
+                    }
+                }
+                if (okCellIdx != -1) {
+                    cellIdx = okCellIdx;
+                }
+            }
+            auto nextTargetPos = pathsDeque[path_idx][cellIdx];
+            pseudoStage.update(nextTargetPos);
+            tourPosSeq.emplace_back(pseudoStage.rabbit().pos());
+            cost++;
+            costAll++;
+            distAll += dist(tourPosSeq.back(), now_pos);
+        }
+        return tourPosSeq;
+    }
+
+    bool randomYamanobori(){
+        int rand = XorShift() % (scrollN - 1);
+        int pathsIdx = seq[rand] * scrollN + seq[rand+1];
+        int cellIdx = XorShift() % ((int)pathsDeque[pathsIdx].size() - 1) + 1;
+        float theta = kaku(pathsDeque[pathsIdx][cellIdx-1], pathsDeque[pathsIdx][cellIdx], pathsDeque[pathsIdx][cellIdx+1]);
+        if((theta/PI) * 180 < 10)return false;
+        float randX = Prob()/5;
+        float randY = Prob()/5;
+        auto tmpPathsDeque = pathsDeque;
+        tmpPathsDeque[pathsIdx][cellIdx].x += randX;
+        tmpPathsDeque[pathsIdx][cellIdx].y += randY;
+//        float nxtTheta = kaku(tmpPathsDeque[pathsIdx][cellIdx-1], tmpPathsDeque[pathsIdx][cellIdx], tmpPathsDeque[pathsIdx][cellIdx+1]);
+        if(existScroll[(int)pathsDeque[pathsIdx][cellIdx].x][(int)pathsDeque[pathsIdx][cellIdx].y]) {
+            if (not isSame(tmpPathsDeque[pathsIdx][cellIdx], pathsDeque[pathsIdx][cellIdx])) {
+                return false;
+            }
+        }
+        else{
+            if(int(bStage.terrain(pathsDeque[pathsIdx][cellIdx])) < int(bStage.terrain(tmpPathsDeque[pathsIdx][cellIdx]))){
+                return false;
+            }
+        }
+        hoge tmpVals(seq, tmpPathsDeque);
+        tmpVals.moveByScrollSeq();
+        if(costAll > tmpVals.costAll || (costAll == tmpVals.costAll && distAll > tmpVals.distAll)){
+            if(costAll > tmpVals.costAll){
+//                    dump((nxtTheta/PI)*180);
+//                    dbg('\t', itr, (theta/PI) * 180, tmpCost, tmpDist);
+//                    float preDo = (theta / PI) * 180;
+//                    float nxtDo = (nxtTheta / PI) * 180;
+//                    dump(preDo, nxtDo);
+            }
+            swap(*this, tmpVals);
+            return true;
+        }
+        return false;
+    }
+};
 class SolverBase{
 public:
-    Stage bStage;
     int scrollN;
     Vector2 iniPos;
     vector<int> PositionSeq;
     float distScroll[M + 5][M + 5]{};
-    bool existScroll[H][W]{};
+
     vector<deque<Vector2>> pathsDeque;
     Vector2 ini_pos;
     vector<Vector2> positions;
@@ -369,92 +569,8 @@ public:
         // 最初のポジション
         positions.push_back(ini_pos);
     }
-    bool isSame(const Vector2 &a, const Vector2 &b){
-        return (int)a.x == (int)b.x && (int)a.y == (int)b.y;
-    }
-    float dist(float x, float y){
-        return sqrt(x*x+y*y);
-    }
-    float dist(const Vector2& a,const Vector2& b){
-        return dist(abs(a.x-b.x), abs(a.y-b.y));
-    }
     int idxEncodeCell(int a, int b){
         return a * Wn + b;
-    }
-    int calcCostFromScrollSeq(const vector<int> &tmpSeq, vector<deque<Vector2>> &tmpPathsDeque, float &dist){
-//        setScrollPosAfterBuildScrollSeq(tmpSeq, tmpPathsDeque);
-        auto x = moveByScrollSeq(tmpSeq, tmpPathsDeque, dist);
-        return x.size();
-    }
-    float getJumpDist(const Stage& aStage, const Rabbit& rabbit){
-        return rabbit.power() * terrain_magni(aStage.terrain(rabbit.pos()));
-    }
-    float terrain_magni(const Vector2& pos){
-        return terrain_magni(bStage.terrain(pos));
-    }
-    float terrain_magni(const Terrain& t){
-        int idx = 0;
-        if(t == Terrain::Plain)idx = 0; // 平地
-        if(t == Terrain::Bush)idx = 1; // 茂み
-        if(t == Terrain::Sand)idx = 2; // 砂池
-        if(t == Terrain::Pond)idx = 3; // 池
-        if(t == Terrain::TERM)idx = 0; // 置物
-        return Parameter::JumpTerrianCoefficient[idx];
-    }
-    void setScrollPosAfterBuildScrollSeq(const vector<int>&scrollSeq, vector<deque<Vector2>> &pathsDequeNow){
-        for(int i = 0; i < scrollN - 2; i++){
-            int l = scrollSeq[i];
-            int mid = scrollSeq[i+1];
-            int r = scrollSeq[i+2];
-            int pathLIdx = l * scrollN + mid;
-            int pathRIdx = mid * scrollN + r;
-            // rの位置を設定する
-            Vector2 midScrollPos = bStage.scrolls()[mid].pos();
-            while(isSame(pathsDequeNow[pathLIdx].back(), midScrollPos)){
-                pathsDequeNow[pathLIdx].pop_back();
-            }
-            while(isSame(pathsDequeNow[pathRIdx].front(), midScrollPos)){
-                pathsDequeNow[pathRIdx].pop_front();
-            }
-            pair<int, int> midScrollCellCenterIdx = aCellStage.getCellCenterIdx(midScrollPos);
-            int midCenterX = midScrollCellCenterIdx.first;
-            int midCenterY = midScrollCellCenterIdx.second;
-            int scrollX = midCenterX;
-            int scrollY = midCenterY;
-            Vector2 NewScrollPos = aCellStage.getCellPos(scrollX, scrollY);
-            Vector2 LPos = pathsDequeNow[pathLIdx].back();
-            Vector2 RPos = pathsDequeNow[pathRIdx].front();
-
-            float sumDist = dist(LPos, midScrollPos) + dist(RPos, midScrollPos);
-            for(int dxx = -n_Splits / 2; dxx <= n_Splits/2; dxx++) {
-                for (int dyy = -n_Splits / 2; dyy <= n_Splits / 2; dyy++) {
-                    int nx = midCenterX + dxx;
-                    int ny = midCenterY + dyy;
-                    if (aCellStage.isOutOfBounds(nx, ny))continue;
-                    Vector2 tmpScrollPos = aCellStage.getCellPos(nx, ny);
-                    float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos) * 1.1;
-                    if (chmin(sumDist, sumDistTmp)) {
-                        NewScrollPos = aCellStage.getCellPos(nx, ny);
-                    }
-                }
-            }
-//            float ScrollIntX = int(NewScrollPos.x);
-//            float ScrollIntY = int(NewScrollPos.y);
-//            for(float dd = 0.0; dd < 1.0; dd += 0.099){
-//                Vector2 tmpScrollPos = {ScrollIntX + dd, ScrollIntY};
-//                float sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
-//                if(chmin(sumDist, sumDistTmp)){
-//                    NewScrollPos = tmpScrollPos;
-//                }
-//                tmpScrollPos = {ScrollIntX, ScrollIntY + dd};
-//                sumDistTmp = dist(LPos, tmpScrollPos) + dist(RPos, tmpScrollPos);
-//                if(chmin(sumDist, sumDistTmp)){
-//                    NewScrollPos = tmpScrollPos;
-//                }
-//            }
-            pathsDequeNow[pathLIdx].push_back(NewScrollPos);
-            pathsDequeNow[pathRIdx].push_front(NewScrollPos);
-        }
     }
     bool shouldGaman(const Stage &tmpStage, const int path_idx, const int cellIdx, const vector<deque<Vector2>> &pathsDequeNow){
         int nowRabiTer = (int) tmpStage.terrain(tmpStage.rabbit().pos());
@@ -468,69 +584,6 @@ public:
         int nxtCellTer = (int) tmpStage.terrain(nxtCellPos);
         return nowRabiTer == nowCellTer && nxtCellTer - nowCellTer > 1;
     }
-    vector<Vector2> moveByScrollSeq(const vector<int> &scrollSeq, const vector<deque<Vector2>> &pathsDequeNow, float& tourDist, bool isTimeShow = false){
-        tourDist = 0;
-        MyTimer t;
-        if(isTimeShow)t.reset();
-        Stage pseudoStage = bStage; // この後も初期状態を使う可能性があるので完全には破壊したくない
-        vector<Vector2> res;
-        int scrollSeqIdx = 0;
-        int cellIdx = 0;
-        while(not pseudoStage.isEnd()) {
-            auto player = pseudoStage.rabbit();
-            Vector2 now_pos = player.pos();
-            float length = getJumpDist(pseudoStage, player);
-            while (scrollSeqIdx + 1 < (int) scrollSeq.size() &&
-                    pseudoStage.scrolls()[scrollSeq[scrollSeqIdx + 1]].isGotten()) { // 2
-                scrollSeqIdx++;
-                cellIdx = 0;
-            }
-            int scroll_l = scrollSeq[scrollSeqIdx];
-            int scroll_r = scrollSeq[scrollSeqIdx + 1];
-            int path_idx = scroll_l * scrollN + scroll_r;
-
-            //
-            int iniCellIdx = cellIdx;
-            bool isSecondMove = false;
-            bool gamanned = false;
-            while (cellIdx + 1 < (int) pathsDequeNow[path_idx].size() &&
-                   length > dist(now_pos, pathsDequeNow[path_idx][cellIdx])) {
-                if (isSecondMove && shouldGaman(pseudoStage, path_idx, cellIdx, pathsDequeNow)){
-                    gamanned = true;
-                    break;
-                }
-                cellIdx++;
-                isSecondMove = true;
-            }
-            if(gamanned && length > 2) {
-                // 最大限伸ばしたときに何が起きるかを見てから手前で止まるか考えるべき
-                int nowTer = int(pseudoStage.terrain(now_pos));
-                int tmpCellIdx = iniCellIdx;
-                int okCellIdx = -1; // 今より悪くならない場所の最も奥の座標を保存する
-                while (tmpCellIdx + 1 < (int) pathsDequeNow[path_idx].size() &&
-                       length > dist(now_pos, pathsDequeNow[path_idx][tmpCellIdx])) {
-                    tmpCellIdx++;
-                    auto tmpNxtTargetPos = pathsDequeNow[path_idx][tmpCellIdx];
-                    auto tmpNxtPos = pseudoStage.getNextPos(player.pos(), player.power(), tmpNxtTargetPos);
-                    int tmpNxtTer = (int) pseudoStage.terrain(tmpNxtPos);
-                    if (nowTer >= tmpNxtTer) {
-                        okCellIdx = tmpCellIdx;
-                    }
-                }
-                if (okCellIdx != -1) {
-                    cellIdx = okCellIdx;
-                }
-            }
-            auto nextTargetPos = pathsDequeNow[path_idx][cellIdx];
-            pseudoStage.update(nextTargetPos);
-            res.emplace_back(pseudoStage.rabbit().pos());
-            tourDist += dist(res.back(), now_pos);
-        }
-        if(isTimeShow) {
-            dbg(t.get());
-        }
-        return res;
-    } //
     float calcCost(const vector<int>& v){
         float cost = 0;
         int sz = v.size();
@@ -663,104 +716,63 @@ public:
         }
     }
     vector<Vector2> solve() /*override*/{
-//        buildDistanceMatrix(); // そのままでOK
         dijkstra();
         buildMemoCost();
-        // これらの変数は、scrollSeqに依存して変化
-        vector<int> BestScrollSeq;
-        vector<deque<Vector2>> BestPathsDeque;
+        hoge minVals;
         int minCost = INF;
-        float minDist = INF;
         vector<vector<int>> betterScrollSeqs;
         solveBitDP(betterScrollSeqs);
         for(auto &v: betterScrollSeqs) {
             auto tmpDeque = pathsDeque;
-            setScrollPosAfterBuildScrollSeq(v, tmpDeque);
-            int dpCost = dp[(1 << (scrollN-1)) - 1][v.back()];
-            float tmpDist = 0;
-            int cost = calcCostFromScrollSeq(v, tmpDeque, tmpDist);
+            hoge tmpVals(v, tmpDeque);
+            tmpVals.setScrollPosAfterBuildScrollSeq();
+            tmpVals.moveByScrollSeq();
+//            int dpCost = dp[(1 << (scrollN-1)) - 1][v.back()];
 //            dump(v, cost, dpCost);
-            if(chmin(minCost, cost)){
-                swap(BestScrollSeq, v);
-                swap(BestPathsDeque, tmpDeque);
-                swap(minDist, tmpDist);
+            if(chmin(minCost, tmpVals.costAll)){
+                swap(minVals, tmpVals);
             }
         }
+        MyTimer t;
+        /**
+         * GREEDY 2OP
+         */
+         t.reset();
+         while(true){
+             bool changed = false;
+             for(int i = 1; i < scrollN; i++){
+                 if(t.get() > MyAnswer::GREEDY_TSP_LIMIT)break;
+                 for(int j = 1; j < scrollN; j++){
+                     if(t.get() > MyAnswer::GREEDY_TSP_LIMIT)break;
+                     if(tspSwap2Opt(minVals, i, j)){
+                         changed = true;
+                     }
+                 }
+             }
+             if(not changed)break;
+         }
         /*
          * 山登りをする
          */
-        MyTimer t;
+        // RANDOM YAMANOBORI
         t.reset();
         int itr = 0;
-        float tl = 0.068;
-//        float tl = 0.003 * scrollN;
-//        if(scrollN == 21)tl += 0.1;
-        // 元々0.049
-//        dump(tl);
         while(true) {
-//            itr++;
             if(itr % 10 == 0){
-                if(t.get() > tl)break;
+                if(t.get() > MyAnswer::RANDOM_LIMIT)break;
 //                dump(itr);
             }
-            int rand = XorShift() % (scrollN - 1);
-            int pathsIdx = BestScrollSeq[rand] * scrollN + BestScrollSeq[rand+1];
-            int cellIdx = XorShift() % ((int)BestPathsDeque[pathsIdx].size() - 1) + 1;
-            float theta = kaku(BestPathsDeque[pathsIdx][cellIdx-1], BestPathsDeque[pathsIdx][cellIdx], BestPathsDeque[pathsIdx][cellIdx+1]);
-            if((theta/PI) * 180 < 10)continue;
-            float randX = Prob()/5;
-            float randY = Prob()/5;
-            auto tmpPathsDeque = BestPathsDeque;
-            tmpPathsDeque[pathsIdx][cellIdx].x += randX;
-            tmpPathsDeque[pathsIdx][cellIdx].y += randY;
-//            float nxtTheta = kaku(tmpPathsDeque[pathsIdx][cellIdx-1], tmpPathsDeque[pathsIdx][cellIdx], tmpPathsDeque[pathsIdx][cellIdx+1]);
-            if(existScroll[(int)BestPathsDeque[pathsIdx][cellIdx].x][(int)BestPathsDeque[pathsIdx][cellIdx].y]) {
-                if (not isSame(tmpPathsDeque[pathsIdx][cellIdx], BestPathsDeque[pathsIdx][cellIdx])) {
-                    continue;
-                }
+            if(minVals.randomYamanobori()){
+                dump(itr);
             }
-            else{
-                if(int(bStage.terrain(BestPathsDeque[pathsIdx][cellIdx])) < int(bStage.terrain(tmpPathsDeque[pathsIdx][cellIdx]))){
-                    continue;
-                }
-            }
-            float tmpDist = 0;
-            int tmpCost = calcCostFromScrollSeq(BestScrollSeq, tmpPathsDeque, tmpDist);
-            if(minCost > tmpCost || (minCost == tmpCost && minDist > tmpDist)){
-                dbg('\t', itr, (theta/PI) * 180, tmpCost, tmpDist);
-                if(minCost > tmpCost){
-//                    dump((nxtTheta/PI)*180);
-                }
-                minCost = tmpCost;
-                minDist = tmpDist;
-                swap(tmpPathsDeque, BestPathsDeque);
-            }
+            itr++;
         }
         dump(itr);
-        float d = 0;
-        return moveByScrollSeq(BestScrollSeq, BestPathsDeque, d);
+        return minVals.tourPosSeq;
+//        return moveByScrollSeq(BestScrollSeq, BestPathsDeque, d);
     }
-    float kaku(Vector2 &a, Vector2 &b, Vector2 &c)const{
-        float ax = a.x - b.x;
-        float ay = a.y - b.y;
-        float cx = c.x - b.x;
-        float cy = c.y - b.y;
-        float alpha = atan2(ax, ay);
-        float beta = atan2(cx, cy);
-        float res = abs(alpha - beta);
-        res = abs(res - PI);
-        res = abs(res);
-        while(res > PI){
-            res -= PI;
-        }
-        // res < PI
-        if(PI - res < res)res = PI - res;
-        return res;
-    }
-    double Prob(void){
-        double ret = (double)XorShift() / UINT_MAX;
-        return ret;
-    }
+
+
     int calcCostForMemo(int cnt, int from, int to){
         if(to == scrollN-1)return -1;
         if(from == to)return -1;
@@ -772,14 +784,40 @@ public:
         player.setPower(aCellStage.beki[cnt]);
         Scroll toScroll = bStage.scrolls()[to];
         int cellIdx = 0; // cellIdxとは異なる
+
         int res = 0;
         while(not isSame(player.pos(), toScroll.pos())){
+            auto now_pos = player.pos();
             float length = getLength(player.pos(), player.power());
+            int iniCellIdx = cellIdx;
             bool isSecondMove = false;
+            bool gamanned = false;
             while(cellIdx + 1 < (int)pathsDeque[pathsDequeIdx].size() && length > dist(player.pos(), pathsDeque[pathsDequeIdx][cellIdx])){
-                if(isSecondMove && shouldGaman(player, pathsDequeIdx, cellIdx, pathsDeque))break;
+                if(isSecondMove && shouldGaman(player, pathsDequeIdx, cellIdx, pathsDeque)){
+                    gamanned = true;
+                    break;
+                }
                 cellIdx++;
                 isSecondMove = true;
+            }
+            if(gamanned && length > 2) {
+                // 最大限伸ばしたときに何が起きるかを見てから手前で止まるか考えるべき
+                int nowTer = int(bStage.terrain(now_pos));
+                int tmpCellIdx = iniCellIdx;
+                int okCellIdx = -1; // 今より悪くならない場所の最も奥の座標を保存する
+                while (tmpCellIdx + 1 < (int) pathsDeque[pathsDequeIdx].size() &&
+                       length > dist(now_pos, pathsDeque[pathsDequeIdx][tmpCellIdx])) {
+                    tmpCellIdx++;
+                    auto tmpNxtTargetPos = pathsDeque[pathsDequeIdx][tmpCellIdx];
+                    auto tmpNxtPos = bStage.getNextPos(player.pos(), player.power(), tmpNxtTargetPos);
+                    int tmpNxtTer = (int) bStage.terrain(tmpNxtPos);
+                    if (nowTer >= tmpNxtTer) {
+                        okCellIdx = tmpCellIdx;
+                    }
+                }
+                if (okCellIdx != -1) {
+                    cellIdx = okCellIdx;
+                }
             }
             auto nextTargetPos = pathsDeque[pathsDequeIdx][cellIdx];
             myRabbitUpdate(player, nextTargetPos); // playerの場所更新する
@@ -811,8 +849,6 @@ public:
             memoCost[i][l][r] = calcCostForMemo(i, l, r);
         }
     }
-
-
     int nV = Hn * Wn;
     float inf = 1e5;
     vector<float> costs;
@@ -894,8 +930,32 @@ public:
         }
         return res;
     }
-};
+    // tsp関連
+    bool tspSwap2Opt(hoge& vals){
+        int p = XorShift() % (scrollN-1) +1;
+        int q = XorShift() % (scrollN-1) +1;
+        if(p > q)swap(p,q);
+        return tspSwap2Opt(vals, p, q);
+    }
+    bool tspSwap2Opt(hoge &vals, int p, int q){
+        auto tmpseq = vals.seq;
+        auto tmppd = vals.pathsDeque;
+        reverse(tmpseq.begin() + p, tmpseq.begin() + q);
+        hoge tmpVals(tmpseq, vals.pathsDeque);
+        tmpVals.setScrollPosAfterBuildScrollSeq();
+        tmpVals.moveByScrollSeq();
 
+        if(vals.costAll > tmpVals.costAll){
+            swap(vals, tmpVals);
+            return true;
+        }
+        return false;
+    }
+    int calcCostForRandom(){
+        return 0;
+    }
+
+};
 //-----------------------------------------------------------------------------
 
 /// コンストラクタ
@@ -923,6 +983,7 @@ void Answer::initialize(const Stage& aStage)
 {
     dump(aMyAnswer.StageNum);
     aMyAnswer.clear();
+    aMyAnswer.setStage(aStage);
     MyTimer t;
     t.reset();
     Solve(aStage);

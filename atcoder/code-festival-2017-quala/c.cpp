@@ -47,74 +47,55 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-template<class T> class Dijkstra {
-public:
-    int N;
-    T inf;
-    vector<T> cost;
-    vector<vector<pair<T, int>>> edge;
- 
-    Dijkstra(const int N, T inf) : N(N), inf(inf),cost(N), edge(N) {
-    }
- 
-    void make_edge(int from, int to, T w) {
-        edge[from].push_back({ w,to });
-    }
- 
-    void solve(int start) {
-        for(int i = 0; i < N; ++i) cost[i] = inf;
- 
-        priority_queue<pair<T, int>, vector<pair<T, int>>, greater<pair<T, int>>> pq;
-        cost[start] = 0;
-        pq.push({ 0,start });
- 
-        while (!pq.empty()) {
-            T v = pq.top().first;
-            int from = pq.top().second;
-            pq.pop();
-            for (auto u : edge[from]) {
-                T w = v + u.first;
-                int to = u.second;
-                if (w < cost[to]) {
-                    cost[to] = w;
-                    pq.push({ w,to });
-                }
-            }
-        }
-        return;
-    }
-};
 
-int N;
-ll x[20], y[20], z[20];
+
 int main() {
-    cin >> N;
-    rep(i,N){
-        cin >> x[i] >> y[i] >> z[i];
+    int H, W;
+    cin >> H >> W;
+    vector<string> S(H);
+    cin >> S;
+    map<char, int> mp;
+    rep(i,H)rep(j,W){
+        mp[S[i][j]]++;
     }
-    int nV = bit(N) * N;
-    Dijkstra<int> G(nV, INF);
-    for(int m = 0; m < bit(N); m++){
-        rep(i,N){
-            rep(j,N){
-                int from = m * N + i;
-                if(m & bit(j))continue;
-                int toM = m | bit(j);
-                int to = toM * N + j;
-                ll cost = abs(x[i]-x[j]) + abs(y[i]-y[j]) + max(0LL, z[j]-z[i]);
-                G.make_edge(from, to, cost);
-            }
+    map<int, int> cnts;
+    vvec<bool> used(H, vec<bool>(W, false));
+    rep(i,H){
+        rep(j,W){
+            if(used[i][j])continue;
+            // 
+            int ni = H-1-i;
+            int nj = W-1-j;
+            //[i, j]
+            //[i, nj]
+            //[ni,j]
+            //[ni,nj]
+            set<pair<int, int>> st;
+            st.insert({i,j});
+            st.insert({i,nj});
+            st.insert({ni,j});
+            st.insert({ni,nj});
+            used[i][j] = used[i][nj] = used[ni][j] = used[ni][nj] = true;
+            cnts[st.size()]++;
         }
     }
-    int start = 1 * N + 0;
-    G.solve(start);
-    int bitAll = bit(N) - 1;
-    ll ans = INFLL;
-    rep1(j,N){
-        int last = bitAll * N + j;
-        ll cost = G.cost[last];
-        cost += abs(x[0]-x[j]) + abs(y[0]-y[j]) + max(0LL, z[0]-z[j]);
-        chmin(ans, cost);
+    dump(cnts);
+    // 4, 2, 1のみ
+    // 4個の束がいくつ作れるか数える
+    int cnt4 = 0, cnt2 = 0;
+    for(auto p: mp){
+        cnt4 += p.second / 4;
+        cnt2 += p.second / 2;
     }
-    cout << ans << endl;
+    if(cnt4 < cnts[4]){
+        cout << "No" << endl;
+        return 0;
+    }
+    // 2の束
+    cnt2 -= cnts[4] * 2;
+    if(cnt2 < cnts[2]){
+        cout << "No" << endl;
+        return 0;
+    }
+    cout << "Yes" << endl;
 }

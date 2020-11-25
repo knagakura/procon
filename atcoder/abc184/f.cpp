@@ -47,74 +47,57 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-template<class T> class Dijkstra {
-public:
-    int N;
-    T inf;
-    vector<T> cost;
-    vector<vector<pair<T, int>>> edge;
- 
-    Dijkstra(const int N, T inf) : N(N), inf(inf),cost(N), edge(N) {
-    }
- 
-    void make_edge(int from, int to, T w) {
-        edge[from].push_back({ w,to });
-    }
- 
-    void solve(int start) {
-        for(int i = 0; i < N; ++i) cost[i] = inf;
- 
-        priority_queue<pair<T, int>, vector<pair<T, int>>, greater<pair<T, int>>> pq;
-        cost[start] = 0;
-        pq.push({ 0,start });
- 
-        while (!pq.empty()) {
-            T v = pq.top().first;
-            int from = pq.top().second;
-            pq.pop();
-            for (auto u : edge[from]) {
-                T w = v + u.first;
-                int to = u.second;
-                if (w < cost[to]) {
-                    cost[to] = w;
-                    pq.push({ w,to });
-                }
-            }
-        }
-        return;
-    }
-};
 
-int N;
-ll x[20], y[20], z[20];
+
 int main() {
-    cin >> N;
-    rep(i,N){
-        cin >> x[i] >> y[i] >> z[i];
-    }
-    int nV = bit(N) * N;
-    Dijkstra<int> G(nV, INF);
-    for(int m = 0; m < bit(N); m++){
-        rep(i,N){
-            rep(j,N){
-                int from = m * N + i;
-                if(m & bit(j))continue;
-                int toM = m | bit(j);
-                int to = toM * N + j;
-                ll cost = abs(x[i]-x[j]) + abs(y[i]-y[j]) + max(0LL, z[j]-z[i]);
-                G.make_edge(from, to, cost);
+    int N, T;
+    cin >> N >> T;
+    vector<ll> A(N);
+    rep(i,N)cin >> A[i];
+    sort(all(A));
+    int n = N / 2;
+    int m = N - n;
+    vector<ll> v;
+    vector<ll> v2;
+    for(int i = 0; i < bit(n); i++){
+        ll summ = 0;
+        rep(j,n){
+            if(i&bit(j)){
+                summ += A[j];
             }
         }
+        v.emplace_back(summ);
     }
-    int start = 1 * N + 0;
-    G.solve(start);
-    int bitAll = bit(N) - 1;
-    ll ans = INFLL;
-    rep1(j,N){
-        int last = bitAll * N + j;
-        ll cost = G.cost[last];
-        cost += abs(x[0]-x[j]) + abs(y[0]-y[j]) + max(0LL, z[0]-z[j]);
-        chmin(ans, cost);
+    for(int i = 0; i < bit(m); i++){
+        ll summ = 0;
+        rep(j,m){
+            if(i&bit(j)){
+                summ += A[n+j];
+            }
+        }
+        v2.emplace_back(summ);
+    }
+    dump(v);
+    dump(v2);
+    ll ans = 0;
+    int sz = v.size();
+    sort(all(v2));
+    rep(i,sz){
+        ll rem = T - v[i];
+        if(rem < 0)continue;
+        int idx = lower_bound(all(v2), rem) - v2.begin();
+        // if(idx == v2.size())continue;
+        idx--;
+        ll a = v2[idx];
+        dump(v[i], rem, idx, a);
+        if(v[i] + a <= T){
+            chmax(ans, v[i] + a);
+        }
+        if(idx + 1 < v2.size()){
+            if(v[i] + v2[idx+1] <= T){
+                chmax(ans, v[i]+v2[idx+1]);
+            }
+        }
     }
     cout << ans << endl;
 }

@@ -487,6 +487,71 @@ struct transport_only_0 : strategy<B> {
         }
     }
 };
+
+struct transport_charge2grid : strategy<B> {
+    std::set<size_t> assigned_order;
+    transport_charge2grid(const B& b, const graph_summary& gs) :
+            strategy<B>(b, gs) {}
+    void initialize() {
+        strategy::initialize();
+        assigned_order.clear();
+    }
+    void command(const grid_info&, const EV_info& ev_i, const order_info& order_i) {
+        for (size_t n = 0; n < ev_i.N_EV; ++n) {
+            if (!is_free(n)) continue;
+            const size_t current = ev_i.c[n].u;
+            const size_t safety_energy = EV.Delta_EV_move * 50;
+            if (auto [_, pos] = nearest_nanogrid(current, gs); current != pos) {
+                const size_t len_to_charge = gs.len[current][pos];
+                const int expected_energy = ev_i.c[n].charge - len_to_charge * EV.Delta_EV_move;
+                if (expected_energy < 0) {
+                    enqueue(n, "stay", 1000);
+                }
+                else
+                    enqueue(n, move_EV(current, pos, gs));
+                continue;
+            }
+            else {
+                if (ev_i.c[n].charge < safety_energy) {
+                    enqueue(n, strprintf("charge_from_grid %zu", EV.V_EV_max), ceil(1.0 * (safety_energy - ev_i.c[n].charge) / EV.V_EV_max));
+                    continue;
+                }
+            }
+            std::set<size_t> unassigned_order;
+            for (size_t i = 0; i < order_i.N_order; ++i)
+                if (assigned_order.count(order_i.id[i]) == 0)
+                    unassigned_order.insert(i);
+            if (unassigned_order.size() > 0) {
+                size_t count = 0;
+                std::vector<tuple<size_t, size_t, size_t>> assign_order;
+                while (!unassigned_order.empty() && count++ < EV.N_trans_max) {
+                    const size_t order_index = *(unassigned_order.begin());
+                    unassigned_order.erase(unassigned_order.begin());
+                    const size_t from = order_i.w[order_index];
+                    const size_t to = order_i.z[order_index];
+                    assign_order.emplace_back(from, to, order_i.id[order_index]);
+                    assigned_order.insert(order_i.id[order_index]);
+                }
+                auto path = find_transit_path_greedy(current, assign_order, gs);
+                vector<size_t> transit; transit.reserve(path.size() + 1);
+                const size_t expected_transit_length = transit_length(path, gs.len) + gs.len[current][path[0].first];
+                if (ev_i.c[n].charge < (expected_transit_length + gs.cover_radius) * EV.Delta_EV_move) {
+                    enqueue(n, strprintf("charge_from_grid %zu", EV.V_EV_max), ((expected_transit_length + gs.cover_radius) * EV.Delta_EV_move - ev_i.c[n].charge) / EV.V_EV_max + 1);
+                }
+                size_t cur = current;
+                for (auto [to, pick_up] : path) {
+                    enqueue(n, move_EV(cur, to, gs));
+                    if (pick_up != -1) enqueue(n, strprintf("pickup %d", pick_up));
+                    cur = to;
+                }
+                continue;
+            }
+            else {
+            }
+            continue;
+        }
+    }
+};
 vector<string> split_command(const string &command_pack){
     vector<string> ret;
     stringstream reader(command_pack);

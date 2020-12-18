@@ -16,6 +16,8 @@
 FILE *log_dest =
     stderr;
 using namespace std;
+#define all(a) (a).begin(),(a).end()
+#define SUM(v) accumulate(all(v), 0LL)
 
 #define TOSTRING(x) string(#x)
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
@@ -30,13 +32,13 @@ void dump_func(){ DUMPOUT << endl; }
 template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail) { DUMPOUT << head; if (sizeof...(Tail) > 0) { DUMPOUT << ", "; } dump_func(std::move(tail)...); }
 
 #ifdef DEBUG
-#define dbg(...) { dump_func(__VA_ARGS__) }
+#define dbg(...) dump_func(__VA_ARGS__)
 #define dump(...) DUMPOUT << string(#__VA_ARGS__) << ": "; dump_func(__VA_ARGS__)
 #else
 #define dbg(...)
 #define dump(...)
 #endif
-
+constexpr int myV = 225;
 struct graph_data{
     constexpr static size_t MaxDegree = 5;
     size_t V, E;
@@ -127,7 +129,8 @@ struct B{
         src>> T_max;
     }
 };
-struct carinfo{
+class carinfo{
+public:
     size_t charge;
     size_t u, v, dist_from_u, dist_to_v;
     size_t N_adj;
@@ -142,19 +145,26 @@ struct carinfo{
             --a[i];
         }
     }
+    friend ostream& operator<<(ostream& os, const carinfo& a){
+        os << "{" << a.charge << ", {" << a.u << "," << a.v << "}}";
+        return os;
+    }
 };
 struct grid_info{
     size_t N_grid;
     std::vector<size_t> x, y;
+    std::vector<size_t> power;
     std::vector<int> pw_actual;
     std::vector<size_t> pw_excess, pw_buy;
     grid_info() = default;
     grid_info(size_t N_grid)
         :N_grid(N_grid), x(N_grid), y(N_grid), pw_actual(N_grid), pw_excess(N_grid), pw_buy(N_grid){}
     void load(std::istream &src, [[maybe_unused]]size_t V = 225, [[maybe_unused]]size_t C_grid_max = 50000){
+        power.assign(myV, 0);
         for(size_t i = 0; i < N_grid; ++i){
             src >> x[i] >> y[i] >> pw_actual[i] >> pw_excess[i] >> pw_buy[i];
             --x[i];
+            power[x[i]] = y[i];
         }
     }
 };
@@ -361,8 +371,22 @@ struct strategy :public P {
     const graph_summary& gs;
     vector<list<string>> command_queue;
     strategy(const P& p, const graph_summary& gs) : P(p), gs(gs),
-        command_queue(P::EV.N_EV) {}
-    virtual void command(const grid_info& g_i, const EV_info& ev_i, const order_info& order_i) = 0;
+                                                    command_queue(P::EV.N_EV) {}
+    virtual void command(const grid_info& g_i, const EV_info& ev_i, const order_info& order_i){
+
+    }
+    virtual void command(const grid_info& g_i,
+                         const EV_info& ev_i,
+                         const order_info& order_i,
+                         int large_charge,
+                         int emergency_charge){
+    }
+    virtual void command(const grid_info& grid_i,
+                 const EV_info& ev_i,
+                 const order_info&,
+                 int large_ev_charge,
+                 int large_grid_charge,
+                 int emergency_charge) {}
     virtual void initialize() {
         for (auto& queue : command_queue) queue.clear();
     }
@@ -406,6 +430,76 @@ struct all_stay : strategy<P> {
     void command(const grid_info&, const EV_info&, const order_info&) {}
 };
 template<class P>
+struct my_all_stay : strategy<P> {
+    using S = strategy<P>;
+    std::mt19937_64 engine;
+    my_all_stay(const P& p, const graph_summary& gs) : strategy<P>(p, gs) {}
+    void command(const grid_info& grid_i, const EV_info& ev_i, const order_info&, int large_ev_charge, int large_grid_charge, int emergency_charge) {
+        vector<bool> mukatta(grid_i.N_grid, false);
+        for (size_t n = 0; n < ev_i.N_EV; ++n) {
+            if (!S::is_free(n)) continue;
+            const size_t current = ev_i.c[n].u;
+            const size_t safety_energy = S::EV.Delta_EV_move * 50;
+            auto [_, pos] = nearest_nanogrid(current, S::gs);
+            if (current != pos) {
+                const size_t len_to_charge = S::gs.len[current][pos];
+                const int expected_energy = ev_i.c[n].charge - len_to_charge * S::EV.Delta_EV_move;
+                if (expected_energy < 0) {
+                    S::enqueue(n, "stay", 1000);
+                }
+                else
+                    S::enqueue(n, move_EV(current, pos, S::gs));
+                continue;
+            }
+            else {
+                if(ev_i.c[n].charge >= large_ev_charge){
+                    for(int i = 0; i < grid_i.N_grid; i++){
+                        if(mukatta[i])continue;
+                        if(grid_i.y[i] < emergency_charge){
+                            S::enqueue(n, move_EV(current, grid_i.x[i], S::gs));
+                            int len_to_charge = S::gs.len[current][grid_i.x[i]];
+                            int expected_charge = ev_i.c[n].charge - S::EV.Delta_EV_move * len_to_charge;
+                            int repeat_cnt = expected_charge / S::EV.V_EV_max - 1;
+                            if(repeat_cnt > 30)repeat_cnt = 30;
+                            S::enqueue(n, strprintf("charge_to_grid %zu", S::EV.V_EV_max), repeat_cnt);
+                            mukatta[i] = true;
+                            break;
+                        }
+                    }
+                }
+                else if(grid_i.power[pos] >= large_grid_charge){
+                    S::enqueue(n, strprintf(
+                            "charge_from_grid % zu",
+                            min(large_grid_charge/2 - ev_i.c[n].charge, S::EV.V_EV_max)),
+                               1);
+                }
+//                else if(grid_i.power[pos] >= 10000){
+//                    if(ev_i.c[n].charge < 3000) {
+//                        S::enqueue(n, strprintf(
+//                                "charge_from_grid % zu",
+//                                min(5000 - ev_i.c[n].charge, S::EV.V_EV_max)),
+//                                   1);
+//                    }
+//                }
+//                else if(ev_i.c[n].charge < 1000){
+//                    for(int i = 0; i < grid_i.N_grid; i++){
+//                        if(mukatta[i])continue;
+//                        if(grid_i.y[i] > 20000){
+//                            int len_to_charge = S::gs.len[current][grid_i.x[i]];
+//                            int expected_charge = ev_i.c[n].charge - S::EV.Delta_EV_move * len_to_charge;
+//                            if(expected_charge < 0)continue;
+////                            S::enqueue(n, move_EV(current, grid_i.x[i], S::gs));
+////                            S::enqueue(n, strprintf("charge_from_grid %zu", S::EV.V_EV_max), 1);
+//                            mukatta[i] = true;
+//                            break;
+//                        }
+//                    }
+//                }
+            }
+        }
+    }
+};
+template<class P>
 struct random_walk : strategy<P> {
     using S = strategy<P>;
     std::mt19937_64 engine;
@@ -441,13 +535,15 @@ template<class P>
 struct my_random_walk : strategy<P> {
     using S = strategy<P>;
     std::mt19937_64 engine;
-    random_walk(const P& p, const graph_summary& gs) : strategy<P>(p, gs) {}
-    void command(const grid_info&, const EV_info& ev_i, const order_info&) {
+    my_random_walk(const P& p, const graph_summary& gs) : strategy<P>(p, gs) {}
+    void command(const grid_info& grid_i, const EV_info& ev_i, const order_info&) {
         for (size_t n = 0; n < ev_i.N_EV; ++n) {
             if (!S::is_free(n)) continue;
             const size_t current = ev_i.c[n].u;
             const size_t safety_energy = S::EV.Delta_EV_move * 50;
-            if (auto [_, pos] = nearest_nanogrid(current, S::gs); current != pos) {
+            const size_t excess_energy = S::EV.Delta_EV_move * 60;
+            auto [_, pos] = nearest_nanogrid(current, S::gs);
+            if (current != pos) {
                 const size_t len_to_charge = S::gs.len[current][pos];
                 const int expected_energy = ev_i.c[n].charge - len_to_charge * S::EV.Delta_EV_move;
                 if (expected_energy < 0) {
@@ -458,8 +554,13 @@ struct my_random_walk : strategy<P> {
                 continue;
             }
             else {
+                if(ev_i.c[n].charge >= excess_energy && grid_i.power[pos] < 1000){
+                    long long repeat_cnt = ceil(1.0 * (ev_i.c[n].charge - safety_energy) / S::EV.V_EV_max);
+                    S::enqueue(n, strprintf("charge_to_grid %zu", S::EV.V_EV_max), repeat_cnt);
+                }
                 if (ev_i.c[n].charge < safety_energy) {
-                    S::enqueue(n, strprintf("charge_from_grid %zu", S::EV.V_EV_max), ceil(1.0 * (safety_energy - ev_i.c[n].charge) / S::EV.V_EV_max));
+                    int repeat_cnt = ceil(1.0 * (safety_energy - ev_i.c[n].charge) / S::EV.V_EV_max);
+                    S::enqueue(n, strprintf("charge_from_grid %zu", S::EV.V_EV_max), repeat_cnt);
                     continue;
                 }
             }
@@ -539,19 +640,54 @@ int main(){
     order_info order_i;
     string command_per_turn;
     vector<pair<double, double>> scores; scores.reserve(N_solution);
+    long long  actualSum = 0, excessSum = 0, buySum = 0;
     for(size_t n = 0; n < 1; ++n){
 //        str.reset(new all_stay<A>(prob, gs));
+        str.reset(new my_all_stay<A>(prob, gs));
 //         str.reset(new random_walk<A>(prob, gs));
-         str.reset(new my_random_walk<A>(prob, gs));
+//         str.reset(new my_random_walk<A>(prob, gs));
         str->initialize();
+        vector<string> command_list;
         for(size_t t = 0; t < prob.T_max; ++t){
             grid_i.load(cin);
+            actualSum += SUM(grid_i.pw_actual);
+            excessSum += SUM(grid_i.pw_excess);
+            buySum += SUM(grid_i.pw_buy);
             ev_i.load(cin);
-            str->command(grid_i, ev_i, order_i);
-            command_per_turn = str->dequeue(ev_i);
-            auto command_list = split_command(command_per_turn);
+            int large_ev_charge = 15000;
+            int large_grid_charge = 30000;
+            while(large_ev_charge > 3000) {
+                str->command(grid_i, ev_i, order_i, large_ev_charge, large_grid_charge, 1000);
+                command_per_turn = str->dequeue(ev_i);
+                command_list = split_command(command_per_turn);
+                bool ok = false;
+                for (int i = 0; i < ev_i.N_EV; i++) {
+                    if (command_list[i] != "stay") {
+                        ok = true;
+                    }
+                }
+                if(ok){
+//                    dump(t, command_list);
+                    break;
+                }
+                large_ev_charge -= 500;
+            }
             cout << command_per_turn << flush;
+            if(t % 100 == 0 || t == prob.T_max-1) {
+                dump(t);
+                dump(ev_i.c);
+                dump(grid_i.x);
+                dump(grid_i.y);
+                dump(grid_i.pw_actual);
+                dump(grid_i.pw_excess);
+            }
+            if(SUM(grid_i.pw_buy)){
+                dump(command_list);
+                dump(t, grid_i.pw_buy);
+            }
         }
+        dump(prob.grid.DayType);
+        dump(actualSum, excessSum, buySum);
         grid_i.load(cin);
         ev_i.load(cin);
         double Score;

@@ -8,10 +8,7 @@
 #include <vector>
 #include <string>
 
-
-// pw_type, DAY_TYPE, PATTARN, pw_1, pd_2, ..., pw_{N_DIV}
 int PW[2][2][3][20] = {
-  // from power_A.csv
   {
     {
       {
@@ -36,7 +33,6 @@ int PW[2][2][3][20] = {
       },
     }
   },
-  // from power_B.csv
   {
     {
       {
@@ -67,12 +63,11 @@ int PW[2][2][3][20] = {
 
 void output_expected_state_of_power(size_t DAY_TYPE, size_t pw_type, FILE *fp) {
   
-  // N_DIV, N_PATTERN, DISPERSION, P_EVENT, DELTA_EVENT  を出力
   std::string P_EVENT = (DAY_TYPE == 1 or DAY_TYPE == 3 ? "0.1" : "0.0");
   fprintf(fp, "%zu %zu %zu %s %zu\n", N_DIV, N_PATTERN, DISPERSION, P_EVENT.c_str(), DELTA_EVENT);
   for (size_t i = 0; i < N_PATTERN; i++) {
     for (size_t j = 0; j < N_DIV; j++) {
-      int wether = (DAY_TYPE <= 1 ? 0 : 1); // 晴れなら 0, 雨なら 1
+      int wether = (DAY_TYPE <= 1 ? 0 : 1);
       int pw = PW[pw_type][wether][i][j];
       if (j + 1 == N_DIV) {
         fprintf(fp, "%d\n", pw);

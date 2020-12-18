@@ -7,7 +7,7 @@ public:
   size_t node_id;
   int max_cap;
   int cap;
-  int type; // 0: normal grid, [1, MAX_TYPE]: nano_grid
+  int type;
   int pw_actual,pw_excess,pw_buy;
 
 
@@ -22,7 +22,7 @@ public:
 	  }
 
 
-  bool is_grid(){//grid ならtrue
+  bool is_grid(){
 	  return type != 0;
   }
 

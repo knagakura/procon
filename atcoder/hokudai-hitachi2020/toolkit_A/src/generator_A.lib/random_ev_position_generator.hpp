@@ -11,7 +11,6 @@ void generate_random_ev_position(size_t N, size_t N_EV, random_number &rnd, FILE
   assert(N_EV <= N);
   std::vector<size_t> x(N_EV);
 
-  // N 個の頂点から N_NANO 個の頂点を選ぶ
   std::vector<size_t> permutation(N);
   std::iota(permutation.begin(), permutation.end(), 1);
   rnd.shuffle(permutation.begin(), permutation.end());

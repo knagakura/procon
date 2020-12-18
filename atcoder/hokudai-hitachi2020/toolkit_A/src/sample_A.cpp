@@ -16,6 +16,27 @@
 FILE *log_dest =
     stderr;
 using namespace std;
+
+#define TOSTRING(x) string(#x)
+template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
+template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]"; return os; };
+template <typename T> ostream &operator<<(ostream &os, set<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
+template <typename T> ostream &operator<<(ostream &os, multiset<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
+template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
+template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
+
+#define DUMPOUT cerr
+void dump_func(){ DUMPOUT << endl; }
+template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail) { DUMPOUT << head; if (sizeof...(Tail) > 0) { DUMPOUT << ", "; } dump_func(std::move(tail)...); }
+
+#ifdef DEBUG
+#define dbg(...) { dump_func(__VA_ARGS__) }
+#define dump(...) DUMPOUT << string(#__VA_ARGS__) << ": "; dump_func(__VA_ARGS__)
+#else
+#define dbg(...)
+#define dump(...)
+#endif
+
 struct graph_data{
     constexpr static size_t MaxDegree = 5;
     size_t V, E;
@@ -416,6 +437,38 @@ struct random_walk : strategy<P> {
         }
     }
 };
+template<class P>
+struct my_random_walk : strategy<P> {
+    using S = strategy<P>;
+    std::mt19937_64 engine;
+    random_walk(const P& p, const graph_summary& gs) : strategy<P>(p, gs) {}
+    void command(const grid_info&, const EV_info& ev_i, const order_info&) {
+        for (size_t n = 0; n < ev_i.N_EV; ++n) {
+            if (!S::is_free(n)) continue;
+            const size_t current = ev_i.c[n].u;
+            const size_t safety_energy = S::EV.Delta_EV_move * 50;
+            if (auto [_, pos] = nearest_nanogrid(current, S::gs); current != pos) {
+                const size_t len_to_charge = S::gs.len[current][pos];
+                const int expected_energy = ev_i.c[n].charge - len_to_charge * S::EV.Delta_EV_move;
+                if (expected_energy < 0) {
+                    S::enqueue(n, "stay", 1000);
+                }
+                else
+                    S::enqueue(n, move_EV(current, pos, S::gs));
+                continue;
+            }
+            else {
+                if (ev_i.c[n].charge < safety_energy) {
+                    S::enqueue(n, strprintf("charge_from_grid %zu", S::EV.V_EV_max), ceil(1.0 * (safety_energy - ev_i.c[n].charge) / S::EV.V_EV_max));
+                    continue;
+                }
+            }
+            uniform_int_distribution<size_t> dice(0, ev_i.c[n].N_adj - 1);
+            const size_t goal = dice(engine);
+            S::enqueue(n, move_EV(current, ev_i.c[n].a[goal], S::gs));
+        }
+    }
+};
 vector<string> split_command(const string &command_pack){
     vector<string> ret;
     stringstream reader(command_pack);
@@ -486,9 +539,10 @@ int main(){
     order_info order_i;
     string command_per_turn;
     vector<pair<double, double>> scores; scores.reserve(N_solution);
-    for(size_t n = 0; n < N_solution; ++n){
-        str.reset(new all_stay<A>(prob, gs));
-        // str.reset(new random_walk<A>(prob, gs));
+    for(size_t n = 0; n < 1; ++n){
+//        str.reset(new all_stay<A>(prob, gs));
+//         str.reset(new random_walk<A>(prob, gs));
+         str.reset(new my_random_walk<A>(prob, gs));
         str->initialize();
         for(size_t t = 0; t < prob.T_max; ++t){
             grid_i.load(cin);

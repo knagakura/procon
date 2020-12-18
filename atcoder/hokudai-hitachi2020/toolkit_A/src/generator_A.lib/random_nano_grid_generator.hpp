@@ -14,7 +14,6 @@ std::pair<std::vector<size_t>, std::vector<size_t>> generate_random_nano_grid(si
   std::vector<size_t> nanos(N_GRID);
   std::vector<size_t> patterns(N_GRID);
 
-  // N 個の頂点から N_GRID 個の頂点を選ぶ
   std::vector<size_t> permutation(N);
   std::iota(permutation.begin(), permutation.end(), 1);
   rnd.shuffle(permutation.begin(), permutation.end());

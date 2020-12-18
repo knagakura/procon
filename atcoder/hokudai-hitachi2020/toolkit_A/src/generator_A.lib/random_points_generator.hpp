@@ -18,7 +18,6 @@ std::pair<std::vector<double>, std::vector<double>> random_points_generator(size
 	}
 
 	size_t restN = N - M * M;
-	// N = M * M + rest_N;
 
 	for(size_t i = 0; i < M; i++) {
 		for(size_t j = 0; j < M; j++) {

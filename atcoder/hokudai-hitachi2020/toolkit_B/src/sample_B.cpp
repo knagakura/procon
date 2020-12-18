@@ -16,18 +16,40 @@
 FILE *log_dest =
     stderr;
 using namespace std;
+#define TOSTRING(x) string(#x)
+template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
+template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]"; return os; };
+template <typename T> ostream &operator<<(ostream &os, set<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
+template <typename T> ostream &operator<<(ostream &os, multiset<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
+template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
+template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
+
+#define DUMPOUT cerr
+void dump_func(){ DUMPOUT << endl; }
+template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail) { DUMPOUT << head; if (sizeof...(Tail) > 0) { DUMPOUT << ", "; } dump_func(std::move(tail)...); }
+
+#ifdef DEBUG
+#define dbg(...) dump_func(__VA_ARGS__)
+#define dump(...) DUMPOUT << string(#__VA_ARGS__) << ": "; dump_func(__VA_ARGS__)
+#else
+#define dbg(...)
+#define dump(...)
+#endif
+
 struct graph_data{
     constexpr static size_t MaxDegree = 5;
     size_t V, E;
     std::map<size_t, std::map<size_t, size_t>> edges;
     graph_data(std::istream &src){
         src >> V >> E;
+        cerr << V << " " << E << endl;
         for(size_t i = 0; i < E; ++i){
             size_t u, v, d;
             src >> u >> v >> d;
             --u, --v;
             edges[u][v] = d;
             edges[v][u] = d;
+            cerr << u << " " << v << " " << d << endl;
         }
         for([[maybe_unused]]auto &[u, connects] : edges){
         }
@@ -314,6 +336,7 @@ struct move_EV : action {
                 this->push_back("move " + std::to_string(next + 1));
         }
     }
+
     move_EV(size_t current, const std::vector<size_t>& path, const graph_summary& gs) {
         size_t cur = current;
         for (size_t goal : path)
@@ -322,6 +345,13 @@ struct move_EV : action {
                 for (size_t count = 0; count < gs.len[cur][next]; ++count)
                     this->push_back("move " + std::to_string(next + 1));
             }
+    }
+    move_EV(size_t current, size_t goal, const graph_summary& gs, const size_t safety_energy) {
+        for (size_t cur = current; cur != goal; cur = gs.next[cur][goal]) {
+            const size_t next = gs.next[cur][goal];
+            for (size_t count = 0; count < gs.len[cur][next]; ++count)
+                this->push_back("move " + std::to_string(next + 1));
+        }
     }
 };
 auto minimal_matching(const vector<size_t>& start, const vector<size_t>& goal, const graph_summary& gs) {
@@ -382,7 +412,10 @@ struct strategy :public P {
         for (size_t i = 0; i < repeat; ++i)
             command_queue[EV_index].push_back(cmd);
     }
-    void enqueue(size_t EV_index, list<string>&& cmd_list) {
+    void enqueue(size_t EV_index, list<string>&& cmd_list, bool emergence = false) {
+        if(emergence){
+            command_queue[EV_index].clear();
+        }
         command_queue[EV_index].splice(command_queue[EV_index].end(), cmd_list);
     }
 };
@@ -487,7 +520,6 @@ struct transport_only_0 : strategy<B> {
         }
     }
 };
-
 struct transport_charge2grid : strategy<B> {
     std::set<size_t> assigned_order;
     transport_charge2grid(const B& b, const graph_summary& gs) :
@@ -496,20 +528,48 @@ struct transport_charge2grid : strategy<B> {
         strategy::initialize();
         assigned_order.clear();
     }
-    void command(const grid_info&, const EV_info& ev_i, const order_info& order_i) {
+    void command(const grid_info& grid_i, const EV_info& ev_i, const order_info& order_i) override {
+        /* あるEVに対して、処理を決める
+         * 今実装してあるのはtransportのみ
+         * 全てのgridを見て、やばそうなところがあったらそこに駆けつける処理を追加したい
+         * 駆けつける処理は、push_frontで優先的に入れたい
+         */
+//        const int EmergencePower = 1000;z
+//        vector<bool> used(grid_i.N_grid, false);
+//        for (size_t n = 0; n < ev_i.N_EV; ++n) {
+//            if (!is_free(n)) continue;
+//            const size_t current = ev_i.c[n].u;
+//            for (size_t i = 0; i < grid_i.N_grid; i++) {
+//                if(used[i])continue;
+//                if (grid_i.y[i] < EmergencePower) {
+//                    const size_t pos = grid_i.x[i];
+//                    const size_t len_to_charge = gs.len[current][pos];
+//                    const int expected_energy = ev_i.c[n].charge - len_to_charge * EV.Delta_EV_move;
+//                    const size_t safety_energy = EV.Delta_EV_move * 50;
+//                    if(expected_energy >= 0) {
+////                        enqueue(n, move_EV(current, pos, gs), true);
+////                        enqueue(n, strprintf("charge_to_grid %zu", EV.V_EV_max), ceil(1.0 * (EmergencePower - grid_i.y[i]) / EV.V_EV_max));
+//                        used[i] = true;
+//                        break;
+//                    }
+//                }
+//            }
+//        }
         for (size_t n = 0; n < ev_i.N_EV; ++n) {
             if (!is_free(n)) continue;
             const size_t current = ev_i.c[n].u;
             const size_t safety_energy = EV.Delta_EV_move * 50;
+            // 以下、transport
             if (auto [_, pos] = nearest_nanogrid(current, gs); current != pos) {
                 const size_t len_to_charge = gs.len[current][pos];
                 const int expected_energy = ev_i.c[n].charge - len_to_charge * EV.Delta_EV_move;
                 if (expected_energy < 0) {
                     enqueue(n, "stay", 1000);
                 }
-                else
+                else {
                     enqueue(n, move_EV(current, pos, gs));
-                continue;
+                    continue;
+                }
             }
             else {
                 if (ev_i.c[n].charge < safety_energy) {
@@ -521,7 +581,11 @@ struct transport_charge2grid : strategy<B> {
             for (size_t i = 0; i < order_i.N_order; ++i)
                 if (assigned_order.count(order_i.id[i]) == 0)
                     unassigned_order.insert(i);
-            if (unassigned_order.size() > 0) {
+
+
+            if (!unassigned_order.empty()) {
+                dump(assigned_order.size());
+                dump(unassigned_order.size());
                 size_t count = 0;
                 std::vector<tuple<size_t, size_t, size_t>> assign_order;
                 while (!unassigned_order.empty() && count++ < EV.N_trans_max) {
@@ -540,7 +604,7 @@ struct transport_charge2grid : strategy<B> {
                 }
                 size_t cur = current;
                 for (auto [to, pick_up] : path) {
-                    enqueue(n, move_EV(cur, to, gs));
+                    enqueue(n, move_EV(cur, to, gs));//ここを変えたい
                     if (pick_up != -1) enqueue(n, strprintf("pickup %d", pick_up));
                     cur = to;
                 }
@@ -626,7 +690,8 @@ int main(){
     for(size_t n = 0; n < N_solution; ++n){
         // str.reset(new all_stay<B>(prob, gs));
         // str.reset(new random_walk<B>(prob, gs));
-        str.reset(new transport_only_0(prob, gs));
+//        str.reset(new transport_only_0(prob, gs));
+        str.reset(new transport_charge2grid(prob, gs));
         str->initialize();
         for(size_t t = 0; t < prob.T_max; ++t){
             grid_i.load(cin);
@@ -635,6 +700,7 @@ int main(){
             str->command(grid_i, ev_i, order_i);
             command_per_turn = str->dequeue(ev_i);
             auto command_list = split_command(command_per_turn);
+//            dump(command_list);
             cout << command_per_turn << flush;
         }
         grid_i.load(cin);
@@ -642,6 +708,7 @@ int main(){
         order_i.load(cin);
         double S_trans, S_ele;
         cin >> S_trans >> S_ele;
+        dump(S_trans, S_ele);
     }
     return 0;
 }

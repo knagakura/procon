@@ -31,7 +31,6 @@ void output_for_graphgraph(const graph<edge> &G, std::vector<double> x, std::vec
   size_t M = edges.size();
   fprintf(fp, "%zu %zu\n", N, M);
 
-	// print points
 	for(size_t i = 0; i < N; i++) {
 		inv[nodes[i]] = i;
 	}
@@ -39,7 +38,6 @@ void output_for_graphgraph(const graph<edge> &G, std::vector<double> x, std::vec
 		fprintf(fp, "%f %f\n", x[inv[i]] * 100, y[inv[i]] * 100);
 	}
 
-	// print edges
   for(auto e : edges) {
     size_t u, v; edge::cost_type c;
     u = nodes[e.src] + INDEXED, v = nodes[e.dst] + INDEXED, c = e.cost;

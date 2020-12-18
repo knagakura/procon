@@ -15,23 +15,19 @@
 #include "generator_A.lib/random_number.hpp"
 #include "generator_A.lib/union_find.hpp"
 #include "generator_A.lib/random_points_generator.hpp"
-// #include "./random_frequency_generator.hpp"
 #include "generator_A.lib/output_for_graphgraph.hpp"
 
 
 graph<edge> kruskal(std::vector<double> x, std::vector<double> y) {
 	
-	// the number of vertices
 	size_t N = x.size();
 	graph<edge> G(N);
 	using Point = std::pair<size_t, size_t>;
 
 	assert(MIN_N <= N and N <= MAX_N);
 	
-	// edges {cost, point}
 	std::vector<std::pair<double, Point>> edges;
 	
-	// all to all distance
 	std::vector<std::vector<double>> distance(N, std::vector<double> (N, 0.0));
 
 	for(size_t u = 0; u < N; u++) {
@@ -41,13 +37,10 @@ graph<edge> kruskal(std::vector<double> x, std::vector<double> y) {
 		}
 	}
 
-	// sort edges
 	std::sort(edges.begin(), edges.end());
 
-	// manage connected components by using Union Find
 	UnionFind uf(N);
 	
-	// create minimam spanninng tree
 	for(size_t ei = 0; ei < edges.size(); ei++) {
 		size_t u, v;
 		std::tie(u, v) = edges[ei].second;
@@ -77,8 +70,8 @@ graph<edge> generate_random_graph(size_t N, size_t M, random_number &rnd) {
   std::vector<double> x;
   std::vector<double> y;
   std::vector<size_t> degree(N, 0);
-  std::tie(x, y) = random_points_generator(N, rnd);														// point
-	std::vector<std::vector<double>> distance(N, std::vector<double> (N, 0.0)); // all to all distance
+  std::tie(x, y) = random_points_generator(N, rnd);														
+	std::vector<std::vector<double>> distance(N, std::vector<double> (N, 0.0)); 
 	using Point = std::pair<size_t, size_t>;
 
 	for(size_t u = 0; u < N; u++) {
@@ -87,10 +80,8 @@ graph<edge> generate_random_graph(size_t N, size_t M, random_number &rnd) {
 		}
 	}
   
-	// create minimam spanning tree
   graph<edge> G = kruskal(x, y);
   
-	// caluculate degree of certices
   for(size_t i = 0; i < N; i++) {
     for(auto e : G[i]) {
       size_t u, v;
@@ -102,7 +93,6 @@ graph<edge> generate_random_graph(size_t N, size_t M, random_number &rnd) {
     }
   }
 
-  // select edge greedy
   size_t restEdge = M - (N - 1);
   G.sort_edges();
 	
@@ -110,8 +100,7 @@ graph<edge> generate_random_graph(size_t N, size_t M, random_number &rnd) {
 	std::vector<std::vector<double>> edgeCost(N, std::vector<double> (N, INF));
 	std::set<std::pair<double, Point>> edgeSet;
 
-	// edgeCost[i][j] := deg[i] * deg[j] * distance。もう使われている辺は INF とする。 
-	// edgeSet := {cost, {i, j}} で格納。
+
 
   for(size_t i = 0; i < N; i++) {
     for(size_t j = i + 1; j < N; j++) {
@@ -132,9 +121,6 @@ graph<edge> generate_random_graph(size_t N, size_t M, random_number &rnd) {
     }
   }
 	
-	// edgeSet のなかでコスト最小の辺を取り出す
-  // 辺を追加
-  // 次数を更新して、edgeSet, edgeCost を更新
   for(; restEdge > 0; restEdge--) {
 		
 		size_t u, v;
@@ -152,12 +138,10 @@ graph<edge> generate_random_graph(size_t N, size_t M, random_number &rnd) {
       degree[u]++;
       degree[v]++;
 			
-			// u, v に隣接している辺に関するコストを再計算
 			for(size_t x = 0; x < N; x++) {
 				
 				if(x == u or x == v) continue;			
 
-				// 辺 (u, x)
 				{
 					size_t a = std::min(u, x);
 					size_t b = std::max(u, x);
@@ -171,7 +155,6 @@ graph<edge> generate_random_graph(size_t N, size_t M, random_number &rnd) {
 					}
 				}
 
-				// 辺 (u, x)
 				{
 					size_t a = std::min(v, x);
 					size_t b = std::max(v, x);

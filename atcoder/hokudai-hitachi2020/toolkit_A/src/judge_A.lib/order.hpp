@@ -3,12 +3,12 @@
 
 class order {
 public:
-  size_t order_id;//0-index
+  size_t order_id;
   size_t start_time;
   int  end_time;
-  int from;//0-index
-  int to;//0-index
-  int vehicle_id; // 0: 頂点 from で待機中
+  int from;
+  int to;
+  int vehicle_id;
 
   order() = default;
   order(size_t order_id, size_t start_time, int from, int to) : 

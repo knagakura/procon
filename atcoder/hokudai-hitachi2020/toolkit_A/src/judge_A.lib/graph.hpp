@@ -67,7 +67,6 @@ public:
     }
   }
 
-  // 頂点 u と直接結ばれている辺であって、端点が v であるもの (のインデックス) を返す
   /*int find(size_t u, size_t v) const {
     size_t lb = 0, ub = g[u].size();
     while(ub - lb > 1) {
@@ -88,7 +87,7 @@ public:
 
   void print_all_nodes(FILE *fp){
 	  for( auto i:nodes ){
-		  if( i.is_grid() )// not normal grid
+		  if( i.is_grid() )
 		  i.print(fp);
 	  }
   }

@@ -1,7 +1,7 @@
 #ifndef POSITION_HPP
 #define POSITION_HPP
 
-#include "judge_A.lib/graph.hpp" // edge_distanceの型を cost_type
+#include "judge_A.lib/graph.hpp"
 
 class position {
 public:
@@ -15,14 +15,14 @@ public:
     from(from), to(to), distance(distance) , edge_distance(edge_distance){}
 
   bool on_vertex(){
-	  if( distance == 0 || distance == edge_distance ){// 0 is from , edge_distance is to
+	  if( distance == 0 || distance == edge_distance ){
 		  return true;
 	  }else{
 		  return false;
 	  }
   }
 
-  int now_vertex(){//if vehicle isn't on vertex, return -1?
+  int now_vertex(){
 	  if( on_vertex() ){
 		  if( distance == 0 ){
 			  return from;

@@ -18,14 +18,12 @@ public:
   vehicle(int max_cap, int cap, position pos) : 
     max_cap(max_cap), cap(cap), pos(pos) {}
   
-  // 充電
   bool charge(int amount) {
     if (amount < 0) return false;
     cap = std::min(max_cap, cap + amount);
     return true;
   }
   
-  // 消費
   bool consume(int amount) {
     if (amount < 0 ) return false;
     if ( amount > cap) return false;
@@ -44,7 +42,7 @@ public:
   }
 
 
-  void add_order(size_t id){// this vehicle pick up about the order/
+  void add_order(size_t id){
 	  orders.insert(id);
   }
   void erase_order(size_t id ){

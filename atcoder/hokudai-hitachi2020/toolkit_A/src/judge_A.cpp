@@ -8,14 +8,13 @@
 #include "judge_A.lib/reactive.hpp"
 
 
-void judge::init_input(FILE *fp){//writting after wrong cas1
+void judge::init_input(FILE *fp){
 	T_now = 0;
 	num_orders = 0;
 
 	std::fscanf(fp,"%zu",&N_sol);
 	INFO("N_sol : %zu", N_sol);
 
-	// Init_input , Order , Amount of Charging in the scenario
 	std::fscanf(fp ,"%zu %zu",&N,&M);
 	INFO("%zu vertices and %zu edges will be loaded.", N, M);
 
@@ -25,14 +24,14 @@ void judge::init_input(FILE *fp){//writting after wrong cas1
 	c_output = std::vector<size_t>(M);
 
 	for(size_t i=0;i<M;i++){
-		size_t u,v,c;//u,v are 1-index.
-		std::fscanf(fp,"%zu %zu %zu",&u,&v,&c);//assume input as 1-index
+		size_t u,v,c;
+		std::fscanf(fp,"%zu %zu %zu",&u,&v,&c);
 		u_output[i] = u;
 		v_output[i] = v;
 		c_output[i] = c;
-		u--,v--;// transform 1-index to 0-index
+		u--,v--;
 		g.add_edge(u,v,c);
-		g.add_edge(v,u,c);//逆辺
+		g.add_edge(v,u,c);
 
 	}
 	g.sort_edges();
@@ -69,7 +68,6 @@ void judge::init_input(FILE *fp){//writting after wrong cas1
 		std::fscanf(fp,"%zu %zu",&x,&type);
 		x_output[i] = x;
 		type_output[i] = type;
-		// 1-index to 0-index
 		INFO("A nano grid at point %zu has the electricity pattern %zu.", x - 1, type );
 		g.set_node(x - 1, node(C_Max_Grid, C_Init_Grid, type , x - 1) );
 	}
@@ -87,7 +85,6 @@ void judge::init_input(FILE *fp){//writting after wrong cas1
 	for(size_t i=0;i<N_vehicle;i++){
 		size_t pos;
 		std::fscanf(fp,"%zu",&pos);
-		// 1-index to 0-index
 		INFO("EV %zu is at point %zu.", i, pos - 1);
 		pos_output[i] = pos;
 		position now_pos = position( pos - 1, g[pos - 1][0].dst, 0, g[pos - 1][0].cost );
@@ -104,9 +101,7 @@ void judge::init_input(FILE *fp){//writting after wrong cas1
 	orders = std::vector< std::vector<order> > ( (T_last+1) * N_sol );
 	energies = std::vector< std::vector<energy> > (T_max * N_sol , std::vector<energy>( N_nano ) );
 
-	for(size_t k=0;k<N_sol;k++){
-		//ここからは、コンテスタントには直接見せない予定の部分
-		//Order
+	for(size_t k=0;k<1;k++){
 
 		for(size_t i=0;i<=T_last;i++){
 			size_t N_new_order;
@@ -114,19 +109,16 @@ void judge::init_input(FILE *fp){//writting after wrong cas1
 			orders[i+k*(T_last+1)] = std::vector<order> (N_new_order);
 			for(size_t j=0;j<N_new_order;j++){
 				size_t order_id, from,to,time;
-				//order_id , from,to  , time  1-index 
 				std::fscanf(fp, "%zu %zu %zu %zu",&order_id,&from,&to,&time);
-				order_id--,from--,to--;// 1-index to 0-index
+				order_id--,from--,to--;
 				orders[i+k*(T_last+1)][j] = order(order_id,time,from,to);
 			}
 		}
 
 
-		//Amount of Charging
 		for(size_t i=0;i<T_max;i++){
 			for(size_t j=0;j<N_nano;j++){
-				// delta は変化量なにで負を取りうる
-				size_t nano_id; //nano_id 1-index
+				size_t nano_id;
 				int delta;
 				std::fscanf(fp, "%zu %d", &nano_id, &delta);
 				nano_id--;
@@ -147,7 +139,7 @@ void judge::copy_sol( judge &J,  int sol ){
 	INFO("input data: x -> %zu", energies[0][0].id);
 }
 
-bool judge::valid_input(){//contestant's input
+bool judge::valid_input(){
 	const size_t N_vehicles = vehicles.size();
 	std::vector<bool> used(N_vehicles);
 	for(size_t vehicle_id = 0; vehicle_id < N_vehicles; ++vehicle_id){
@@ -184,7 +176,7 @@ bool judge::valid_input(){//contestant's input
 
 
 bool judge::next_time_step(){
-	for(size_t i=0;i<N_nano;i++){//Charging
+	for(size_t i=0;i<N_nano;i++){
 		info_day.push( energies[ T_now ][ i ] );
 	}
 
@@ -194,7 +186,6 @@ bool judge::next_time_step(){
 }
 
 
-// 出力
 void judge::print_all(FILE *fp){
 	print_rest_energy(fp);
 	print_vehicle(fp);
@@ -204,10 +195,10 @@ void judge::print_all(FILE *fp){
 void judge::print_vehicle(FILE *fp){
 	for(size_t i=0;i<N_vehicle;i++){
 		int u,v;
-		size_t N_can_go,dist_u,dist_v;//u,v 0-index
+		size_t N_can_go,dist_u,dist_v;
 		u = vehicles[i].now_vertex();
 		std::vector<size_t> can_go_vertices;
-		if( u == -1 ){//辺上にいる
+		if( u == -1 ){
 			u = vehicles[i].pos.from;
 			v = vehicles[i].pos.to;
 			dist_u = vehicles[i].pos.distance;
@@ -215,7 +206,7 @@ void judge::print_vehicle(FILE *fp){
 			N_can_go = 2;
 			can_go_vertices.push_back(u);
 			can_go_vertices.push_back(v);
-		}else{//頂点上にいる
+		}else{
 			v = u;
 			dist_u = 0;
 			dist_v = 0;
@@ -239,7 +230,7 @@ void judge::print_vehicle(FILE *fp){
 }
 
 
-void judge::print_Initial_Output(FILE *fp){//固定パラメータ出力
+void judge::print_Initial_Output(FILE *fp){
 	fprintf(fp,"%zu %zu\n",N,M);
 	for(size_t i=0;i<M;i++){
 		fprintf(fp,"%zu %zu %zu\n",u_output[i],v_output[i],c_output[i]);
@@ -259,7 +250,7 @@ void judge::print_Initial_Output(FILE *fp){//固定パラメータ出力
 		fprintf(fp,"%zu %zu\n",x_output[i],type_output[i]);
 	}
 	
-	fprintf(fp, "%zu %zu %zu %d %zu\n",N_vehicle,C_Init_EV,C_Max_EV,V_Max_EV, Delta_move);//A問題の設定:運搬依頼の上限を排除
+	fprintf(fp, "%zu %zu %zu %d %zu\n",N_vehicle,C_Init_EV,C_Max_EV,V_Max_EV, Delta_move);
 	for(size_t i=0;i<N_vehicle;i++){
 		fprintf(fp,"%zu\n",pos_output[i]);
 	}
@@ -299,11 +290,10 @@ double score( std::vector<std::pair<double,double> > &Ans){
 double main2(){
 	registerValidation();
 
-	int N_sol = 0;//現在何回目か
-	bool debug_flag = true; // デバッグ出力を出すかのフラグ
+	int N_sol = 0;
+	bool debug_flag = true;
 
 
-	// init_input
 	judge Common;
 
 	FILE *fp,*contestant_input,*time_step_result;
@@ -333,16 +323,15 @@ double main2(){
 
 
 		for(size_t t=0;t<Judge.T_max;t++){
-			INFO("Turn %zu",t);//timestep tのときの内部変化(Charge,Orderの発生)
-			Judge.next_time_step();//この処理は、最初にやるべきか後にやるべきかは応相談だと思う。
-
+			INFO("Turn %zu",t);
+			Judge.next_time_step();
 			Judge.print_all(time_step_result );
-			if( Judge.valid_input() ){//コンテスタントが正しい、入力や処理をしているならtrueを返す
-			}else{//そうでなければWAになるなにかを返す
+			if( Judge.valid_input() ){
+			}else{
 				exit(1);
 			}
 
-			if( Judge.valid_end_time() ){//総充電量などを確かめる部分
+			if( Judge.valid_end_time() ){
 
 			}else{
 				exit(1);

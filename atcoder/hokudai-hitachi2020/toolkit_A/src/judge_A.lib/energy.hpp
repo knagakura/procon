@@ -3,7 +3,7 @@
 
 class energy{
 public:
-	size_t id;//nano_id
+	size_t id;
 	int amount;
 
 	energy() = default;

@@ -1,7 +1,6 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 #include <cstdio>
-//#include "../utils/constraints.hpp"
 
 class node {
 public:
@@ -20,15 +19,14 @@ public:
 		  pw_actual = 0;
 		  pw_excess = 0;
 		  pw_buy = 0;
-	  } //node_idが定義できてなかったので追加しました。
+	  } 
 
 
-  bool is_grid(){//grid ならtrue
+  bool is_grid(){
 	  return type != 0;
   }
 
   bool charge(int amount) {
-    //if (type == -1) return false;
     if( !is_grid() ) return false;
     if (amount < 0) return false;
     cap = std::min(max_cap, cap + amount);
@@ -37,9 +35,7 @@ public:
 
   bool consume(int amount) {
     if( !is_grid() ) return false;
-    //if (type == -1) return false;
     if (amount < 0) return false;
-    //if (amount > CHARGE_PER_TURN ) return false;
     if ((size_t)amount > cap) return false;
     cap -= amount;
     return true;

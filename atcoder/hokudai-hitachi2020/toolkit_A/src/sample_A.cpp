@@ -13,11 +13,18 @@
 #include <list>
 #include <string>
 #include <unistd.h>
+#include <bits/stdc++.h>
 FILE *log_dest =
-    stderr;
+        stderr;
 using namespace std;
+typedef long long ll;
+#define rep(i,N) for(int i=0;i<int(N);++i)
 #define all(a) (a).begin(),(a).end()
 #define SUM(v) accumulate(all(v), 0LL)
+//struct fast_ios{ fast_ios(){ cin.tie(0); ios::sync_with_stdio(false); cout << fixed << setprecision(20); }; }fast_ios_;
+
+template<class T> inline bool chmax(T& a, T b) { if (a < b) { a = b; return true; } return false; }
+template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true; } return false; }
 
 #define TOSTRING(x) string(#x)
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
@@ -154,6 +161,7 @@ struct grid_info{
     size_t N_grid;
     std::vector<size_t> x, y;
     std::vector<size_t> power;
+    std::vector<size_t> xinv;
     std::vector<int> pw_actual;
     std::vector<size_t> pw_excess, pw_buy;
     grid_info() = default;
@@ -161,10 +169,12 @@ struct grid_info{
         :N_grid(N_grid), x(N_grid), y(N_grid), pw_actual(N_grid), pw_excess(N_grid), pw_buy(N_grid){}
     void load(std::istream &src, [[maybe_unused]]size_t V = 225, [[maybe_unused]]size_t C_grid_max = 50000){
         power.assign(myV, 0);
+        xinv.assign(myV, -1);
         for(size_t i = 0; i < N_grid; ++i){
             src >> x[i] >> y[i] >> pw_actual[i] >> pw_excess[i] >> pw_buy[i];
             --x[i];
             power[x[i]] = y[i];
+            xinv[x[i]] = i;
         }
     }
 };
@@ -257,8 +267,9 @@ struct graph_summary {
 };
 size_t transit_length(const std::vector<size_t>& path, const std::vector<std::vector<size_t>>& min_path_len) {
     size_t len = 0;
-    for (size_t i = 1; i < path.size(); ++i)
+    for (size_t i = 1; i < (int)path.size(); ++i) {
         len += min_path_len[path[i - 1]][path[i]];
+    }
     return len;
 }
 size_t transit_length(const std::vector<pair<size_t, int>>& path, const std::vector<std::vector<size_t>>& min_path_len) {
@@ -298,15 +309,15 @@ vector<pair<size_t, int>> find_transit_path_greedy(size_t current,
     while (1) {
         for (size_t i = 0; i < order.size(); ++i)
             switch (pickup_flag[i]) {
-            case 0:
-                candidate.push_back(get<0>(order[i]));
-                index.push_back(i);
-                break;
-            case 1:
-                candidate.push_back(get<1>(order[i]));
-                index.push_back(i);
-                break;
-            default:;
+                case 0:
+                    candidate.push_back(get<0>(order[i]));
+                    index.push_back(i);
+                    break;
+                case 1:
+                    candidate.push_back(get<1>(order[i]));
+                    index.push_back(i);
+                    break;
+                default:;
             }
         if (candidate.size() == 0) break;
         for ([[maybe_unused]]auto p : candidate) ;
@@ -382,11 +393,14 @@ struct strategy :public P {
                          int emergency_charge){
     }
     virtual void command(const grid_info& grid_i,
-                 const EV_info& ev_i,
-                 const order_info&,
-                 int large_ev_charge,
-                 int large_grid_charge,
-                 int emergency_charge) {}
+                        const EV_info& ev_i,
+                        const order_info&,
+                        int large_ev_charge,
+                        int large_grid_charge,
+                        int emergency_charge) {}
+    virtual void command(const grid_info& grid_i, const EV_info& ev_i, const order_info&,
+                         int large_ev_charge, int large_grid_charge, int emergency_charge,
+                         bool gerira, bool totsuhare) {}
     virtual void initialize() {
         for (auto& queue : command_queue) queue.clear();
     }
@@ -423,6 +437,9 @@ struct strategy :public P {
     void enqueue(size_t EV_index, list<string>&& cmd_list) {
         command_queue[EV_index].splice(command_queue[EV_index].end(), cmd_list);
     }
+    void queue_reset(size_t EV_index) {
+        command_queue[EV_index].clear();
+    }
 };
 template<class P>
 struct all_stay : strategy<P> {
@@ -434,8 +451,61 @@ struct my_all_stay : strategy<P> {
     using S = strategy<P>;
     std::mt19937_64 engine;
     my_all_stay(const P& p, const graph_summary& gs) : strategy<P>(p, gs) {}
-    void command(const grid_info& grid_i, const EV_info& ev_i, const order_info&, int large_ev_charge, int large_grid_charge, int emergency_charge) {
+    void command(const grid_info& grid_i, const EV_info& ev_i, const order_info&,
+                 int large_ev_charge, int large_grid_charge, int emergency_charge,
+                 bool gerira = false, bool totsuhare = false) {
+//        if(totsuhare){
+//            dump("totsuhare");
+//            for (size_t n = 0; n < ev_i.N_EV; ++n) {
+////                if(not S::is_free(n)){
+////                    int current = ev_i.c[n].u;
+////                    int nxt = ev_i.c[n].v;
+////                    if(current == nxt) {
+////                        S::queue_reset(n);
+////                    }
+////                }
+//                vector<int> hareIdx, freeEvIdx, freeCharge;
+//                for(int i = 0; i < grid_i.N_grid; i++){
+//                    if(grid_i.pw_actual[i] > 600){
+//                        hareIdx.emplace_back(i);
+//                    }
+//                }
+//                for(int i = 0; i < ev_i.N_EV; i++){
+//                    if(S::is_free(i)){
+//                        freeEvIdx.emplace_back(i);
+//                        freeCharge.emplace_back(ev_i.c[i].charge);
+//                    }
+//                }
+//                dump(hareIdx);
+//                dump(freeEvIdx);
+//                dump(freeCharge);
+//                vector<bool> matched(ev_i.N_EV, false);
+//                int sz = hareIdx.size();
+//                for(int i = 0; i < sz; i++){
+//                    int gridPos = grid_i.x[hareIdx[i]];
+//                    int minn = 1e4;
+//                    int minJ = -1;
+//                    for(int j = 0 ;j < freeEvIdx.size(); j++){
+//                        if(matched[freeEvIdx[j]])continue;
+//                        int evPos = ev_i.c[freeEvIdx[j]].u;
+//                        int len = S::gs.len[evPos][gridPos];
+//                        if(ev_i.c[freeEvIdx[j]].charge < 5000 && ev_i.c[freeEvIdx[j]].charge >= S::EV.Delta_EV_move * len && chmin(minn, len)){
+//                            minJ = j;
+//                        }
+//                    }
+//                    dump(minJ);
+//                    if(minJ >= 0){
+//                        matched[freeEvIdx[minJ]] = true;
+//                        S::enqueue(freeEvIdx[minJ], move_EV(ev_i.c[freeEvIdx[minJ]].u, gridPos, S::gs));
+//                        {
+//                            S::enqueue(n, strprintf("charge_from_grid %zu", S::EV.V_EV_max), 5);
+//                        }
+//                    }
+//                }
+//            }
+//        }
         vector<bool> mukatta(grid_i.N_grid, false);
+        vector<bool> added(grid_i.N_grid, false);
         for (size_t n = 0; n < ev_i.N_EV; ++n) {
             if (!S::is_free(n)) continue;
             const size_t current = ev_i.c[n].u;
@@ -452,6 +522,8 @@ struct my_all_stay : strategy<P> {
                 continue;
             }
             else {
+                // この場所のgrid_num
+                int grid_num = grid_i.xinv[pos];
                 if(ev_i.c[n].charge >= large_ev_charge){
                     for(int i = 0; i < grid_i.N_grid; i++){
                         if(mukatta[i])continue;
@@ -473,28 +545,19 @@ struct my_all_stay : strategy<P> {
                             min(large_grid_charge/2 - ev_i.c[n].charge, S::EV.V_EV_max)),
                                1);
                 }
-//                else if(grid_i.power[pos] >= 10000){
-//                    if(ev_i.c[n].charge < 3000) {
-//                        S::enqueue(n, strprintf(
-//                                "charge_from_grid % zu",
-//                                min(5000 - ev_i.c[n].charge, S::EV.V_EV_max)),
-//                                   1);
-//                    }
-//                }
-//                else if(ev_i.c[n].charge < 1000){
-//                    for(int i = 0; i < grid_i.N_grid; i++){
-//                        if(mukatta[i])continue;
-//                        if(grid_i.y[i] > 20000){
-//                            int len_to_charge = S::gs.len[current][grid_i.x[i]];
-//                            int expected_charge = ev_i.c[n].charge - S::EV.Delta_EV_move * len_to_charge;
-//                            if(expected_charge < 0)continue;
-////                            S::enqueue(n, move_EV(current, grid_i.x[i], S::gs));
-////                            S::enqueue(n, strprintf("charge_from_grid %zu", S::EV.V_EV_max), 1);
-//                            mukatta[i] = true;
-//                            break;
-//                        }
-//                    }
-//                }
+                else if(grid_i.y[grid_num] > 40000 || grid_i.pw_excess[grid_num] > 0){
+                    S::enqueue(n, strprintf(
+                            "charge_from_grid % zu",
+                            min(25000 - ev_i.c[n].charge, S::EV.V_EV_max)),
+                            1);
+                }
+                else if(not added[grid_num] && grid_i.pw_buy[grid_num] > 100 && ev_i.c[n].charge > 10000){
+                    S::enqueue(n, strprintf(
+                            "charge_to_grid % zu",
+                            min(ev_i.c[n].charge, S::EV.V_EV_max/2)),
+                               1);
+                    added[grid_num] = true;
+                }
             }
         }
     }
@@ -595,18 +658,18 @@ struct command{
     string to_str() const{
         switch (type)
         {
-        case command_type::stay:
-            return strprintf("stay");
-        case command_type::move:
-            return strprintf("move %zu", val);
-        case command_type::pickup:
-            return strprintf("pickup %zu", val);
-        case command_type::charge_from_grid:
-            return strprintf("charge_from_grid %zu", val);
-        case command_type::charge_to_grid:
-            return strprintf("charge_to_grid %zu", val);
-        default:
-            break;
+            case command_type::stay:
+                return strprintf("stay");
+            case command_type::move:
+                return strprintf("move %zu", val);
+            case command_type::pickup:
+                return strprintf("pickup %zu", val);
+            case command_type::charge_from_grid:
+                return strprintf("charge_from_grid %zu", val);
+            case command_type::charge_to_grid:
+                return strprintf("charge_to_grid %zu", val);
+            default:
+                break;
         }
         return "";
     }
@@ -654,10 +717,26 @@ int main(){
             excessSum += SUM(grid_i.pw_excess);
             buySum += SUM(grid_i.pw_buy);
             ev_i.load(cin);
+            bool gerira = false, totsuhare = false;
+            if(*max_element(all(grid_i.pw_actual)) > 600) {
+                dump(grid_i.pw_actual);
+                totsuhare = true;
+                dbg(t, "突然の晴だ");
+            }
+            if(*min_element(all(grid_i.pw_actual)) < -600) {
+                dump(grid_i.pw_actual);
+                gerira = true;
+                dbg(t, "ゲリラ豪雨だ");
+            }
             int large_ev_charge = 15000;
             int large_grid_charge = 30000;
             while(large_ev_charge > 3000) {
-                str->command(grid_i, ev_i, order_i, large_ev_charge, large_grid_charge, 1000);
+                if(totsuhare){
+                    dump(t);
+                }
+                str->command(grid_i, ev_i, order_i,
+                             large_ev_charge, large_grid_charge, 1000,
+                             gerira, totsuhare);
                 command_per_turn = str->dequeue(ev_i);
                 command_list = split_command(command_per_turn);
                 bool ok = false;
@@ -670,21 +749,40 @@ int main(){
 //                    dump(t, command_list);
                     break;
                 }
+//                dump(large_ev_charge, large_grid_charge);
                 large_ev_charge -= 500;
+//                large_grid_charge = max(25000, large_grid_charge-1000);
             }
             cout << command_per_turn << flush;
-            if(t % 100 == 0 || t == prob.T_max-1) {
-                dump(t);
-                dump(ev_i.c);
-                dump(grid_i.x);
-                dump(grid_i.y);
-                dump(grid_i.pw_actual);
-                dump(grid_i.pw_excess);
-            }
-            if(SUM(grid_i.pw_buy)){
-                dump(command_list);
-                dump(t, grid_i.pw_buy);
-            }
+//            dump(t, command_list);
+//            if(t % 100 == 0 || t == prob.T_max-1) {
+//                dump(t);
+//                dump(ev_i.c);
+//                dump(grid_i.x);
+//                dump(grid_i.y);
+//                dump(grid_i.pw_actual);
+//                if(SUM(grid_i.pw_excess)){
+//                    dump(grid_i.pw_excess);
+//                }
+//                if(SUM(grid_i.pw_buy)) {
+//                    dump(grid_i.pw_buy);
+//                }
+//            }
+//            int eSum =SUM(grid_i.pw_excess);
+//            int bSum = SUM(grid_i.pw_buy);
+//            if(eSum > 0 || bSum > 0){
+//                dump(t);
+//                dump(command_list);
+//                dump(grid_i.y);
+//                dump(grid_i.pw_actual);
+//                dump(eSum, bSum);
+//                if(eSum > 0){
+//                    dump(grid_i.pw_excess);
+//                }
+//                if(bSum > 0){
+//                    dump(grid_i.pw_buy);
+//                }
+//            }
         }
         dump(prob.grid.DayType);
         dump(actualSum, excessSum, buySum);

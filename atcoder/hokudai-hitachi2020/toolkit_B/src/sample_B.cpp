@@ -378,7 +378,9 @@ struct strategy :public P {
     vector<list<string>> command_queue;
     strategy(const P& p, const graph_summary& gs) : P(p), gs(gs),
         command_queue(P::EV.N_EV) {}
-    virtual void command(const grid_info& g_i, const EV_info& ev_i, const order_info& order_i) = 0;
+    virtual void command(const grid_info& g_i, const EV_info& ev_i, const order_info& order_i){}
+    virtual void command(const grid_info& g_i, const EV_info& ev_i, const order_info& order_i, int time){}
+    virtual void command(const grid_info& g_i, const EV_info& ev_i, const order_info& order_i, int time, const B &prob){}
     virtual void initialize() {
         for (auto& queue : command_queue) queue.clear();
     }
@@ -408,14 +410,18 @@ struct strategy :public P {
     void enqueue(size_t EV_index, const string& cmd) {
         command_queue[EV_index].push_back(cmd);
     }
+    void enqueue_front(size_t EV_index, const string& cmd) {
+        command_queue[EV_index].push_front(cmd);
+    }
     void enqueue(size_t EV_index, const string& cmd, size_t repeat) {
         for (size_t i = 0; i < repeat; ++i)
             command_queue[EV_index].push_back(cmd);
     }
-    void enqueue(size_t EV_index, list<string>&& cmd_list, bool emergence = false) {
-        if(emergence){
-            command_queue[EV_index].clear();
-        }
+    void enqueue_front(size_t EV_index, const string& cmd, size_t repeat) {
+        for (size_t i = 0; i < repeat; ++i)
+            command_queue[EV_index].push_front(cmd);
+    }
+    void enqueue(size_t EV_index, list<string>&& cmd_list) {
         command_queue[EV_index].splice(command_queue[EV_index].end(), cmd_list);
     }
 };
@@ -524,43 +530,42 @@ struct transport_charge2grid : strategy<B> {
     std::set<size_t> assigned_order;
     transport_charge2grid(const B& b, const graph_summary& gs) :
             strategy<B>(b, gs) {}
-    void initialize() {
+    void initialize() override{
         strategy::initialize();
         assigned_order.clear();
     }
-    void command(const grid_info& grid_i, const EV_info& ev_i, const order_info& order_i) override {
-        /* あるEVに対して、処理を決める
-         * 今実装してあるのはtransportのみ
-         * 全てのgridを見て、やばそうなところがあったらそこに駆けつける処理を追加したい
-         * 駆けつける処理は、push_frontで優先的に入れたい
-         */
-//        const int EmergencePower = 1000;z
-//        vector<bool> used(grid_i.N_grid, false);
-//        for (size_t n = 0; n < ev_i.N_EV; ++n) {
-//            if (!is_free(n)) continue;
-//            const size_t current = ev_i.c[n].u;
-//            for (size_t i = 0; i < grid_i.N_grid; i++) {
-//                if(used[i])continue;
-//                if (grid_i.y[i] < EmergencePower) {
-//                    const size_t pos = grid_i.x[i];
-//                    const size_t len_to_charge = gs.len[current][pos];
-//                    const int expected_energy = ev_i.c[n].charge - len_to_charge * EV.Delta_EV_move;
-//                    const size_t safety_energy = EV.Delta_EV_move * 50;
-//                    if(expected_energy >= 0) {
-////                        enqueue(n, move_EV(current, pos, gs), true);
-////                        enqueue(n, strprintf("charge_to_grid %zu", EV.V_EV_max), ceil(1.0 * (EmergencePower - grid_i.y[i]) / EV.V_EV_max));
-//                        used[i] = true;
-//                        break;
-//                    }
-//                }
-//            }
-//        }
+    void command(const grid_info& grid_i, const EV_info& ev_i, const order_info& order_i, int time, const B &prob) override {
+        vector<bool> added(grid_i.N_grid, false);
         for (size_t n = 0; n < ev_i.N_EV; ++n) {
-            if (!is_free(n)) continue;
             const size_t current = ev_i.c[n].u;
+            const size_t nxt = ev_i.c[n].v;
             const size_t safety_energy = EV.Delta_EV_move * 50;
+            auto [_, pos] = nearest_nanogrid(current, gs);
+            // 動いてる途中で、かつ、
+            int gridnum = -1;
+            for(int i = 0; i < grid_i.N_grid; i++){
+                if(grid_i.x[i] == current){
+                    gridnum = i;
+                    break;
+                }
+            }
+            if(!is_free(n) && current == pos && current == nxt){
+                if(grid_i.y[gridnum] > 10000 && ev_i.c[n].charge < 10000){
+                    // dump("get from grid");
+                    enqueue_front(n, strprintf("charge_from_grid %zu",EV.V_EV_max, 1));
+                }
+                else if(prob.grid.DayType >= 2 && grid_i.pw_buy[gridnum] > 0 && ev_i.c[n].charge > 10000 && not added[gridnum]){
+                    enqueue_front(n, strprintf("charge_to_grid %zu",EV.V_EV_max/4, 1));
+                    added[gridnum] = true;
+                }
+                // else if(grid_i.y[gridnum] < 5000 && ev_i.c[n].charge > 10000){
+                //     dump(n, gridnum, "give to grid");
+                //     enqueue_front(n, strprintf("charge_to_grid %zu",EV.V_EV_max, 1));
+                // }
+            }
+            if (!is_free(n)) continue;
             // 以下、transport
-            if (auto [_, pos] = nearest_nanogrid(current, gs); current != pos) {
+            if (current != pos) {
                 const size_t len_to_charge = gs.len[current][pos];
                 const int expected_energy = ev_i.c[n].charge - len_to_charge * EV.Delta_EV_move;
                 if (expected_energy < 0) {
@@ -582,10 +587,7 @@ struct transport_charge2grid : strategy<B> {
                 if (assigned_order.count(order_i.id[i]) == 0)
                     unassigned_order.insert(i);
 
-
             if (!unassigned_order.empty()) {
-                dump(assigned_order.size());
-                dump(unassigned_order.size());
                 size_t count = 0;
                 std::vector<tuple<size_t, size_t, size_t>> assign_order;
                 while (!unassigned_order.empty() && count++ < EV.N_trans_max) {
@@ -697,17 +699,26 @@ int main(){
             grid_i.load(cin);
             ev_i.load(cin);
             order_i.load(cin);
-            str->command(grid_i, ev_i, order_i);
+            str->command(grid_i, ev_i, order_i, t, prob);
             command_per_turn = str->dequeue(ev_i);
             auto command_list = split_command(command_per_turn);
 //            dump(command_list);
             cout << command_per_turn << flush;
+            if(t % 100 == 0){
+                dump(t);
+                dump(command_list);
+                dump(grid_i.y);  
+                dump(grid_i.pw_actual);
+                dump(grid_i.pw_excess);
+                dump(grid_i.pw_buy);
+            }
         }
         grid_i.load(cin);
         ev_i.load(cin);
         order_i.load(cin);
         double S_trans, S_ele;
         cin >> S_trans >> S_ele;
+        dump(prob.grid.DayType);
         dump(S_trans, S_ele);
     }
     return 0;

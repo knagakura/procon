@@ -1,0 +1,41 @@
+test3:
+actualSum, excessSum, buySum: -393772, 145444, 178788
+2974318.00
+
+actualSum, excessSum, buySum: -393772, 65823, 18061
+3273496.00
+prob.grid.DayType: 3
+actualSum, excessSum, buySum: -393772, 65345, 25325
+3266260.00
+actualSum, excessSum, buySum: -393772, 65345, 24214
+3267371.00
+actualSum, excessSum, buySum: -393772, 79257, 23514
+3255470.00
+actualSum, excessSum, buySum: -393772, 79257, 29980
+3250863.00
+actualSum, excessSum, buySum: -393772, 88542, 84419
+3192389.00
+actualSum, excessSum, buySum: -393772, 45607, 189786
+3148284.00
+actualSum, excessSum, buySum: -393772, 45607, 233967
+3108874.00
+
+
+test0:
+actualSum, excessSum, buySum: -524343, 239973, 241451
+2646031.00
+
+prob.grid.DayType: 2
+actualSum, excessSum, buySum: -694973, 5636, 129447
+2832989.00
+
+test1
+actualSum, excessSum, buySum: -674328, 239352, 349224
+2382394.00
+actualSum, excessSum, buySum: -674328, 216131, 317323
+2438701.00
+actualSum, excessSum, buySum: -674328, 203486, 313340
+2456278.00
+actualSum, excessSum, buySum: -674328, 204201, 312011
+2456531.00
+

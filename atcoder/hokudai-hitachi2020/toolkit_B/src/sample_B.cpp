@@ -558,6 +558,10 @@ struct transport_charge2grid : strategy<B> {
                     enqueue_front(n, strprintf("charge_to_grid %zu",EV.V_EV_max/4, 1));
                     added[gridnum] = true;
                 }
+                else if(prob.grid.DayType == 1 &&grid_i.pw_buy[gridnum] > 0 && ev_i.c[n].charge > 10000 && not added[gridnum]){
+                    enqueue_front(n, strprintf("charge_to_grid %zu",EV.V_EV_max/4, 1));
+                    added[gridnum] = true;
+                }
                 // else if(grid_i.y[gridnum] < 5000 && ev_i.c[n].charge > 10000){
                 //     dump(n, gridnum, "give to grid");
                 //     enqueue_front(n, strprintf("charge_to_grid %zu",EV.V_EV_max, 1));

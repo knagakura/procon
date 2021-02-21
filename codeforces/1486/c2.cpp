@@ -50,48 +50,54 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    ll C;
-    cin >> N >> C;
-    vector<ll> a(N), b(N), c(N);
-    vector<ll> v;
-    rep(i,N){
-        cin >> a[i] >> b[i] >> c[i];
-        v.push_back(a[i]-1);
-        v.push_back(a[i]);
-        v.push_back(a[i]+1);
-        v.push_back(b[i]-1);
-        v.push_back(b[i]);
-        v.push_back(b[i]+1);
+    int  N;
+    cin >> N;
+    // l < r, 1-indexed
+    auto out = [](int l, int r) -> int{
+        // invalid
+        if(l >= r){
+            return -1;
+        }
+        cout << "? " << l << " " << r << endl;
+        int res;
+        cin >> res;
+        return res;
+    };
+    auto ans = [](int x){
+        cout << "! " << x << endl;
+    };
+    int s = out(1, N);
+    // [1, s]を見て、
+    int ns = out(1, s);
+    // 結果が同じなら、[1, s]に最大がある
+    if(s == ns){
+        int ok = 1;
+        int ng = s;
+        while(ng - ok > 1){
+            int mid = (ok + ng) / 2;
+            int i = out(mid, s);
+            if(i == s){
+                ok = mid;
+            }
+            else{
+                ng = mid;
+            }
+        }
+        ans(ok);
     }
-    sort(all(v));
-    v.erase(unique(all(v)), v.end());
-    sort(all(v));
-    dump(v);
-    int M = v.size();
-    map<ll,int> mp;
-    map<int,ll> mpinv;
-    rep(i,M){
-        mp[v[i]] = i;
-        mpinv[i] = v[i];
+    // 結果が異なるなら、[s+1, N]に最大がある
+    else{
+        int ng = s;
+        int ok = N;
+        while(ok - ng > 1){
+            int mid = (ok + ng) / 2;
+            int i = out(s, mid);
+            if(i == s){
+                ok = mid;
+            }else{
+                ng = mid;
+            }
+        }
+        ans(ok);
     }
-    dump(mp);
-    vector<ll> imos(M+5, 0);
-    rep(i,N){
-        imos[mp[a[i]]] += c[i];
-        imos[mp[b[i]]+1] -= c[i];
-    }
-    rep(i,M+4){
-        imos[i+1] += imos[i];
-    }
-    dump(imos);
-    ll ans = 0;
-    rep(i,M-1){
-        ll len = v[i+1] - v[i];
-        ll aa = min(C, imos[i]);
-        dump(aa, len);
-        ans += aa * len;
-    }
-    cout << ans << endl;
 }
-

@@ -49,49 +49,34 @@ const string dir = "DRUL";
 */
 
 
+int a[555][555];
+int b[555][555];
 int main() {
-    int N;
-    ll C;
-    cin >> N >> C;
-    vector<ll> a(N), b(N), c(N);
-    vector<ll> v;
-    rep(i,N){
-        cin >> a[i] >> b[i] >> c[i];
-        v.push_back(a[i]-1);
-        v.push_back(a[i]);
-        v.push_back(a[i]+1);
-        v.push_back(b[i]-1);
-        v.push_back(b[i]);
-        v.push_back(b[i]+1);
+    int h, w;
+    cin >> h >> w;
+    rep(i,h)rep(j,w){
+        cin >> a[i][j];
     }
-    sort(all(v));
-    v.erase(unique(all(v)), v.end());
-    sort(all(v));
-    dump(v);
-    int M = v.size();
-    map<ll,int> mp;
-    map<int,ll> mpinv;
-    rep(i,M){
-        mp[v[i]] = i;
-        mpinv[i] = v[i];
+    ll LCM = a[0][0];
+    rep(i,h)rep(j,w){
+        LCM = lcm(LCM, a[i][j]);
     }
-    dump(mp);
-    vector<ll> imos(M+5, 0);
-    rep(i,N){
-        imos[mp[a[i]]] += c[i];
-        imos[mp[b[i]]+1] -= c[i];
+    dump(LCM);
+    rep(i,h)rep(j,w){
+        b[i][j] = LCM;
     }
-    rep(i,M+4){
-        imos[i+1] += imos[i];
+    rep(i,h)rep(j,w){
+        if((i + j)%2 == 0){
+            b[i][j] += a[i][j] * a[i][j] * a[i][j] * a[i][j];
+        }
     }
-    dump(imos);
-    ll ans = 0;
-    rep(i,M-1){
-        ll len = v[i+1] - v[i];
-        ll aa = min(C, imos[i]);
-        dump(aa, len);
-        ans += aa * len;
+    rep(i,h)rep(j,w){
+        cout << b[i][j];
+        if(j == w-1){
+            cout << endl;
+        }else{
+            cout << " ";
+        }
     }
-    cout << ans << endl;
+    cout << endl;
 }
-

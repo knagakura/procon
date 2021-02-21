@@ -20,7 +20,6 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
 template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]"; return os; };
 template <typename T> ostream &operator<<(ostream &os, set<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
-template <typename T> ostream &operator<<(ostream &os, multiset<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
 template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
 template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
 
@@ -29,7 +28,7 @@ void dump_func(){ DUMPOUT << endl; }
 template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail) { DUMPOUT << head; if (sizeof...(Tail) > 0) { DUMPOUT << ", "; } dump_func(std::move(tail)...); }
 
 #ifdef DEBUG
-#define dbg(...) { dump_func(__VA_ARGS__) }
+#define dbg(...) dump_func(__VA_ARGS__)
 #define dump(...) DUMPOUT << string(#__VA_ARGS__) << ": "; dump_func(__VA_ARGS__)
 #else
 #define dbg(...)
@@ -47,51 +46,29 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
-
-
-int main() {
-    int N;
-    ll C;
-    cin >> N >> C;
-    vector<ll> a(N), b(N), c(N);
-    vector<ll> v;
-    rep(i,N){
-        cin >> a[i] >> b[i] >> c[i];
-        v.push_back(a[i]-1);
-        v.push_back(a[i]);
-        v.push_back(a[i]+1);
-        v.push_back(b[i]-1);
-        v.push_back(b[i]);
-        v.push_back(b[i]+1);
+void solve(){
+    int N, K;
+    cin >> N >> K;
+    vector<ll> p(N);
+    rep(i,N)cin >> p[i];
+    ll ng = -1;
+    ll ok = INF * 1e7;
+    while(ok - ng > 1){
+        ll mid = (ok + ng) / 2;
+        ll summ = mid;
+        bool flag = true;
+        rep(i,N-1){
+            summ += p[i];
+            if(100 * p[i+1] - K*summ > 0){
+                flag = false;
+            }
+        }
+        (flag ? ok : ng) = mid;
     }
-    sort(all(v));
-    v.erase(unique(all(v)), v.end());
-    sort(all(v));
-    dump(v);
-    int M = v.size();
-    map<ll,int> mp;
-    map<int,ll> mpinv;
-    rep(i,M){
-        mp[v[i]] = i;
-        mpinv[i] = v[i];
-    }
-    dump(mp);
-    vector<ll> imos(M+5, 0);
-    rep(i,N){
-        imos[mp[a[i]]] += c[i];
-        imos[mp[b[i]]+1] -= c[i];
-    }
-    rep(i,M+4){
-        imos[i+1] += imos[i];
-    }
-    dump(imos);
-    ll ans = 0;
-    rep(i,M-1){
-        ll len = v[i+1] - v[i];
-        ll aa = min(C, imos[i]);
-        dump(aa, len);
-        ans += aa * len;
-    }
-    cout << ans << endl;
+    cout << ok << endl;
 }
-
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
+}

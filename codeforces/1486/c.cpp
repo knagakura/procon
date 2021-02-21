@@ -36,7 +36,7 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #define dump(...)
 #endif
 
-const int INF = (ll)1e9;
+const int INF = (ll)1e8;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = 1000000007;
 // const ll MOD = 998244353;
@@ -49,49 +49,61 @@ const string dir = "DRUL";
 */
 
 
+// [l, r]
+ll outQ(int l, int r){
+    l++;
+    // assert(l < r);
+    if(l == r)return l-1+INF;
+    cout << "?" << " " << l << " " << r << endl;
+    ll res;
+    cin >> res;
+    return --res;
+}
+int dfs(int l, int r, int idx){
+    if(idx >= INF){
+        return idx - INF;
+    }
+    dump(l, r, idx);
+    if(l+2 == r){
+        return l + r-1 - idx;
+    }
+    int mid = (l + r) / 2;
+    if(l <= idx && idx < mid){
+        int lidx = outQ(l, mid);
+        if(lidx >= INF){
+            return lidx - INF;
+        }
+        if(lidx == idx){
+            return dfs(l, mid, lidx);
+        }else{
+            int ridx = outQ(mid, r);
+            return dfs(mid, r, idx);
+        }
+    }else{
+        int ridx = outQ(mid, r);
+        if(ridx >= INF){
+            return ridx - INF;
+        }
+        if(ridx == idx){
+            return dfs(mid, r, ridx);
+        }
+        else{
+            int lidx = outQ(l, mid);
+            return dfs(l, mid, lidx);
+        }
+    }
+}
 int main() {
     int N;
-    ll C;
-    cin >> N >> C;
-    vector<ll> a(N), b(N), c(N);
-    vector<ll> v;
-    rep(i,N){
-        cin >> a[i] >> b[i] >> c[i];
-        v.push_back(a[i]-1);
-        v.push_back(a[i]);
-        v.push_back(a[i]+1);
-        v.push_back(b[i]-1);
-        v.push_back(b[i]);
-        v.push_back(b[i]+1);
+    cin >> N;
+    if(N == 2){
+        int se;
+        cout << "? 1 2" << endl;
+        cin >> se;
+        cout << "! " << 1+2-se << endl;
+        return 0;
     }
-    sort(all(v));
-    v.erase(unique(all(v)), v.end());
-    sort(all(v));
-    dump(v);
-    int M = v.size();
-    map<ll,int> mp;
-    map<int,ll> mpinv;
-    rep(i,M){
-        mp[v[i]] = i;
-        mpinv[i] = v[i];
-    }
-    dump(mp);
-    vector<ll> imos(M+5, 0);
-    rep(i,N){
-        imos[mp[a[i]]] += c[i];
-        imos[mp[b[i]]+1] -= c[i];
-    }
-    rep(i,M+4){
-        imos[i+1] += imos[i];
-    }
-    dump(imos);
-    ll ans = 0;
-    rep(i,M-1){
-        ll len = v[i+1] - v[i];
-        ll aa = min(C, imos[i]);
-        dump(aa, len);
-        ans += aa * len;
-    }
-    cout << ans << endl;
+    int idx = outQ(0, N);
+    int ans = dfs(0, N, idx) + 1;
+    cout << "! " << ans << endl;
 }
-

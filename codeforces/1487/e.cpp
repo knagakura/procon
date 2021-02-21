@@ -48,50 +48,91 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+template<class T> class Dijkstra {
+public:
+    int N;
+    T inf;
+    vector<T> cost;
+    vector<vector<pair<T, int>>> edge;
+ 
+    Dijkstra(const int N, T inf) : N(N), inf(inf),cost(N), edge(N) {
+    }
+ 
+    void make_edge(int from, int to, T w) {
+        edge[from].push_back({ w,to });
+    }
+ 
+    void solve(int start) {
+        for(int i = 0; i < N; ++i) cost[i] = inf;
+ 
+        priority_queue<pair<T, int>, vector<pair<T, int>>, greater<pair<T, int>>> pq;
+        cost[start] = 0;
+        pq.push({ 0,start });
+ 
+        while (!pq.empty()) {
+            T v = pq.top().first;
+            int from = pq.top().second;
+            pq.pop();
+            for (auto u : edge[from]) {
+                T w = v + u.first;
+                int to = u.second;
+                if (w < cost[to]) {
+                    cost[to] = w;
+                    pq.push({ w,to });
+                }
+            }
+        }
+        return;
+    }
+};
+
+/*
+使い方
+1. まずインスタンス生成
+重みの型、頂点の数、距離の無限大のINFLL
+Dijkstra<ll> d(N, INFLL);
+
+2. 辺を貼る
+iからjに重みwの辺を貼る場合
+d.make_edge(i,j,w);
+
+3. 頂点sから解く
+d.solve(s);
+
+4. sからgの距離
+d.cost[g]
+
+GigaCode2019 E - 車の乗り継ぎ
+https://atcoder.jp/contests/gigacode-2019/submissions/8651446
+
+*/
 
 int main() {
-    int N;
-    ll C;
-    cin >> N >> C;
-    vector<ll> a(N), b(N), c(N);
-    vector<ll> v;
-    rep(i,N){
-        cin >> a[i] >> b[i] >> c[i];
-        v.push_back(a[i]-1);
-        v.push_back(a[i]);
-        v.push_back(a[i]+1);
-        v.push_back(b[i]-1);
-        v.push_back(b[i]);
-        v.push_back(b[i]+1);
+    int n[4], m[3];
+    rep(i,4){
+        cin >> n[i];
     }
-    sort(all(v));
-    v.erase(unique(all(v)), v.end());
-    sort(all(v));
-    dump(v);
-    int M = v.size();
-    map<ll,int> mp;
-    map<int,ll> mpinv;
-    rep(i,M){
-        mp[v[i]] = i;
-        mpinv[i] = v[i];
+    vector<vector<ll>> a(4);
+    rep(i,4){
+        a[i].resize(n[i]);
+        cin >> a[i];
     }
-    dump(mp);
-    vector<ll> imos(M+5, 0);
-    rep(i,N){
-        imos[mp[a[i]]] += c[i];
-        imos[mp[b[i]]+1] -= c[i];
+    auto f = [&](int i, int j) -> int{
+        int summ = 0;
+        rep(k, i){
+            summ += n[k];
+        }
+        return summ + j;
+    };
+    Dijkstra<ll> G(n[0]+n[1]+n[2]+n[3]+4, INFLL);
+    rep(i,3){
+        cin >> m[i];
+        rep(j, m[i]){
+            int u, v;
+            cin >> u >> v;
+            u--, v--;
+            G.make_edge(f(i, u), f(i+1, v), INFLL);
+            // vmp[i][{u, v}]++;
+        }
     }
-    rep(i,M+4){
-        imos[i+1] += imos[i];
-    }
-    dump(imos);
-    ll ans = 0;
-    rep(i,M-1){
-        ll len = v[i+1] - v[i];
-        ll aa = min(C, imos[i]);
-        dump(aa, len);
-        ans += aa * len;
-    }
-    cout << ans << endl;
 }
-

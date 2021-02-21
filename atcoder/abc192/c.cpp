@@ -50,48 +50,28 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    ll C;
-    cin >> N >> C;
-    vector<ll> a(N), b(N), c(N);
-    vector<ll> v;
-    rep(i,N){
-        cin >> a[i] >> b[i] >> c[i];
-        v.push_back(a[i]-1);
-        v.push_back(a[i]);
-        v.push_back(a[i]+1);
-        v.push_back(b[i]-1);
-        v.push_back(b[i]);
-        v.push_back(b[i]+1);
+    ll N;
+    int K;
+    cin >> N >> K;
+    auto g1 = [&](ll x){
+        auto s = to_string(x);
+        sort(all(s));
+        x = stoll(s);
+        return x;
+    };
+    auto g2 = [&](ll x){
+        auto s = to_string(x);
+        sort(all(s), greater<>());
+        x = stoll(s);
+        return x;
+    };
+    auto f = [&](ll x){
+        return g2(x) - g1(x);
+    };
+    vector<ll> a(K+1);
+    a[0] = N;
+    rep(i,K){
+        a[i+1] = f(a[i]);
     }
-    sort(all(v));
-    v.erase(unique(all(v)), v.end());
-    sort(all(v));
-    dump(v);
-    int M = v.size();
-    map<ll,int> mp;
-    map<int,ll> mpinv;
-    rep(i,M){
-        mp[v[i]] = i;
-        mpinv[i] = v[i];
-    }
-    dump(mp);
-    vector<ll> imos(M+5, 0);
-    rep(i,N){
-        imos[mp[a[i]]] += c[i];
-        imos[mp[b[i]]+1] -= c[i];
-    }
-    rep(i,M+4){
-        imos[i+1] += imos[i];
-    }
-    dump(imos);
-    ll ans = 0;
-    rep(i,M-1){
-        ll len = v[i+1] - v[i];
-        ll aa = min(C, imos[i]);
-        dump(aa, len);
-        ans += aa * len;
-    }
-    cout << ans << endl;
+    cout << a[K] << endl;
 }
-

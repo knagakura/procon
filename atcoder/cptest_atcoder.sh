@@ -17,7 +17,7 @@ fext="${filename##*.}"
 
 if [ ${fext} = "cpp" ] ; then
     echo g ./${filename}
-    g++-9 -O2 -std=gnu++17 -Wall -Wextra -DDEBUG ./${filename}
+    g++-11 -O2 -std=gnu++17 -Wall -Wextra -DDEBUG ./${filename}
     oj t -d ${sample_dir} -i
 elif [ ${fext} = "py" ] ; then
     echo python3 ${filename}

@@ -116,31 +116,34 @@ long long CYCLES_PER_SEC = 2800000000;
 struct MyTimer {
     long long start;
     MyTimer() { reset(); }
- 
-    void reset() { start = getCycle(); }
-        inline double get() { return (double) (getCycle() - start) / CYCLES_PER_SEC; }
- 
-        inline long long getCycle() {
-            unsigned low, high;
-            __asm__ volatile ("rdtsc" : "=a" (low), "=d" (high));
-            return ((long long) low) | ((long long) high << 32);
-    }
-}aMyTimer;
 
-ll dp[777][777];
-pair<int, int> pdp[777][777];
+    void reset() { start = getCycle(); }
+    inline double get() {
+        return (double)(getCycle() - start) / CYCLES_PER_SEC;
+    }
+
+    inline long long getCycle() {
+        unsigned low, high;
+        __asm__ volatile("rdtsc" : "=a"(low), "=d"(high));
+        return ((long long)low) | ((long long)high << 32);
+    }
+} aMyTimer;
+
+ll dp[5000][5000];
+pair<int, int> pdp[5000][5000];
 
 class MSA {
   public:
-    pair<string, string> getPairwiseAlignment(const string &S, const string &T) {
+    pair<vector<int>, vector<int>> getPairwiseAlignment(const vector<int> &S,
+                                              const vector<int> &T) {
         return _getPairwiseAlignment(S, T, true);
     }
-    
+
     /*
-    * '-'を含む最長の文字列Lに対して、L側はスキップすることを許さない方法でアラインメントを求める
-    *
-    */
-    string getPairwiseAlignmentCannotSkip(const string &L, const string &S) {
+     * '-'を含む最長の文字列Lに対して、L側はスキップすることを許さない方法でアラインメントを求める
+     *
+     */
+    vector<int> getPairwiseAlignmentCannotSkip(const vector<int> &L, const vector<int> &S) {
         auto [l, res] = _getPairwiseAlignment(L, S, false);
         dump(l.size(), L.size());
         assert(l.size() == L.size());
@@ -148,7 +151,8 @@ class MSA {
     }
 
   private:
-    pair<string, string> _getPairwiseAlignment(const string &S, const string &T, bool canSkip) {
+    pair<vector<int>, vector<int>> _getPairwiseAlignment(const vector<int> &S, const vector<int> &T,
+                                               bool canSkip) {
         int N = S.size();
         int M = T.size();
         rep(i, N + 1) rep(j, M + 1) {
@@ -166,7 +170,8 @@ class MSA {
                     pdp[i][j + 1] = {i, j};
                 }
                 if(S[i] == T[j]) {
-                    if(chmax(dp[i + 1][j + 1], dp[i][j] + (canSkip ? 10000: 1))) {
+                    if(chmax(dp[i + 1][j + 1],
+                             dp[i][j] + (canSkip ? 10000 : 1))) {
                         pdp[i + 1][j + 1] = {i, j};
                     }
                 } else {
@@ -177,8 +182,8 @@ class MSA {
             }
         }
         // 復元
-        string ans1;
-        string ans2;
+        vector<int> ans1;
+        vector<int> ans2;
         int x = N;
         int y = M;
         while(true) {
@@ -188,16 +193,13 @@ class MSA {
             if(x - 1 == px && y - 1 == py) {
                 ans1.push_back(S[x - 1]);
                 ans2.push_back(T[y - 1]);
-            }
-            else if(x == px && y - 1 == py) {
-                ans1.push_back('-');
+            } else if(x == px && y - 1 == py) {
+                ans1.push_back(4);
                 ans2.push_back(T[y - 1]);
-            }
-            else if(x - 1 == px && y == py) {
+            } else if(x - 1 == px && y == py) {
                 ans1.push_back(S[x - 1]);
-                ans2.push_back('-');
-            }
-            else {
+                ans2.push_back(4);
+            } else {
                 assert(false);
             }
             x = px, y = py;
@@ -207,36 +209,73 @@ class MSA {
         assert(ans1.size() == ans2.size());
         return {ans1, ans2};
     }
-}aMSA;
+} aMSA;
+
+vector<int> convert2Vec(const string &S) {
+    vector<int> v;
+    for(auto &c : S) {
+        if(c == 'A') {
+            v.push_back(0);
+        } else if(c == 'T') {
+            v.push_back(1);
+        } else if(c == 'G') {
+            v.push_back(2);
+        } else if(c == 'C') {
+            v.push_back(3);
+        } else if(c == '-') {
+            v.push_back(4);
+        } else {
+            assert(false);
+        }
+    }
+    return v;
+}
+
+const string genome = "ATGC-";
+string convert2String(const vector<int> &v) {
+    string S;
+    for(auto &val : v) {
+        S.push_back(genome[val]);
+    }
+    return S;
+}
 
 int main() {
     int M;
     cin >> M;
     vector<string> S(M);
     vector<int> sz(M);
-    vector<pair<int, pair<int, string>>> szS;
+    vector<pair<int, pair<int, vector<int>>>> szS;
     rep(i, M) {
         cin >> S[i];
         sz[i] = S[i].size();
-        szS.push_back({sz[i], {i, S[i]}});
+        szS.push_back({sz[i], {i, convert2Vec(S[i])}});
     }
     sort(all(szS));
     int N = szS.back().first;
 
-
-    aMyTimer.reset();
-    vector<string> ans(M);
-    auto [sIdx, s] = szS[M-1].second;
-    auto [tIdx, t] = szS[M-2].second;
-    auto [a, b] = aMSA.getPairwiseAlignment(s, t);
-    ans[sIdx] = a;
-    ans[tIdx] = b;
-    rep(i,M-2){
-        auto [idx, str] = szS[i].second;
-        ans[idx] = aMSA.getPairwiseAlignmentCannotSkip(a, str);
-        dump(i, aMyTimer.get());
+    // aMyTimer.reset();
+    vector<vector<int>> ans(M);
+    vector<int> gen = szS[M-1].second.second;
+    while(aMyTimer.get() < TL) {
+        rep(i, M) {
+            auto [idx, str] = szS[i].second;
+            auto [l, r] = aMSA.getPairwiseAlignment(gen, str);
+            ans[idx] = r;
+            if(gen.size() < l.size()){
+                dump("swap");
+                swap(gen, l);
+            }
+            if(gen != l){
+                dump(i, aMyTimer.get());
+            }
+        }
     }
-    for(auto& _ans: ans){
-        cout << _ans << endl;
+    rep(i, M) {
+        auto [idx, str] = szS[i].second;
+        ans[idx] = aMSA.getPairwiseAlignmentCannotSkip(gen, str);
+    }
+    for(vector<int> &_ans : ans) {
+        cout << convert2String(_ans) << endl;
     }
 }

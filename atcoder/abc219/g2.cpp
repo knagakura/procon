@@ -36,7 +36,7 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #define dump(...)
 #endif
 
-const int INF = (ll)1e7;
+const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = 1000000007;
 // const ll MOD = 998244353;
@@ -48,31 +48,41 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-int dp[333][333][333];
 int main() {
-    int N;
-    cin >> N;
-    int X, Y;
-    cin >> X >> Y;
-    vector<int> A(N), B(N);
+    int N, M, Q;
+    cin >> N >> M >> Q;
+    vector<int> v;
     rep(i,N){
-        cin >> A[i] >> B[i];
+        v.push_back(i+1);
     }
-    rep(i,N+1)rep(j,X+1)rep(k,Y+1){
-        dp[i][j][k] = INF;
+    vector<set<int>> G(N);
+    G.resize(N);
+    rep(i,M){
+        int u, v;
+        cin >> u >> v;
+        u--, v--;
+        G[u].insert(v);
+        G[v].insert(u);
     }
-    dp[0][0][0] = 0;
-    rep(i,N){
-        rep(x, X+1){
-            rep(y,Y+1){
-                chmin(dp[i+1][x][y], dp[i][x][y]);
-                chmin(dp[i+1][min(X, x+A[i])][min(Y, y+B[i])], dp[i][x][y]+1);
-            }
+    vector<int> x(Q);
+    rep(q,Q){
+        cin >> x[q];
+        x[q]--;
+    }
+    vector<pair<int, int>> edges;
+    for(int q = Q-1; q >= 0; q--){
+        for(int nxt: G[x[q]]){
+            edges.emplace_back(x[q], nxt);
         }
+        G[x[q]].clear();
     }
-    if(dp[N][X][Y] == INF){
-        cout << -1 << endl;
-        return 0;
+    reverse(all(edges));
+    dump(edges);
+    for(auto [i, j]: edges){
+        v[j] = v[i];
     }
-    cout << dp[N][X][Y] << endl;
+    rep(i,N){
+        cout << v[i] << " ";
+    }
+    cout << endl;
 }

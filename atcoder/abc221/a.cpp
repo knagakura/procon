@@ -50,11 +50,11 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
+    ll A, B;
+    cin >> A >> B;
+    ll ans = 1;
+    rep(i, A-B){
+        ans *= bit(5);
     }
+    cout << ans << endl;
 }

@@ -50,11 +50,16 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
+    string S;
+    cin >> S;
+    vector<string> vs;
+    int N = S.size();
+    rep(i,N){
+        string a = S.substr(0, i+1);
+        string b = S.substr(i+1, N);
+        vs.push_back(b+a);
     }
+    sort(all(vs));
+    cout << vs.front() << endl;
+    cout << vs.back() << endl;
 }

@@ -50,11 +50,20 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    string S, T;
+    cin >> S >> T;
+    int sz = S.size();
+    if(S == T){
+        cout << "Yes" << endl;
+        return 0;
+    }
+    rep(i, sz-1){
+        string tmp = S;
+        swap(tmp[i], tmp[i+1]);
+        if(tmp == T){
+            cout << "Yes" << endl;
+            return 0;
         }
     }
+    cout << "No" << endl;
 }

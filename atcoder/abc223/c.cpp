@@ -52,9 +52,35 @@ const string dir = "DRUL";
 int main() {
     int N;
     cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    vector<int> A(N), B(N);
+    vector<double> t(N);
+    rep(i,N){
+        cin >> A[i] >> B[i];
+        t[i] = A[i] / double(B[i]);
+    }
+    int lidx = 0;
+    int ridx = N-1;
+    double lx = 0;
+    double rx = SUM(A);
+    while(lidx < ridx){
+        // 時間が短い方を進める
+        double minn = min(t[lidx], t[ridx]);
+        if(t[lidx] < t[ridx]){
+            t[lidx] -= minn;
+            t[ridx] -= minn;
+            lx += minn * B[lidx];
+            rx -= minn * B[ridx];
+            lidx++;
+        }
+        else {
+            t[lidx] -=  minn;
+            t[ridx] -= minn;
+            lx += minn * B[lidx];
+            rx -= minn * B[ridx];
+            ridx--;
         }
     }
+    dump(lidx, ridx);
+    dump(lx, rx);
+    cout << (lx + rx) / 2 << endl;
 }

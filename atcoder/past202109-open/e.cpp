@@ -50,11 +50,33 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    int N, K;
+    cin >> N >> K;
+    vector<pair<int, int>> pc;
+    vector<int> c(N), p(N);
+    cin >> c >> p;
+    rep(i, N) {
+        pc.emplace_back(p[i], c[i]);
+    }
+    sort(all(pc));
+    dump(pc);
+    ll ans = 0;
+    map<int, int> gettedCol;
+    for(auto [p, c]: pc) {
+        if(gettedCol[c]){
+            continue;
+        }
+        ans += p;
+        gettedCol[c]++;
+        if(gettedCol.size() == K){
+            break;
         }
     }
+
+    if(gettedCol.size() < K) {
+        cout << -1 << endl;
+        return 0;
+    }
+    cout << ans << endl;
+
 }

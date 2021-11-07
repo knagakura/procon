@@ -25,7 +25,7 @@ template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T
 template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]"; return os; }
 
 #define DUMPOUT cerr
-void dump_func(){ DUMPOUT << endl; }
+void dump_func(){ DUMPOUT << '\n'; }
 template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail) { DUMPOUT << head; if (sizeof...(Tail) > 0) { DUMPOUT << ", "; } dump_func(std::move(tail)...); }
 
 #ifdef DEBUG
@@ -36,7 +36,6 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #define dump(...)
 #endif
 
-const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = 1000000007;
 // const ll MOD = 998244353;
@@ -48,13 +47,83 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+template<typename T>
+class BIT{
+  public:
+    int N;
+    vector<T> data;
+    BIT(T _N):N(_N){
+        data.assign(N+1, 0);
+    };
+    
+    // a is 1-indexed
+    void add(int a, T w){
+        for(int x = a; x <= N; x += x & -x)data[x] += w;
+    }
+    // 1-indexed sum of prefix [0, a]
+    T sum(int a){
+        T res = 0;
+        for(int x = a; x > 0; x -= x & -x)res += data[x];
+        return res;
+    }
+    // 1-indexed sum of range [l, r]
+    T sum(int l, int r){return sum(r) - sum(l-1);}
+
+    // 0-indexed add
+    void add0(int a, T w){add(a + 1, w);}
+    // 0-indexed sum
+    T sum0(int a){return sum(a + 1);}
+    // 0-indexed sum of range
+    T sum0(int l, int r){return sum0(r) - sum0(l-1);}
+    // show the value
+    void debug(){dump(data);}
+    // k-th number (k is 1 - indexed)
+    T get(int k){
+        T res = 0;
+        int sz = 1;
+        while(sz < (int)data.size()) sz <<= 1;
+        for(int i = sz / 2; i > 0; i >>= 1){
+            if(res + i <= N && data[res + i] < k){
+                k -= data[res + i];
+                res += i;
+            }
+        }
+        return res + 1;
+    }
+};
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    int N, Q;
+    cin >> N >> Q;
+    vector<int> v, rev;
+    rep(i, 2*N) {
+        v.emplace_back(i+1);
+        rev.emplace_back(i+1);
+    }
+    reverse(all(rev));
+    dump(v);
+    dump(rev);
+
+    BIT<int> T(N);
+    while (Q--){
+        int t, k;
+        cin >> t >> k;
+        t--;
+        k--;
+        if(t){
+            T.add0(k, 1);
+        } else {
+            int idx = abs(N-1-k);
+            if(k >= N) {
+                idx = abs(N-k);
+            }
+            int cnt = T.sum0(idx, N-1);
+            dump(cnt);
+            if(cnt&1){
+                cout << rev[k] << '\n';
+            } else {
+                cout << v[k] << '\n';
+            }
         }
     }
 }

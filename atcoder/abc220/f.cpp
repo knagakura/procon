@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
@@ -48,13 +49,55 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+class Solution {
+public:
+    // TIME COMPLEXITY:- O(N)
+    // SPACE COMPLEXITY:- O(N)
+    ll dfs(int v,int par, const vvec<int> &adj,vector<ll>& subtree){
+        ll curr = 0;
+        for(auto u:adj[v]){
+            if(u!=par){
+                curr+=dfs(u,v,adj,subtree);
+                curr+=subtree[u];
+                subtree[v]+=subtree[u];
+            }
+        }
+        return curr;
+    }
+    void dfs(int v,int par,const vvec<int> &adj,vector<ll>& ans,vector<ll>& subtree,ll now){
+        ans[v] = now;
+        for(auto u:adj[v]){
+            if(u!=par)
+                dfs(u,v,adj,ans,subtree,now-subtree[u]+subtree[0]-subtree[u]);
+        }
+    }
+    vector<ll> sumOfDistancesInTree(int n, vector<vector<int>>& edges) {
+        vector<ll> ans(n),subtree(n,1);
+        vvec<int> adj;
+        adj.resize(n);
+        for(auto v:edges){
+            adj[v[0]].push_back(v[1]);
+            adj[v[1]].push_back(v[0]);
+        }
+        ll root_ans = dfs(0,-1,adj,subtree);
+        dfs(0,-1,adj,ans,subtree,root_ans);
+        return ans;
+    }
+};
 
-int main() {
+int main(){
     int N;
     cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
+    vvec<int> edges;
+    rep(i,N-1){
+        int u, v;
+        cin >> u >> v;
+        u--, v--;
+        edges.push_back({u, v});
+    }
+    Solution sol;
+    auto ans = sol.sumOfDistancesInTree(N, edges);
+    for(auto a: ans){
+        cout << a << endl;
     }
 }

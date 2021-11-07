@@ -48,13 +48,106 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+vvec<int> G;
+vec<int> cnt;
+vector<int> visited;
+
+bool dfs(int v, int p){
+    dump(p, v);
+    bool res = false;
+    visited[v]++;
+    for(auto &nv: G[v]){
+        if(visited[nv]){
+            res |= true;
+        }
+        if(res){
+            dump(p, v, nv);
+            break;
+        }
+        res |= dfs(nv, v);
+    }
+    return res;
+}
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    int N, M;
+    cin >> N >> M;
+    G.resize(N);
+    cnt.assign(N, 0);
+    visited.assign(N, 0);
+    map<pair<int, int>, int> mp;
+    rep(i,M){
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        if(mp.count({a, b})){
+            continue;
+        }
+        mp[{a, b}]++;
+        dump(a,b);
+        G[a].push_back(b);
+        cnt[b]++;
+    }
+    dump(G);
+    // bool cycle = false;
+
+    // rep(i,N){
+    //     if(cnt[i] == 0 && G[i].size() > 0 && not visited[i]){
+    //         visited.assign(N, 0);
+    //         cycle |= dfs(i, -1);
+    //     }
+    // }
+
+    // if(cycle){
+    //     cout << -1 << endl;
+    //     return 0;
+    // }
+
+    // stack<int> st;
+    priority_queue<int, vector<int>, greater<int>> st;
+    rep(i,N){
+        if(cnt[i] == 0 && G[i].size() > 0){
+            st.push(i);
+        }
+        else if(cnt[i] == 0){
+            st.push(i);
         }
     }
+
+    // サイクルがあるから無理
+    if(st.empty()){
+        cout <<  -1 << endl;
+        return 0;
+    }
+
+    vector<int> ans;
+    priority_queue<int, vector<int>, greater<int>> pq;
+    while(!st.empty()){
+        int i = st.top();
+        dump(i);
+        st.pop();
+        ans.push_back(i);
+        for(auto &j: G[i]){
+            cnt[j]--;
+            if(cnt[j] == 0){
+                st.push(j);
+            }
+            if(cnt[j] < 0){
+                cout << -1 << endl;
+                return 0;
+            }
+        }
+    }
+    dump(cnt);
+    if(SUM(cnt)){
+        cout << -1 << endl;
+        return 0;
+    }
+    // 
+
+    dump(ans);
+    rep(i,N){
+        cout << ans[i]+1 << " ";
+    }
+    cout << endl;
 }

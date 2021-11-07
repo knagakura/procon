@@ -20,16 +20,15 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
 template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]"; return os; };
 template <typename T> ostream &operator<<(ostream &os, set<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
-template <typename T> ostream &operator<<(ostream &os, multiset<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
 template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
-template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]"; return os; }
+template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
 
 #define DUMPOUT cerr
 void dump_func(){ DUMPOUT << endl; }
 template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail) { DUMPOUT << head; if (sizeof...(Tail) > 0) { DUMPOUT << ", "; } dump_func(std::move(tail)...); }
 
 #ifdef DEBUG
-#define dbg(...) { dump_func(__VA_ARGS__) }
+#define dbg(...) dump_func(__VA_ARGS__)
 #define dump(...) DUMPOUT << string(#__VA_ARGS__) << ": "; dump_func(__VA_ARGS__)
 #else
 #define dbg(...)
@@ -47,14 +46,36 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+void solve(){
+    int N = 3;
+    vector<ll> R(N);
+    cin >> R;
+    sort(all(R));
+    for(int i = 0; i < N; i++){
+        for(int j = i+1; j < N; j++){
+            if((R[j] - R[i]) % 3 == 0){
+                int k = 0 + 1 + 2 - i - j;
+                dump(i, j, k);
+                dump(R[i], R[j], R[k]);
+                ll cnt = (R[j] -  R[i]) / 3;
+                if(R[k] >= cnt){
+                    // ok
 
-
-int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+                    R[i] += 2 * cnt;
+                    R[j] -= cnt;
+                    R[k] -= cnt;
+                    assert(R[i] == R[j]);
+                    ll ans = cnt + R[i];
+                    cout << ans << endl;
+                    return;
+                }
+            }
         }
     }
+    cout << -1 << endl;
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

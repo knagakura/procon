@@ -50,11 +50,11 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
-    }
+    int K;
+    cin >> K;
+    string A, B;
+    cin >> A >> B;
+    ll a = stoll(A, nullptr, K);
+    ll b = stoll(B, nullptr, K);
+    cout << a * b << endl;
 }

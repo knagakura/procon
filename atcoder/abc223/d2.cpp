@@ -50,11 +50,12 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
+    int N, M;
+    vector<int> ans;
+    vector<int> inv;
+    rep(i,N){
+        ans.push_back(i);
+        inv.push_back(i);
     }
+    
 }

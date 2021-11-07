@@ -25,7 +25,7 @@ template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T
 template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]"; return os; }
 
 #define DUMPOUT cerr
-void dump_func(){ DUMPOUT << endl; }
+void dump_func(){ DUMPOUT << '\n'; }
 template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail) { DUMPOUT << head; if (sizeof...(Tail) > 0) { DUMPOUT << ", "; } dump_func(std::move(tail)...); }
 
 #ifdef DEBUG
@@ -36,7 +36,6 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 #define dump(...)
 #endif
 
-const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
 const ll MOD = 1000000007;
 // const ll MOD = 998244353;
@@ -48,13 +47,59 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+#include <atcoder/segtree>
+#include <atcoder/lazysegtree>
+using namespace atcoder;
+using S = long long;
+using F = long long;
 
+const S INF = 8e18;
+
+S op(S a, S b){ return std::max(a, b); }
+S e(){ return 0; }
+S mapping(F f, S x){ return f+x; }
+F composition(F f, F g){ return f+g; }
+F id(){ return 0; }
+
+void dumpSegtree(atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> &seg, int size) {
+#ifdef DEBUG
+    vector<S> t;
+    for (int i = 0; i < seg.size(); i++)
+    {
+        t.emplace_back(seg.prod(i, i+1));
+    }
+    dump(t);
+#endif
+    return;
+}
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    int N, Q;
+    cin >> N >> Q;
+    vector<S> v, rev;
+    rep(i, 2*N) {
+        v.emplace_back(i+1);
+        rev.emplace_back(i+1);
+    }
+    reverse(all(rev));
+    dump(v);
+    dump(rev);
+    atcoder::lazy_segtree<S, op, e, F, mapping, composition, id> seg(2*N);
+    while (Q--){
+        int t, k;
+        cin >> t >> k;
+        t--;
+        if(t){ 
+            seg.apply(N-k, N+k, 1);
+            dumpSegtree(seg, 2 * N);
+        } else {
+            k--;
+            int cnt = seg.prod(k, k+1);
+            dump(cnt);
+            if(cnt&1){
+                cout << rev[k] << '\n';
+            } else {
+                cout << v[k] << '\n';
+            }
         }
     }
 }

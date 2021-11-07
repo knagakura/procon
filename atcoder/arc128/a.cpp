@@ -112,81 +112,48 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
+
 int main() {
-    int N = 9;
-    vvec<int> G(N);
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    cin >> A;
+    A.push_back(INFLL);
+    vector<int> ans(N);
 
-    int M;
-    cin >> M;
-    rep(i, M) {
-        int u, v;
-        cin >> u >> v;
-        u--, v--;
-        G[u].push_back(v);
-        G[v].push_back(u);
-    }
-    vector<int> p(N - 1);
-    vector<int> p_goal(N - 1);
-    rep(i, N - 1) { p_goal[i] = i; }
-    rep(j, N - 1) {
-        cin >> p[j];
-        p[j]--;
-    }
-    dump(p);
-    dump(p_goal);
-    map<vector<int>, int> visited;
-    queue<pair<vector<int>, int>> q;
-    q.push({p, 0});
-    visited[p] = 1;
+    // 単調増加である限り、最大値を更新する
+    // 減少したら、最大値の場所で交換と、いま交換する
+    ll maxIdx = 0;
+    ll maxx = A[0];
+    bool done = false;
+    rep1(i,N){
 
-    dump(G);
-    int ans = INF;
-    while(!q.empty()) {
-        auto [fromState, fromCnt] = q.front();
-        q.pop();
-        bool ok = true;
-        rep(j,N-1){
-            if(fromState[j]!=j){
-                ok = false;
-                break;
-            }
+        if(done){
+            maxx = A[i];
+            maxIdx = i;
+            done = false;
+            continue;
         }
-        if(ok){
-            chmin(ans, fromCnt);
+        if(chmax(maxx, A[i])){
+            // なにもしない
+            maxIdx = i;
         }
-
-        int empty = -1;
-        int emptyCnt = 0;
-        map<int, int> used;
-        rep(j, N - 1) { used[fromState[j]] = 1; }
-        rep(j, N) {
-            if(not used[j]) {
-                empty = j;
-                emptyCnt++;
-            }
-        }
-        assert(empty >= 0);
-        assert(emptyCnt == 1);
-
-        rep(j,N-1) {
-            for(int nxt : G[fromState[j]]) {
-                if(nxt != empty) {
-                    continue;
+        else {
+            while(i < N){
+                if(A[i] < A[i+1]){
+                    break;
                 }
-                vector<int> toState = fromState;
-                //
-                toState[j] = nxt;
-                if(visited[toState]) {
-                    continue;
-                }
-                q.push({toState, fromCnt + 1});
-                visited[toState] = 1;
+                i++;
             }
+            // maxIdxで買って、iで売る
+            ans[maxIdx] = 1;
+            ans[i] = 1;
+
+            // maxIdxの更新などをする
+            done = true;
         }
     }
-    if(ans == INF) {
-        cout << -1 << endl;
-        return 0;
+    rep(i,N){
+        cout << ans[i] << " ";
     }
-    cout << ans << endl;
 }

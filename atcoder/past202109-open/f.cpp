@@ -51,10 +51,41 @@ const string dir = "DRUL";
 
 int main() {
     int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    string S;
+    cin >> N >> S;
+    int cnt = 0;
+    vector<int> v;
+    rep(i, N) {
+        if(S[i] == '0'){
+            cnt++;
+            v.emplace_back(i);
         }
+    }
+    if(cnt == 1){
+        cout << -1 << endl;
+        return 0;
+    }
+    vector<int> ans(N);
+    rep(i, N) {
+        ans[i] = i+1;
+    }
+    int pre = -1;
+    rep(i, N) {
+        if (S[i] == '1')continue;
+        if(pre == -1) {
+            pre = i;
+        }
+        else {
+            swap(ans[pre], ans[i]);
+            pre = -1;
+        }
+    }
+    if(cnt > 3) {
+        swap(ans[v[0]], ans[v.back()]);
+    }
+    rep(i, N) {
+        cout << ans[i];
+        if (i==N-1)cout << endl;
+        else cout << " ";
     }
 }

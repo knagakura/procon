@@ -49,12 +49,83 @@ const string dir = "DRUL";
 */
 
 
-int main() {
+template<class T> class Dijkstra {
+public:
     int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    T inf;
+    vector<T> cost;
+    vector<vector<pair<T, int>>> edge;
+ 
+    Dijkstra(const int N, T inf) : N(N), inf(inf),cost(N), edge(N) {
+    }
+ 
+    void make_edge(int from, int to, T w) {
+        edge[from].push_back({ w,to });
+    }
+ 
+    void solve(int start) {
+        for(int i = 0; i < N; ++i) cost[i] = inf;
+ 
+        priority_queue<pair<T, int>, vector<pair<T, int>>, greater<pair<T, int>>> pq;
+        cost[start] = 0;
+        pq.push({ 0,start });
+ 
+        while (!pq.empty()) {
+            T v = pq.top().first;
+            int from = pq.top().second;
+            pq.pop();
+            for (auto u : edge[from]) {
+                T w = v + u.first;
+                int to = u.second;
+                if (w < cost[to]) {
+                    cost[to] = w;
+                    pq.push({ w,to });
+                }
+            }
+        }
+        return;
+    }
+};
+
+/*
+使い方
+1. まずインスタンス生成
+重みの型、頂点の数、距離の無限大のINFLL
+Dijkstra<ll> d(N, INFLL);
+
+2. 辺を貼る
+iからjに重みwの辺を貼る場合
+d.make_edge(i,j,w);
+
+3. 頂点sから解く
+d.solve(s);
+
+4. sからgの距離
+d.cost[g]
+
+GigaCode2019 E - 車の乗り継ぎ
+https://atcoder.jp/contests/gigacode-2019/submissions/8651446
+
+*/
+int main() {
+    int N, X;
+    cin >> N >> X;
+    Dijkstra<ll> G(N, INFLL);
+    rep(i, N-1) {
+        int a, b, c;
+        cin >> a >> b >> c;
+        a--, b--;
+        G.make_edge(a, b, c);
+        G.make_edge(b, a, c);
+    }
+    bool ok = false;
+    rep(i, N) {
+        G.solve(i);
+        rep(i, N) {
+            if(G.cost[i] == X){
+                ok = true;
+            }
         }
     }
+    cout << (ok ? "Yes" : "No") << endl;
 }

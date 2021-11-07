@@ -50,11 +50,11 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
+    int X;
+    cin >> X;
+    if(X%100 == 0 && X > 0){
+        cout << "Yes" << endl;
+    }else{
+        cout << "No" << endl;
     }
 }

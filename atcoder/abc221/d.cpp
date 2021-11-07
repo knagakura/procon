@@ -48,13 +48,69 @@ const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
 
-
+template<typename T>
+struct Compress {
+	vector<T> v;
+	Compress() {}
+	Compress(vector<T> _v) :v(_v) { build(); }
+ 
+	void add(T x) {
+		v.emplace_back(x);
+	}
+ 
+	void build() {
+		sort(v.begin(), v.end());
+		v.erase(unique(v.begin(), v.end()), v.end());
+	}
+	void build(vector<T> _v) {
+		v = _v;
+		sort(v.begin(), v.end());
+		v.erase(unique(v.begin(), v.end()), v.end());
+	}
+	int get(T x) {
+		return lower_bound(v.begin(), v.end(), x) - v.begin();
+	}
+ 
+	T& operator[](int i) { return v[i]; }
+ 
+ 
+	int size() {
+		return (int)v.size();
+	}
+};
 int main() {
     int N;
     cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
+    vector<ll> A(N), B(N);
+    vector<ll> l(N), r(N);
+    Compress<ll> C;
+    rep(i,N){
+        cin >> A[i] >> B[i];
+        l[i] = A[i];
+        r[i] = A[i] + B[i];
+        C.add(l[i]);
+        C.add(r[i]);
     }
+    C.build();
+    int sz = C.size();
+    vector<ll> imos(sz+1, 0);
+    rep(i,N){
+        int l_idx = C.get(l[i]);
+        int r_idx = C.get(r[i]);
+        imos[l_idx] += 1;
+        imos[r_idx] -= 1;
+    }
+    rep(i,sz){
+        imos[i+1] += imos[i];
+    }
+    dump(C.v);
+    dump(imos);
+    vector<ll> ans(N+1, 0);
+    rep(i, sz){
+        ans[imos[i]] += C[i+1] - C[i];
+    }
+    rep1(i, N+1){
+        cout << ans[i] << " ";
+    }
+    cout << endl;
 }

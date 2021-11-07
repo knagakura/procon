@@ -50,11 +50,21 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
+    int X, Y;
+    cin >> X >> Y;
+    int x = 0;
+    int y = 0;
+    rep1(i,X+1){
+        x += X%i == 0;
+    }
+    rep1(i,Y+1){
+        y += Y%i == 0;
+    }
+    if(x < y) {
+        cout << "Y" << endl;
+    } else if (x > y) {
+        cout << "X" << endl;
+    } else {
+        cout << "Z" << endl;
     }
 }

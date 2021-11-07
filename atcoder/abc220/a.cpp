@@ -113,80 +113,13 @@ const string dir = "DRUL";
 */
 
 int main() {
-    int N = 9;
-    vvec<int> G(N);
-
-    int M;
-    cin >> M;
-    rep(i, M) {
-        int u, v;
-        cin >> u >> v;
-        u--, v--;
-        G[u].push_back(v);
-        G[v].push_back(u);
-    }
-    vector<int> p(N - 1);
-    vector<int> p_goal(N - 1);
-    rep(i, N - 1) { p_goal[i] = i; }
-    rep(j, N - 1) {
-        cin >> p[j];
-        p[j]--;
-    }
-    dump(p);
-    dump(p_goal);
-    map<vector<int>, int> visited;
-    queue<pair<vector<int>, int>> q;
-    q.push({p, 0});
-    visited[p] = 1;
-
-    dump(G);
-    int ans = INF;
-    while(!q.empty()) {
-        auto [fromState, fromCnt] = q.front();
-        q.pop();
-        bool ok = true;
-        rep(j,N-1){
-            if(fromState[j]!=j){
-                ok = false;
-                break;
-            }
-        }
-        if(ok){
-            chmin(ans, fromCnt);
-        }
-
-        int empty = -1;
-        int emptyCnt = 0;
-        map<int, int> used;
-        rep(j, N - 1) { used[fromState[j]] = 1; }
-        rep(j, N) {
-            if(not used[j]) {
-                empty = j;
-                emptyCnt++;
-            }
-        }
-        assert(empty >= 0);
-        assert(emptyCnt == 1);
-
-        rep(j,N-1) {
-            for(int nxt : G[fromState[j]]) {
-                if(nxt != empty) {
-                    continue;
-                }
-                vector<int> toState = fromState;
-                //
-                toState[j] = nxt;
-                if(visited[toState]) {
-                    continue;
-                }
-                q.push({toState, fromCnt + 1});
-                visited[toState] = 1;
-            }
+    int a, b, c;
+    cin >> a >> b >> c;
+    for(int i = a; i <= b; i++){
+        if(i % c == 0){
+            cout << i << endl;
+            return 0;
         }
     }
-    if(ans == INF) {
-        cout << -1 << endl;
-        return 0;
-    }
-    cout << ans << endl;
+    cout << -1 << endl;
 }

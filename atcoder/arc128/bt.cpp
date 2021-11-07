@@ -20,16 +20,15 @@ template<class T> inline bool chmin(T& a, T b) { if (a > b) { a = b; return true
 template <typename T> istream &operator>>(istream &is, vector<T> &vec) { for (T &x : vec) is >> x; return is; }
 template <typename T> ostream &operator<<(ostream &os, const vector<T> &v) { os  << "["; for(auto _: v) os << _ << ", "; os << "]"; return os; };
 template <typename T> ostream &operator<<(ostream &os, set<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
-template <typename T> ostream &operator<<(ostream &os, multiset<T> &st) { os << "("; for(auto _: st) { os << _ << ", "; } os << ")";return os;}
 template <typename T, typename U> ostream &operator<<(ostream &os, const pair< T, U >& p){os << "{" <<p.first << ", " << p.second << "}";return os; }
-template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]"; return os; }
+template <typename T, typename U> ostream &operator<<(ostream &os, const map<T, U> &mp){ os << "["; for(auto _: mp){ os << _ << ", "; } os << "]" << endl; return os; }
 
 #define DUMPOUT cerr
 void dump_func(){ DUMPOUT << endl; }
 template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail) { DUMPOUT << head; if (sizeof...(Tail) > 0) { DUMPOUT << ", "; } dump_func(std::move(tail)...); }
 
 #ifdef DEBUG
-#define dbg(...) { dump_func(__VA_ARGS__) }
+#define dbg(...) dump_func(__VA_ARGS__)
 #define dump(...) DUMPOUT << string(#__VA_ARGS__) << ": "; dump_func(__VA_ARGS__)
 #else
 #define dbg(...)
@@ -47,14 +46,53 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+void solve(){
+    int N = 3;
+    vector<ll> R(N);
+    cin >> R;
+    sort(all(R));
 
+    auto f = [R](int l, int r, int o) -> ll{
+        dump(l, r, o);
+        assert(l < r);
+        assert(l + r + o == 3);
+        // R[l] = R[r]となるまで操作したときにどうなるか
 
-int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+        // 差が3の倍数でないなら何回操作しても一致しない
+        if(abs(R[l] - R[r]) % 3 != 0){
+            return INFLL;
         }
+        ll cnt = abs(R[l] - R[r]) / 3;
+        vector<ll> tR = R;
+        tR[l] += cnt * 2;
+        tR[r] -= cnt;
+        tR[o] -= cnt;
+        if(tR[l] < 0 || tR[r] < 0 || tR[o] < 0){
+            return INFLL;
+        }
+        assert(tR[l] == tR[r]);
+        assert(tR[o] >= 0);
+
+        ll res = cnt + tR[l];
+        dump(cnt, tR, res);
+        assert(res == R[r]);
+        return res;
+    };
+
+    ll ans = INFLL;
+    rep(j,N)rep(i,j){
+        int k = 3 - i - j;
+        chmin(ans, f(i, j, k));
     }
+    if(ans == INFLL){
+        cout << -1 << endl;
+        return;
+    }
+    cout << ans << endl;
+
+}
+int main(){
+    int t;
+    cin >> t;
+    while(t--)solve();
 }

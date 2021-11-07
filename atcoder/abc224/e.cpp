@@ -50,11 +50,42 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    int H, W, N;
+    cin >> H >> W >> N;
+    vvec<pair<int, pair<int, int>>> R(H), C(W);
+    vector<int> r(N), c(N), a(N);
+    rep(i,N){
+        cin >> r[i] >> c[i] >> a[i];
+        r[i]--, c[i]--;
+        R[r[i]].push_back({a[i], {c[i], i}});
+        C[c[i]].push_back({a[i], {r[i], i}});
+    }
+    rep(i,H){
+        sort(all(R[i]));
+        dump(i, R[i]);
+    }
+    rep(j,W){
+        sort(all(C[j]));
+        dump(j, C[j]);
+    }
+
+    // グラフの構築をする
+    vvec<int> G(N);
+    rep(i, H){
+        int sz = R[i].size();
+        rep(j, sz){
+            auto [a, ci] = R[i][j];
+            auto [c, idx] = ci;
+            int k = j;
+            while(R[i][k].first == a){
+                k++;
+            }
+            if(j < k && k < sz){
+                auto [na, nci] = R[i][k];
+                auto [nc, nidx] = nci;
+                G[idx].push_back(nidx);
+            }
         }
     }
+    dump(G);
 }

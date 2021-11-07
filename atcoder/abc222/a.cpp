@@ -50,11 +50,10 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
+    string N;
     cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
+    while(N.size() < 4){
+        N = "0" + N;
     }
+    cout << N << endl;
 }

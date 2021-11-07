@@ -50,11 +50,34 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    ll N, K;
+    cin >> N >> K;
+    vector<ll> A(N), B(N), C(N);
+    rep(i, N) {
+        cin >> A[i] >> B[i] >> C[i];
+    }
+    //
+    auto check = [&](ll x) {
+        // x未満の値の個数
+        ll cnt = 0;
+        rep(i, N) {
+            ll a = A[i];
+            ll b = B[i];
+            ll c = C[i];
+            cnt += max(0LL, min(a, (x - b + c - 1) / c));
+        }
+        dump(x, cnt);
+        return cnt >= K;
+    };
+    ll ng = 0;
+    ll ok = INFLL;
+    while(ok - ng > 1) {
+        ll mid = (ok + ng) / 2;
+        if(check(mid)){
+            ok = mid;
+        } else {
+            ng = mid;
         }
     }
+    cout << ng << endl;
 }

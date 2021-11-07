@@ -113,80 +113,29 @@ const string dir = "DRUL";
 */
 
 int main() {
-    int N = 9;
-    vvec<int> G(N);
-
-    int M;
-    cin >> M;
-    rep(i, M) {
-        int u, v;
-        cin >> u >> v;
-        u--, v--;
-        G[u].push_back(v);
-        G[v].push_back(u);
-    }
-    vector<int> p(N - 1);
-    vector<int> p_goal(N - 1);
-    rep(i, N - 1) { p_goal[i] = i; }
-    rep(j, N - 1) {
-        cin >> p[j];
-        p[j]--;
-    }
-    dump(p);
-    dump(p_goal);
-    map<vector<int>, int> visited;
-    queue<pair<vector<int>, int>> q;
-    q.push({p, 0});
-    visited[p] = 1;
-
-    dump(G);
-    int ans = INF;
-    while(!q.empty()) {
-        auto [fromState, fromCnt] = q.front();
-        q.pop();
-        bool ok = true;
-        rep(j,N-1){
-            if(fromState[j]!=j){
-                ok = false;
-                break;
+    string N;
+    cin >> N;
+    /*
+    昇順にソート済みのvector（またはstring）を入れると
+    辞書順で次の並びのvectorに置き換えてくれる
+    辞書順最後になったら -1 を返し止まる
+    */
+    int sz = N.size();
+    ll ans = 0;
+    sort(all(N));
+    do {
+        // dump(N);
+        rep1(i, sz) {
+            string s = N.substr(0, i);
+            string t = N.substr(i, sz);
+            if(s[0] == '0' || t[0] == '0'){
+                continue;
             }
+            ll a = stoll(s);
+            ll b = stoll(t);
+            chmax(ans, a * b);
+            // dump(s, t);
         }
-        if(ok){
-            chmin(ans, fromCnt);
-        }
-
-        int empty = -1;
-        int emptyCnt = 0;
-        map<int, int> used;
-        rep(j, N - 1) { used[fromState[j]] = 1; }
-        rep(j, N) {
-            if(not used[j]) {
-                empty = j;
-                emptyCnt++;
-            }
-        }
-        assert(empty >= 0);
-        assert(emptyCnt == 1);
-
-        rep(j,N-1) {
-            for(int nxt : G[fromState[j]]) {
-                if(nxt != empty) {
-                    continue;
-                }
-                vector<int> toState = fromState;
-                //
-                toState[j] = nxt;
-                if(visited[toState]) {
-                    continue;
-                }
-                q.push({toState, fromCnt + 1});
-                visited[toState] = 1;
-            }
-        }
-    }
-    if(ans == INF) {
-        cout << -1 << endl;
-        return 0;
-    }
+    } while(next_permutation(all(N)));
     cout << ans << endl;
 }

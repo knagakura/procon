@@ -50,11 +50,61 @@ const string dir = "DRUL";
 
 
 int main() {
-    int N;
-    cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
-        }
+    int N, M;
+    cin >> N >> M;
+    vector<string> A(2*N);
+    cin >> A;
+    vector<int> v;
+    rep(i,2*N){
+        v.emplace_back(i);
     }
+    vector<pair<int, int>> rank; // {cnt, -i};
+    vector<int> cnts(2*N, 0);
+    rep(i, 2*N){
+        rank.emplace_back(cnts[i], -i);
+    }
+    sort(all(rank));
+    // round j
+    rep(j, M){
+        vector<pair<int, int>> nrank;
+
+        // battle
+        for(int i = 0; i < 2 * N; i += 2){
+            int l = -rank[i].second;
+            int r = -rank[i+1].second;
+            char c = A[l][j];
+            char d = A[r][j];
+            if(c == 'G' && d == 'C'){
+                cnts[l]++;
+            }
+            if(c == 'C' && d == 'P'){
+                cnts[l]++;
+            }
+            if(c == 'P' && d == 'G'){
+                cnts[l]++;
+            }
+
+            if(c == 'C' && d == 'G'){
+                cnts[r]++;
+            }
+            if(c == 'P' && d == 'C'){
+                cnts[r]++;
+            }
+            if(c == 'G' && d == 'P'){
+                cnts[r]++;
+            }
+        }
+        rep(i, 2*N){
+            nrank.emplace_back(cnts[i], -i);
+        }
+        //
+        sort(all(nrank));
+        swap(nrank, rank);
+        dump(rank);
+    }
+    reverse(all(rank));
+    for(auto [cnt, ii]: rank){
+        cout << -(ii) + 1 << endl;
+    }
+
 }

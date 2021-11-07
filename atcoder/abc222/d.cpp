@@ -38,8 +38,8 @@ template <class Head, class... Tail> void dump_func(Head &&head, Tail &&... tail
 
 const int INF = (ll)1e9;
 const ll INFLL = (ll)1e18+1;
-const ll MOD = 1000000007;
-// const ll MOD = 998244353;
+// const ll MOD = 1000000007;
+const ll MOD = 998244353;
 const long double PI = acos(-1.0);
 
 /*
@@ -47,14 +47,87 @@ const int dx[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 const int dy[8] = {0, 1, 0, -1, 1, 1, -1, -1};
 const string dir = "DRUL";
 */
+struct mint {
+    long long x;
+    mint(long long _x=0):x((_x%MOD+MOD)%MOD){}
+    mint operator-() const { return mint(-x);}
+    mint& operator+=(const mint a) {
+        if ((x += a.x) >= MOD) x -= MOD;
+        return *this;
+    }
+    mint& operator-=(const mint a) {
+        if ((x += MOD-a.x) >= MOD) x -= MOD;
+        return *this;
+    }
+    mint& operator*=(const mint a) {
+        (x *= a.x) %= MOD;
+        return *this;
+    }
+    mint operator+(const mint a) const {
+        mint res(*this);
+        return res+=a;
+    }
+    mint operator-(const mint a) const {
+        mint res(*this);
+        return res-=a;
+    }
+    mint operator*(const mint a) const {
+        mint res(*this);
+        return res*=a;
+    }
+    mint modpow(long long t) const {
+        if (!t) return 1;
+        mint a = modpow(t>>1);
+        a *= a;
+        if (t&1) a *= *this;
+        return a;
+    }
+    // for prime MOD
+    mint inv() const {
+        return modpow(MOD-2);
+    }
+    mint& operator/=(const mint a) {
+        return (*this) *= a.inv();
+    }
+    mint operator/(const mint a) const {
+        mint res(*this);
+        return res/=a;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const mint& a){
+        os << a.x;
+        return os;
+    }
+};
 
+mint dp[3333][3333];
+mint cdp[3333][3333];
 
+/*
+dp[i][j] = i番目までで、jである場合の数
+*/
 int main() {
     int N;
     cin >> N;
-    for(int i = 0; i < N; i++) {
-        for(int i = 0; i < N; i++) {
-            cout << i << endl;
+    vector<int> a(N), b(N);
+    cin >> a >> b;
+    dump(a, b);
+    dp[0][0] = 1;
+    rep(i,N){
+        for(int j = 0; j < 3332; j++){
+            cdp[i][j+1] = cdp[i][j] + dp[i][j];
         }
+        for(int j = a[i]; j <= b[i]; j++){
+            // 累積和 [0, j]
+            dp[i+1][j] += cdp[i][j+1] - cdp[i][0];
+            // for(int k = 0; k <= j; k++){
+            //     dp[i+1][j] += dp[i][k];
+            // }
+        }
+
     }
+    mint ans = 0;
+    for(int j = 0; j <= 3332; j++){
+        ans += dp[N][j];
+    }
+    cout << ans << endl;
 }

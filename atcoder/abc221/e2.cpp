@@ -113,80 +113,30 @@ const string dir = "DRUL";
 */
 
 int main() {
-    int N = 9;
-    vvec<int> G(N);
-
-    int M;
-    cin >> M;
-    rep(i, M) {
-        int u, v;
-        cin >> u >> v;
-        u--, v--;
-        G[u].push_back(v);
-        G[v].push_back(u);
-    }
-    vector<int> p(N - 1);
-    vector<int> p_goal(N - 1);
-    rep(i, N - 1) { p_goal[i] = i; }
-    rep(j, N - 1) {
-        cin >> p[j];
-        p[j]--;
-    }
-    dump(p);
-    dump(p_goal);
-    map<vector<int>, int> visited;
-    queue<pair<vector<int>, int>> q;
-    q.push({p, 0});
-    visited[p] = 1;
-
-    dump(G);
-    int ans = INF;
-    while(!q.empty()) {
-        auto [fromState, fromCnt] = q.front();
-        q.pop();
-        bool ok = true;
-        rep(j,N-1){
-            if(fromState[j]!=j){
-                ok = false;
-                break;
-            }
-        }
-        if(ok){
-            chmin(ans, fromCnt);
-        }
-
-        int empty = -1;
-        int emptyCnt = 0;
-        map<int, int> used;
-        rep(j, N - 1) { used[fromState[j]] = 1; }
+    int N;
+    cin >> N;
+    vector<ll> A(N);
+    rep(i, N) cin >> A[i];
+    ll ans = 0;
+    for(int i = 0; i < bit(N); i++) {
+        vector<ll> t;
         rep(j, N) {
-            if(not used[j]) {
-                empty = j;
-                emptyCnt++;
+            if(bit(j) & i) {
+                t.push_back(A[j]);
             }
         }
-        assert(empty >= 0);
-        assert(emptyCnt == 1);
-
-        rep(j,N-1) {
-            for(int nxt : G[fromState[j]]) {
-                if(nxt != empty) {
-                    continue;
-                }
-                vector<int> toState = fromState;
-                //
-                toState[j] = nxt;
-                if(visited[toState]) {
-                    continue;
-                }
-                q.push({toState, fromCnt + 1});
-                visited[toState] = 1;
-            }
+        if(t.size() < 2) {
+            continue;
         }
-    }
-    if(ans == INF) {
-        cout << -1 << endl;
-        return 0;
+        int sz = t.size();
+        bool ok = true;
+        if(t.back() < t[0]) {
+            ok = false;
+        }
+        if(ok) {
+            ans++;
+            dump(t);
+        }
     }
     cout << ans << endl;
 }
